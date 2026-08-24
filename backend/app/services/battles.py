@@ -293,6 +293,15 @@ async def on_session_verified(profile: dict, session: dict, verification: dict,
     await maybe_resolve(battle_id)
 
 
+async def _claim(battle_id: str, final_state: str) -> bool:
+    """Move a battle out of play exactly once. True only for the caller that won."""
+    cur = await db.get().execute(
+        "UPDATE battles SET state = ?, updated_at = ? WHERE id = ? AND state IN ('active','resolving')",
+        (final_state, now_iso(), battle_id))
+    await db.get().commit()
+    return cur.rowcount > 0
+
+
 async def maybe_resolve(battle_id: str) -> None:
     from . import demo_multiplayer
     b = await battle_row(battle_id)
@@ -301,9 +310,7 @@ async def maybe_resolve(battle_id: str) -> None:
     players = await _players(battle_id)
     active = [p for p in players if p["left_at"] is None]
     if not active:
-        await db.get().execute("UPDATE battles SET state = 'canceled', updated_at = ? WHERE id = ?",
-                               (now_iso(), battle_id))
-        await db.get().commit()
+        await _claim(battle_id, "canceled")
         return
     if any(p["power"] is None for p in active):
         return  # someone is still being verified
@@ -318,12 +325,17 @@ async def maybe_resolve(battle_id: str) -> None:
         else:
             placements[p["profile_id"]] = place
         place = i + 2
+    # Claim the battle before doing anything observable. maybe_resolve is called
+    # from the auto-finish timer, from leave_battle, and from every player's
+    # verification callback, so without an atomic claim two of them can both
+    # complete the same battle — double placements, double rewards, two
+    # battle.completed events.
+    if not await _claim(battle_id, "completed"):
+        return
     for p in ranked:
         await db.get().execute(
             "UPDATE battle_players SET placement = ? WHERE battle_id = ? AND profile_id = ?",
             (placements[p["profile_id"]], battle_id, p["profile_id"]))
-    await db.get().execute("UPDATE battles SET state = 'completed', updated_at = ? WHERE id = ?",
-                           (now_iso(), battle_id))
     await db.get().commit()
     podium = [{"profile_id": p["profile_id"], "display_name": p["display_name"],
                "power": p["power"], "placement": placements[p["profile_id"]]} for p in ranked]
