@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  Fallback path if you would rather not run setup.gs for Gmail.
+  Import at: Gmail -> Settings -> Filters and Blocked Addresses -> Import filters.
+
+  These queries are STARTING GUESSES at common Duke senders. Rewrite them in week 3
+  from the senders that actually showed up. None of them archive mail: your inbox
+  still shows everything, the labels just give you a filterable stream to scan
+  during the Sunday reset.
+-->
+<feed xmlns='http://www.w3.org/2005/Atom' xmlns:apps='http://schemas.google.com/apps/2006'>
+  <title>College OS — Duke intake filters</title>
+
+  <entry>
+    <category term='filter'></category>
+    <title>Mail Filter</title>
+    <content></content>
+    <apps:property name='hasTheWord' value='from:(sakai.duke.edu OR canvas.duke.edu OR duke.instructure.com)'/>
+    <apps:property name='label' value='Duke/Academic'/>
+    <apps:property name='shouldNeverSpam' value='true'/>
+  </entry>
+
+  <entry>
+    <category term='filter'></category>
+    <title>Mail Filter</title>
+    <content></content>
+    <apps:property name='hasTheWord' value='from:(pratt.duke.edu)'/>
+    <apps:property name='label' value='Duke/Pratt'/>
+    <apps:property name='shouldNeverSpam' value='true'/>
+  </entry>
+
+  <entry>
+    <category term='filter'></category>
+    <title>Mail Filter</title>
+    <content></content>
+    <apps:property name='hasTheWord' value='from:(undergraduateresearch@duke.edu OR ours@duke.edu OR bassconnections@duke.edu)'/>
+    <apps:property name='label' value='Duke/Research'/>
+    <apps:property name='shouldNeverSpam' value='true'/>
+  </entry>
+
+  <entry>
+    <category term='filter'></category>
+    <title>Mail Filter</title>
+    <content></content>
+    <apps:property name='hasTheWord' value='from:(careerhub@duke.edu OR careercenter@duke.edu OR handshake.com)'/>
+    <apps:property name='label' value='Duke/Career'/>
+    <apps:property name='shouldNeverSpam' value='true'/>
+  </entry>
+
+  <entry>
+    <category term='filter'></category>
+    <title>Mail Filter</title>
+    <content></content>
+    <apps:property name='hasTheWord' value='from:(dukegroups.com OR campusgroups.com)'/>
+    <apps:property name='label' value='Duke/Clubs'/>
+    <apps:property name='shouldNeverSpam' value='true'/>
+  </entry>
+
+  <entry>
+    <category term='filter'></category>
+    <title>Mail Filter</title>
+    <content></content>
+    <apps:property name='hasTheWord' value='from:(calendar.duke.edu OR innovate.duke.edu OR entrepreneurship.duke.edu)'/>
+    <apps:property name='label' value='Duke/Opportunities'/>
+    <apps:property name='shouldNeverSpam' value='true'/>
+  </entry>
+
+  <entry>
+    <category term='filter'></category>
+    <title>Mail Filter</title>
+    <content></content>
+    <apps:property name='hasTheWord' value='from:(bursar@duke.edu OR registrar@duke.edu OR housing@duke.edu OR studentaffairs@duke.edu)'/>
+    <apps:property name='label' value='Duke/Administrative'/>
+    <apps:property name='shouldNeverSpam' value='true'/>
+  </entry>
+
+</feed>

@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.db
+*.db-shm
+*.db-wal
+node_modules/
+frontend/dist/
+scratch-server.log
+nohup.out
+.DS_Store

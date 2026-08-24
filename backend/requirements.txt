@@ -1,0 +1,12 @@
+# Pinned so a fresh install matches what the test suite ran against.
+aiosqlite==0.22.1
+cryptography==50.0.0
+fastapi==0.141.1
+httpx==0.28.1
+pydantic==2.13.4
+python-dotenv==1.2.3
+uvicorn[standard]==0.52.4
+
+# Dev / test
+pytest==9.1.1
+pytest-asyncio==1.4.0

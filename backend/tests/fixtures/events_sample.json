@@ -1,0 +1,96 @@
+[
+  {
+    "kind": "calendar#event",
+    "id": "evt_1",
+    "status": "confirmed",
+    "created": "2026-03-01T10:00:00.000Z",
+    "updated": "2026-03-01T10:00:00.000Z",
+    "summary": "1:1 with manager",
+    "description": "",
+    "location": "",
+    "creator": {"email": "self@example.com", "self": true},
+    "organizer": {"email": "self@example.com", "display_name": null},
+    "start": {"date": null, "date_time": "2026-03-02T09:00:00Z", "time_zone": "UTC"},
+    "end": {"date": null, "date_time": "2026-03-02T09:30:00Z", "time_zone": "UTC"},
+    "attendees": [
+      {"email": "self@example.com", "display_name": null, "self": true, "response_status": "accepted", "organizer": null, "optional": null, "resource": null},
+      {"email": "manager@example.com", "display_name": null, "self": null, "response_status": "accepted", "organizer": null, "optional": null, "resource": null}
+    ],
+    "event_type": "default"
+  },
+  {
+    "kind": "calendar#event",
+    "id": "evt_2",
+    "status": "confirmed",
+    "created": "2026-03-01T10:00:00.000Z",
+    "updated": "2026-03-01T10:00:00.000Z",
+    "summary": "Team standup",
+    "description": "",
+    "location": "",
+    "creator": {"email": "self@example.com", "self": true},
+    "organizer": {"email": "self@example.com", "display_name": null},
+    "start": {"date": null, "date_time": "2026-03-02T09:30:00Z", "time_zone": "UTC"},
+    "end": {"date": null, "date_time": "2026-03-02T10:00:00Z", "time_zone": "UTC"},
+    "attendees": [
+      {"email": "self@example.com", "display_name": null, "self": true, "response_status": "accepted", "organizer": null, "optional": null, "resource": null},
+      {"email": "teammate1@example.com", "display_name": null, "self": null, "response_status": "accepted", "organizer": null, "optional": null, "resource": null},
+      {"email": "teammate2@example.com", "display_name": null, "self": null, "response_status": "accepted", "organizer": null, "optional": null, "resource": null}
+    ],
+    "event_type": "default"
+  },
+  {
+    "kind": "calendar#event",
+    "id": "evt_3",
+    "status": "confirmed",
+    "created": "2026-03-01T10:00:00.000Z",
+    "updated": "2026-03-01T10:00:00.000Z",
+    "summary": "Focus block (solo)",
+    "description": "",
+    "location": "",
+    "creator": {"email": "self@example.com", "self": true},
+    "organizer": {"email": "self@example.com", "display_name": null},
+    "start": {"date": null, "date_time": "2026-03-02T22:00:00Z", "time_zone": "UTC"},
+    "end": {"date": null, "date_time": "2026-03-02T23:00:00Z", "time_zone": "UTC"},
+    "attendees": [
+      {"email": "self@example.com", "display_name": null, "self": true, "response_status": "accepted", "organizer": null, "optional": null, "resource": null}
+    ],
+    "event_type": "default"
+  },
+  {
+    "kind": "calendar#event",
+    "id": "evt_4",
+    "status": "confirmed",
+    "created": "2026-03-08T10:00:00.000Z",
+    "updated": "2026-03-08T10:00:00.000Z",
+    "summary": "Next week sync",
+    "description": "",
+    "location": "",
+    "creator": {"email": "self@example.com", "self": true},
+    "organizer": {"email": "manager@example.com", "display_name": "Manager"},
+    "start": {"date": null, "date_time": "2026-03-09T14:00:00Z", "time_zone": "UTC"},
+    "end": {"date": null, "date_time": "2026-03-09T15:00:00Z", "time_zone": "UTC"},
+    "attendees": [
+      {"email": "self@example.com", "display_name": null, "self": true, "response_status": "accepted", "organizer": null, "optional": null, "resource": null},
+      {"email": "manager@example.com", "display_name": null, "self": null, "response_status": "accepted", "organizer": true, "optional": null, "resource": null}
+    ],
+    "event_type": "default"
+  },
+  {
+    "kind": "calendar#event",
+    "id": "evt_5_all_day",
+    "status": "confirmed",
+    "created": "2026-03-01T10:00:00.000Z",
+    "updated": "2026-03-01T10:00:00.000Z",
+    "summary": "Company holiday",
+    "description": "",
+    "location": "",
+    "creator": {"email": "self@example.com", "self": true},
+    "organizer": {"email": "self@example.com", "display_name": null},
+    "start": {"date": "2026-03-03", "date_time": null, "time_zone": null},
+    "end": {"date": "2026-03-04", "date_time": null, "time_zone": null},
+    "attendees": [
+      {"email": "self@example.com", "display_name": null, "self": true, "response_status": "accepted", "organizer": null, "optional": null, "resource": null}
+    ],
+    "event_type": "default"
+  }
+]
