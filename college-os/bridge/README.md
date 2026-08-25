@@ -8,7 +8,7 @@ no connector platform ever sees your data.
 |---|---|
 | Cost | free |
 | Setup | one script, one deploy |
-| Google Cloud project | the script's own auto-created one; you enable five APIs on it, once |
+| Google Cloud project | never visited — the manifest turns on four advanced services for you |
 | Re-authorization | once, and it doesn't expire |
 | Covers | Drive · Docs · Sheets · Slides · Calendar · Gmail (+ Tasks) |
 | GitHub | a free read-only PAT |
@@ -29,25 +29,20 @@ account" is enforced by Google's OAuth layer rather than by trusting the code.
    replace it with `appsscript.json` from this folder. Set `timeZone` if you aren't on Eastern.
 4. Run **`setUpBridge`**. Approve the OAuth prompt — it's your own script, so Google shows the
    "unverified app" warning (*Advanced* → *Go to project*). **Copy the token it prints.**
-5. **Enable the five Google APIs this bridge calls.** Apps Script creates a Cloud project for your
-   script automatically, but its APIs start switched off, so every read returns `google_api_403`
-   until you turn them on. Run `testBridge` once — it prints the project number and a console link
-   in the failure text — then enable, waiting a minute for each to propagate:
+5. Run **`testBridge`**. It exercises every scope and prints one line per connector, so a missing
+   grant or a switched-off API shows up now rather than mid-session. Expect `ok` for Drive, Docs,
+   Sheets, Slides, Calendar and Gmail. Google Tasks prints `OPTIONAL` — the bridge serves it but
+   Compass never calls it, so ignore that line.
 
-   Drive · Calendar · Gmail · Sheets
+   **If you see `accessNotConfigured`,** the underlying Google APIs are not switched on for this
+   script. The manifest in step 3 declares them as advanced services, which normally turns them on
+   for you; if it didn't, add them by hand: left sidebar → **Services** → **+** → add **Drive API**,
+   **Gmail API**, **Google Calendar API** and **Google Sheets API**, then save and re-run.
 
-   **Tasks is optional and you can skip it.** The bridge serves Google Tasks, but Compass has no
-   `task_completed` evidence type yet and never calls it, so `testBridge` reports it as OPTIONAL
-   rather than failed.
+   Do **not** follow the Cloud Console link in Google's error text. Apps Script's default projects
+   are hidden and cannot be opened there by any account — that link is a dead end. Advanced
+   services are the supported way in.
 
-   If the Cloud Console says you need additional access to the project, it is open under a
-   different Google account than the one that owns the script — switch accounts, or append
-   `&authuser=1` to the link.
-
-   There is no cost — these APIs are free at any volume Compass generates. You never write code in
-   the Cloud Console; you only flip five switches.
-6. Run **`testBridge`** again. It exercises every scope and prints one line per connector, so you
-   find a missing grant now rather than mid-session.
 7. **Deploy** → **New deployment** → type **Web app**:
    - Execute as: **Me**
    - Who has access: **Anyone**

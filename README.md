@@ -9,9 +9,9 @@ your private goals, files, or evidence.
 Connected data arrives through one free, self-hosted provider: **the Apps Script bridge**, a
 read-only Web App you deploy in your own Google account
 ([`college-os/bridge/`](college-os/bridge/README.md)), plus a free GitHub PAT. No connector
-platform and no bill — nothing but your own OAuth grant reads your account. Apps Script creates a
-Cloud project for the script itself; deploying means enabling five free Google APIs on it once,
-and writing no code there.
+platform, no Cloud Console and no bill — nothing but your own OAuth grant reads your account. The
+script's manifest turns on the Google APIs it needs as advanced services, so deploying is: paste
+two files, run one function, click Deploy.
 
 The full product/architecture specification lives in [PLAN.md](PLAN.md).
 

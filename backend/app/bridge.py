@@ -89,7 +89,13 @@ async def call(url: str, token: str, capability: str, arguments: dict) -> dict:
                               "The bridge rejected the token. Re-copy it from setUpBridge().")
         if code == "capability_unsupported":
             raise BridgeError("capability_unsupported", f"The bridge does not serve {capability}.")
-        logger.warning("[bridge] %s failed: %s", capability, code)
+        # The bridge names the underlying cause in `message` (a Google API
+        # status, a missing argument). It stays out of the ApiError that
+        # reaches the browser, but throwing it away entirely leaves a failing
+        # install with nothing to go on, so it goes to the local log.
+        detail = str(error.get("message") or "")[:300]
+        logger.warning("[bridge] %s failed: %s%s", capability, code,
+                       f" — {detail}" if detail else "")
         raise BridgeError("bridge_tool_error", f"The bridge could not complete {capability}.")
 
     return payload if isinstance(payload, dict) else {"result": payload}

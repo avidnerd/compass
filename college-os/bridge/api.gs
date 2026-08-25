@@ -137,14 +137,15 @@ function probeSheetsApi() {
       headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
       muteHttpExceptions: true,
     });
+  // Only 403 means the API is switched off. Any other status — 404 for the
+  // fake id, 400, even a transient 503 — proves the API answered, which is the
+  // whole question being asked.
   const code = resp.getResponseCode();
-  if (code === 404 || code === 400) {
-    console.log('ok      google_sheets  (sheets API reachable)');
-  } else if (code === 403) {
-    console.log('FAILED  google_sheets  (sheets API): not enabled on this script\'s Cloud ' +
-      'project. Enable "Google Sheets API" and re-run.');
+  if (code === 403) {
+    console.log('FAILED  google_sheets  (sheets API): not enabled. Add the "Google Sheets API" ' +
+      'advanced service under Services (+) and re-run.');
   } else {
-    console.log('FAILED  google_sheets  (sheets API): unexpected HTTP ' + code);
+    console.log('ok      google_sheets  (sheets API reachable, HTTP ' + code + ')');
   }
 }
 
@@ -216,8 +217,9 @@ function apiGet(url) {
     // in project ... before or it is disabled"). It can contain account
     // details, so it goes to the owner's own execution log — visible when you
     // run testBridge — and never into the error that crosses the network.
-    logApiFailure(code, url, resp.getContentText());
-    throw new Error('google_api_' + code);
+    const body = resp.getContentText();
+    logApiFailure(code, url, body);
+    throw new Error(apiErrorMessage(code, body));
   }
   return JSON.parse(resp.getContentText());
 }
@@ -229,10 +231,32 @@ function apiGetRaw(url) {
   });
   const code = resp.getResponseCode();
   if (code >= 400) {
-    logApiFailure(code, url, resp.getContentText());
-    throw new Error('google_api_' + code);
+    const body = resp.getContentText();
+    logApiFailure(code, url, body);
+    throw new Error(apiErrorMessage(code, body));
   }
   return resp.getContentText();
+}
+
+/**
+ * Google's machine-readable reason, safe to send back to Compass.
+ * `status` and `reason` are enums (PERMISSION_DENIED, accessNotConfigured,
+ * insufficientPermissions) — never file names or other account content, so
+ * unlike the message body these can cross the network.
+ */
+function apiErrorMessage(code, body) {
+  const reason = googleErrorReason(body);
+  return 'google_api_' + code + (reason ? ' (' + reason + ')' : '');
+}
+
+function googleErrorReason(body) {
+  try {
+    const err = (JSON.parse(body) || {}).error || {};
+    const reason = (err.errors && err.errors[0] && err.errors[0].reason) || '';
+    return [err.status || '', reason].filter(String).join('/');
+  } catch (parseErr) {
+    return '';
+  }
 }
 
 /** Owner-only diagnostics. Never reaches the HTTP response. */
