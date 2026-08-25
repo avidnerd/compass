@@ -52,6 +52,7 @@ mocked at the transport layer) plus the frontend typecheck and lint. CI runs the
 | `COMPASS_APP_SECRET` | yes | Any long random string. Derives the key that encrypts stored provider credentials — changing it means re-entering your tokens. |
 | `COMPASS_BRIDGE_URL` / `COMPASS_BRIDGE_TOKEN` | for connected data | Your Apps Script bridge deployment. Can be set per profile in Settings → Connections instead. |
 | `COMPASS_GITHUB_TOKEN` | no | Read-only GitHub PAT |
+| `COMPASS_DRIVE_OWNED_ONLY` | no | Restrict Drive reads to files you own, excluding shared-in files. Off by default; requires a bridge deployed from the current `api.gs`. |
 | `OPENROUTER_MODEL` / `OPENROUTER_FALLBACK_MODELS` | no | Preference order; every candidate is re-verified as free at runtime |
 | `COMPASS_BIND_HOST`, `COMPASS_PUBLIC_MODE`, `COMPASS_FRONTEND_ORIGIN` | no | Default binding is `127.0.0.1`; public mode enforces origin checks |
 | `COMPASS_DEMO_MODE` | no | Enables 1-minute demo battles |

@@ -273,9 +273,17 @@ async def apply_boss_contribution(profile: dict, session: dict, completed: bool,
     except Exception:
         await db.get().rollback()
         return  # this session already contributed
-    hp = max(0, boss["hp_current"] - damage)
-    await db.get().execute("UPDATE boss_encounters SET hp_current = ? WHERE id = ?", (hp, boss["id"]))
+    # Decrement in SQL rather than writing back a value read before the insert:
+    # two party members finishing at the same moment would otherwise each
+    # subtract from the same stale hp and one contribution would vanish.
+    await db.get().execute(
+        "UPDATE boss_encounters SET hp_current = MAX(0, hp_current - ?) WHERE id = ?",
+        (damage, boss["id"]))
     await db.get().commit()
+    cur = await db.get().execute(
+        "SELECT hp_current FROM boss_encounters WHERE id = ?", (boss["id"],))
+    row = await cur.fetchone()
+    hp = row["hp_current"] if row else 0
 
     # +1 Collaboration at most once per day for eligible co-op contributions.
     today = date.today().isoformat()
@@ -304,10 +312,15 @@ async def resolve_boss(encounter_id: str) -> None:
     if row is None or row["state"] != "active":
         return
     boss = dict(row)
-    await db.get().execute(
-        "UPDATE boss_encounters SET state = 'defeated', resolved_at = ? WHERE id = ?",
+    # Claim the encounter atomically. Concurrent contributions can both drive hp
+    # to zero and both land here; without this each contributor would get two
+    # journal memories, two reactions and the party two boss.defeated events.
+    claim = await db.get().execute(
+        "UPDATE boss_encounters SET state = 'defeated', resolved_at = ? WHERE id = ? AND state = 'active'",
         (now_iso(), encounter_id))
     await db.get().commit()
+    if claim.rowcount == 0:
+        return
     theme = json.loads(boss["theme_json"] or "{}")
     await events.publish("party", boss["party_id"], "boss.defeated", encounter_id,
                          {"name": theme.get("name"), "defeat_line": theme.get("defeat_line")})

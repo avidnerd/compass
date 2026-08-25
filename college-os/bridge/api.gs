@@ -229,10 +229,14 @@ function hello() {
 }
 
 function driveListFiles(args) {
+  // owned_only drops files other people shared in. Their names and contents
+  // reach Compass's prompts, so an install that does not need shared files can
+  // remove that input entirely.
+  var query = args.owned_only ? "trashed = false and 'me' in owners" : 'trashed = false';
   const payload = apiGet('https://www.googleapis.com/drive/v3/files?' + qs({
     pageSize: Math.min(Number(args.page_size) || 1000, 1000),
     pageToken: args.page_token,
-    q: 'trashed = false',
+    q: query,
     orderBy: 'modifiedTime desc',
     fields: 'nextPageToken,files(id,name,mimeType,modifiedTime,createdTime,trashed)',
   }));

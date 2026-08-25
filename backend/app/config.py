@@ -42,6 +42,12 @@ class Settings:
     bridge_url: str = os.environ.get("COMPASS_BRIDGE_URL", "").strip()
     bridge_token: str = os.environ.get("COMPASS_BRIDGE_TOKEN", "").strip()
     github_token: str = os.environ.get("COMPASS_GITHUB_TOKEN", "").strip()
+    # Drive lists everything the account can see, which includes files other
+    # people have shared in. Their names and contents are attacker-controlled
+    # input to the scan and to verification. Setting this restricts every Drive
+    # read to files the user owns. Needs a bridge redeployed from the current
+    # api.gs; older deployments ignore the flag.
+    drive_owned_only: bool = _bool("COMPASS_DRIVE_OWNED_ONLY", False)
 
     openrouter_api_key: str | None = os.environ.get("OPENROUTER_API_KEY")
     openrouter_model: str = os.environ.get("OPENROUTER_MODEL", "google/gemma-4-26b-a4b-it:free")

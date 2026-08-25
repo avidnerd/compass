@@ -74,6 +74,8 @@ def _bucket_hour(dt: datetime) -> str:
 async def list_drive_files(profile: dict, force: bool = False,
                            serve_stale_on_error: bool = False) -> tuple[list[dict], dict]:
     arguments = {"page_size": 1000}
+    if settings.drive_owned_only:
+        arguments["owned_only"] = True
 
     async def _fetch_pages():
         files: list[dict] = []
