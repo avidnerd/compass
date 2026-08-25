@@ -52,6 +52,34 @@ export async function api<T>(path: string, opts: Options = {}): Promise<Envelope
   return payload as Envelope<T>
 }
 
+/**
+ * POST a document as the raw request body. Used for planning a quest from a
+ * brief the user already has — sending the text as-is avoids a multipart
+ * parser on the server, and the metadata rides in headers.
+ */
+export async function postDocument<T>(
+  path: string, text: string, headers: Record<string, string> = {},
+): Promise<Envelope<T>> {
+  const resp = await fetch(`/api/v1${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', ...headers },
+    credentials: 'same-origin',
+    body: text,
+  })
+  let payload: unknown = null
+  try {
+    payload = await resp.json()
+  } catch {
+    /* non-JSON error */
+  }
+  if (!resp.ok) {
+    const err = (payload as { error?: { code?: string; message?: string } })?.error
+    throw new ApiError(resp.status, err?.code ?? 'unknown_error',
+      err?.message ?? `Request failed (${resp.status})`)
+  }
+  return payload as Envelope<T>
+}
+
 /** Stable idempotency key that survives component re-renders and retries. */
 const idemKeys = new Map<string, string>()
 export function idempotencyKey(scope: string): string {

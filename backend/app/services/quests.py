@@ -82,6 +82,60 @@ def available_evidence_types() -> list[str]:
     return out
 
 
+MAX_DOCUMENT_CHARS = 40_000
+
+
+async def plan_from_document(profile_id: str, goal: str, document: str) -> tuple[llm.QuestPlan, str | None]:
+    """Build a plan from a document the user already has.
+
+    A brief that literally lists its tasks needs no model at all, so the
+    deterministic extractor runs first and the LLM is reserved for prose. The
+    document text is never written anywhere — it lives in this call only.
+    """
+    document = (document or "")[:MAX_DOCUMENT_CHARS]
+    evidence = available_evidence_types()
+
+    titles = llm.extract_tasks_from_text(document)
+    if len(titles) >= 3:
+        return llm.plan_from_tasks(titles, evidence), None
+
+    interests: list[str] = []
+    cur = await db.get().execute("SELECT topics_json FROM interest_profiles WHERE profile_id = ?",
+                                 (profile_id,))
+    row = await cur.fetchone()
+    if row:
+        interests = [t["label"] for t in json.loads(row["topics_json"])][:5]
+    # The document itself keys the cache, so re-uploading the same brief is free.
+    plan_key = {"doc_hash": sha256_hex(document), "goal_hash": sha256_hex(goal or ""),
+                "evidence": sorted(evidence)}
+    try:
+        plan, model_id = await llm.extract_quest_plan(
+            profile_id, goal, document, evidence, interests, plan_key)
+        for sg in plan.subgoals:
+            sg.evidence_types = [e for e in sg.evidence_types if e in evidence] or ["manual_confirmation"]
+        return plan, model_id
+    except (openrouter.FreeModelUnavailable, openrouter.LLMOutputInvalid):
+        # No model: anything the extractor did find still beats a generic plan.
+        if titles:
+            return llm.plan_from_tasks(titles, evidence), None
+        return llm.fallback_quest_plan(goal or "your uploaded document"), None
+
+
+async def create_quest_from_document(profile_id: str, goal: str, document: str,
+                                     body: dict | None = None) -> dict:
+    """Create a quest whose plan comes from the document, not from an inference."""
+    plan, model_id = await plan_from_document(profile_id, goal, document)
+    if not plan.subgoals:
+        raise ApiError(422, "no_tasks_found",
+                       "No tasks could be read from that document. Try one that lists its "
+                       "steps, or describe the goal and let Compass plan it.")
+    derived_goal = (goal or "").strip() or plan.subgoals[0].title
+    quest = await create_quest(profile_id, {**(body or {}), "goal": derived_goal, "plan": False})
+    await _insert_plan(profile_id, quest["id"], plan, model_id)
+    await events.publish("profile", profile_id, "quest.updated", quest["id"], {"state": "draft"})
+    return await quest_with_subgoals(profile_id, quest["id"])
+
+
 async def create_quest(profile_id: str, body: dict) -> dict:
     goal = (body.get("goal") or "").strip()
     if not goal:

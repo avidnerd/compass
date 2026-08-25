@@ -106,6 +106,44 @@ async def list_quests(request: Request, cursor: str | None = None, limit: int = 
                      "available_evidence_types": quest_service.available_evidence_types()}, request)
 
 
+MAX_DOCUMENT_BYTES = 200_000
+_TEXTLIKE_SUFFIXES = (".txt", ".md", ".markdown", ".csv", ".rst", ".org", ".text")
+
+
+@router.post("/quests:from-document", status_code=201)
+async def create_quest_from_document(request: Request, profile: dict = CurrentProfile):
+    """Create a quest from a document the user already wrote.
+
+    The body is the raw file (or pasted text); the optional goal rides in a
+    header so no multipart parser is needed. The text is used to build the plan
+    and then dropped — like every other content read, it is never persisted.
+    """
+    declared = request.headers.get("content-length")
+    if declared:
+        try:
+            if int(declared) > MAX_DOCUMENT_BYTES:
+                raise ApiError(413, "document_too_large", "That document is too large (200 KB max).")
+        except ValueError as exc:
+            raise ApiError(422, "invalid_request", "Invalid content-length.") from exc
+
+    filename = (request.headers.get("x-file-name") or "").strip().lower()
+    if filename and not filename.endswith(_TEXTLIKE_SUFFIXES):
+        raise ApiError(415, "unsupported_document",
+                       "Upload a .txt, .md or .csv file, or paste the text. PDF and Word files "
+                       "aren't readable yet — export or copy the text out first.")
+
+    raw = await request.body()
+    if len(raw) > MAX_DOCUMENT_BYTES:
+        raise ApiError(413, "document_too_large", "That document is too large (200 KB max).")
+    text = raw.decode("utf-8", errors="replace").strip()
+    if len(text) < 20:
+        raise ApiError(422, "invalid_request", "That document is empty or too short to plan from.")
+
+    goal = (request.headers.get("x-quest-goal") or "")[:300]
+    quest = await quest_service.create_quest_from_document(profile["id"], goal, text)
+    return envelope(quest, request)
+
+
 @router.post("/quests", status_code=201)
 async def create_quest(request: Request, profile: dict = CurrentProfile):
     body = await request.json()

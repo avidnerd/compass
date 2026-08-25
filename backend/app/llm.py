@@ -199,6 +199,101 @@ async def decompose_quest(profile_id: str, goal: str, meaning: str | None, targe
     )
 
 
+async def extract_quest_plan(profile_id: str, goal: str, document: str,
+                             available_evidence: list[str], interests: list[str],
+                             plan_key: dict) -> tuple[QuestPlan, str]:
+    """Read the plan a document already contains instead of inventing one.
+
+    The document is the user's own brief, assignment sheet or task list, so the
+    job is extraction and faithful wording — not creativity. Whatever the user
+    wrote wins over anything the model would rather propose.
+    """
+    user = (
+        "Below is a document the user already has: a project brief, assignment "
+        "instructions, or a task list. Extract the work it describes as 3-7 subgoals.\n"
+        "Rules:\n"
+        "1. Use the tasks the document actually states. Do NOT invent work it does not mention.\n"
+        "2. Keep the user's own wording in each title wherever you can.\n"
+        "3. If it lists more than 7 tasks, merge the smallest ones so the most "
+        "significant work survives; never silently drop a major deliverable.\n"
+        "4. If it states deadlines or acceptance conditions, use them as the "
+        "acceptance criterion verbatim rather than paraphrasing.\n"
+        "5. Only if the document is pure prose with no discernible tasks may you "
+        "infer a breakdown from what it describes.\n"
+        f"Goal the user gave (may be empty): <untrusted-data>{_data(goal)}</untrusted-data>\n"
+        f"Evidence types you may use (ONLY these): {', '.join(available_evidence)}\n"
+        f"User interests (context only): {', '.join(interests) or 'unknown'}\n\n"
+        f"### The document\n<untrusted-data>\n{_data(document)}\n</untrusted-data>"
+    )
+    return await openrouter.call_free_structured(
+        profile_id, "quest_plan_from_document", QuestPlan,
+        system=_UNTRUSTED_PREFIX + "You are Compass's quest planner reading a document the user "
+        "supplied. You extract the plan it already contains; you do not replace it with your own.",
+        # Extraction, not invention — keep it as literal as the model allows.
+        user=user, temperature=0.1, cache_key_material=plan_key,
+    )
+
+
+# Bullets, numbers, checkboxes — the shapes a task actually takes in a brief.
+_TASK_LINE = re.compile(r"^\s*(?:[-*+•‣▪]|\[[ xX]?\]|\(?\d{1,2}[.)]|[a-z][.)])\s+(.{3,200})$")
+_HEADING = re.compile(r"^\s*#{1,6}\s+(.+)$")
+
+
+def extract_tasks_from_text(text: str, limit: int = 7) -> list[str]:
+    """Pull the tasks a document already states, without a model.
+
+    Most project briefs, assignment sheets and task lists are literally lists.
+    When that is true there is nothing for an LLM to infer, so this runs first
+    and the model is only needed for prose.
+    """
+    def collect(pattern) -> list[str]:
+        found: list[str] = []
+        seen: set[str] = set()
+        for raw in (text or "").splitlines():
+            match = pattern.match(raw)
+            if not match:
+                continue
+            # Checked-off items are already done; they are not work to plan.
+            # The box may stand alone or sit inside a bullet ("- [x] done").
+            if re.match(r"^\s*(?:[-*+•‣▪]\s+)?\[[xX]\]", raw):
+                continue
+            title = re.sub(r"^\[[ xX]?\]\s*", "", match.group(1))
+            title = " ".join(title.split()).strip(" .;:-")
+            key = title.lower()
+            if len(title) < 3 or key in seen:
+                continue
+            seen.add(key)
+            found.append(title[:120])
+            if len(found) >= limit:
+                break
+        return found
+
+    # A real list beats headings. Headings are only the task list when the
+    # document has no list at all — otherwise they are section labels
+    # ("Milestones", "Overview") that would pollute the plan.
+    items = collect(_TASK_LINE)
+    return items if len(items) >= 2 else collect(_HEADING)
+
+
+def plan_from_tasks(titles: list[str], evidence: list[str]) -> QuestPlan:
+    """Turn extracted task titles into a plan, no model involved."""
+    usable = [e for e in ("file_modified", "document_content_changed") if e in evidence]
+    return QuestPlan(
+        subgoals=[
+            SubgoalDraft(
+                title=title,
+                rationale="Taken from the document you uploaded.",
+                acceptance_criterion=f"{title[:250]} — done as written.",
+                estimated_sessions=1, difficulty=2,
+                evidence_types=(usable or ["manual_confirmation"])[:3],
+                manual_fallback=f"Did you complete: {title[:150]}?",
+            )
+            for title in titles[:7]
+        ] or [],
+        category="general",
+    )
+
+
 def fallback_quest_plan(goal: str) -> QuestPlan:
     return QuestPlan(
         subgoals=[
