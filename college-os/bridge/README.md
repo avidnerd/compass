@@ -8,7 +8,7 @@ no connector platform ever sees your data.
 |---|---|
 | Cost | free |
 | Setup | one script, one deploy |
-| Google Cloud project | not needed |
+| Google Cloud project | the script's own auto-created one; you enable five APIs on it, once |
 | Re-authorization | once, and it doesn't expire |
 | Covers | Drive · Docs · Sheets · Slides · Calendar · Gmail (+ Tasks) |
 | GitHub | a free read-only PAT |
@@ -29,14 +29,26 @@ account" is enforced by Google's OAuth layer rather than by trusting the code.
    replace it with `appsscript.json` from this folder. Set `timeZone` if you aren't on Eastern.
 4. Run **`setUpBridge`**. Approve the OAuth prompt — it's your own script, so Google shows the
    "unverified app" warning (*Advanced* → *Go to project*). **Copy the token it prints.**
-5. Optional but recommended: run **`testBridge`**. It exercises every scope and prints one line per
-   connector, so you find a missing grant now rather than mid-session.
-6. **Deploy** → **New deployment** → type **Web app**:
+5. **Enable the five Google APIs this bridge calls.** Apps Script creates a Cloud project for your
+   script automatically, but its APIs start switched off, so every read returns `google_api_403`
+   until you turn them on. Run `testBridge` once — it prints the project number and a console link
+   in the failure text — then enable, waiting a minute for each to propagate:
+
+   Drive · Calendar · Gmail · Sheets · Tasks
+
+   Only Drive, Calendar, Gmail and Tasks show up in the test output; **Sheets needs enabling too**,
+   because the Sheets probe reads through Drive and only fails later, on a dashboard read.
+
+   There is no cost — these APIs are free at any volume Compass generates. You never write code in
+   the Cloud Console; you only flip five switches.
+6. Run **`testBridge`** again. It exercises every scope and prints one line per connector, so you
+   find a missing grant now rather than mid-session.
+7. **Deploy** → **New deployment** → type **Web app**:
    - Execute as: **Me**
    - Who has access: **Anyone**
 
    Copy the `/exec` URL.
-7. In Compass: **Settings → Connections** → paste the URL and token → *Connect bridge*. Compass
+8. In Compass: **Settings → Connections** → paste the URL and token → *Connect bridge*. Compass
    verifies the deployment before saving anything.
 
 Prefer configuring it once for every local profile? Put `COMPASS_BRIDGE_URL` and

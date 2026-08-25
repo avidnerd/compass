@@ -114,6 +114,30 @@ function testBridge() {
       console.log('FAILED  ' + connector + '  (' + capability + '): ' + err);
     }
   });
+  probeSheetsApi();
+}
+
+/**
+ * The google_sheets validator reads through Drive, so a disabled Sheets API
+ * stays hidden until the first real dashboard read fails. Ask the Sheets API
+ * about a deliberately invalid id instead: 404 proves it is enabled and
+ * reachable, 403 means it still needs switching on in the Cloud project.
+ */
+function probeSheetsApi() {
+  const resp = UrlFetchApp.fetch(
+    'https://sheets.googleapis.com/v4/spreadsheets/compass-bridge-probe-not-a-real-id', {
+      headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+      muteHttpExceptions: true,
+    });
+  const code = resp.getResponseCode();
+  if (code === 404 || code === 400) {
+    console.log('ok      google_sheets  (sheets API reachable)');
+  } else if (code === 403) {
+    console.log('FAILED  google_sheets  (sheets API): not enabled on this script\'s Cloud ' +
+      'project. Enable "Google Sheets API" and re-run.');
+  } else {
+    console.log('FAILED  google_sheets  (sheets API): unexpected HTTP ' + code);
+  }
 }
 
 function newToken() {
@@ -180,7 +204,11 @@ function apiGet(url) {
   });
   const code = resp.getResponseCode();
   if (code >= 400) {
-    // Never echo the provider body back — it can contain account details.
+    // Google's body usually says exactly what is wrong ("API has not been used
+    // in project ... before or it is disabled"). It can contain account
+    // details, so it goes to the owner's own execution log — visible when you
+    // run testBridge — and never into the error that crosses the network.
+    logApiFailure(code, url, resp.getContentText());
     throw new Error('google_api_' + code);
   }
   return JSON.parse(resp.getContentText());
@@ -191,8 +219,18 @@ function apiGetRaw(url) {
     headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
     muteHttpExceptions: true,
   });
-  if (resp.getResponseCode() >= 400) throw new Error('google_api_' + resp.getResponseCode());
+  const code = resp.getResponseCode();
+  if (code >= 400) {
+    logApiFailure(code, url, resp.getContentText());
+    throw new Error('google_api_' + code);
+  }
   return resp.getContentText();
+}
+
+/** Owner-only diagnostics. Never reaches the HTTP response. */
+function logApiFailure(code, url, body) {
+  console.error('google_api_' + code + ' calling ' + String(url).split('?')[0] +
+    '\n  Google said: ' + String(body || '').slice(0, 600));
 }
 
 function qs(params) {
