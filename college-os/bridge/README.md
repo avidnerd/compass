@@ -34,10 +34,15 @@ account" is enforced by Google's OAuth layer rather than by trusting the code.
    until you turn them on. Run `testBridge` once — it prints the project number and a console link
    in the failure text — then enable, waiting a minute for each to propagate:
 
-   Drive · Calendar · Gmail · Sheets · Tasks
+   Drive · Calendar · Gmail · Sheets
 
-   Only Drive, Calendar, Gmail and Tasks show up in the test output; **Sheets needs enabling too**,
-   because the Sheets probe reads through Drive and only fails later, on a dashboard read.
+   **Tasks is optional and you can skip it.** The bridge serves Google Tasks, but Compass has no
+   `task_completed` evidence type yet and never calls it, so `testBridge` reports it as OPTIONAL
+   rather than failed.
+
+   If the Cloud Console says you need additional access to the project, it is open under a
+   different Google account than the one that owns the script — switch accounts, or append
+   `&authuser=1` to the link.
 
    There is no cost — these APIs are free at any volume Compass generates. You never write code in
    the Cloud Console; you only flip five switches.

@@ -71,6 +71,11 @@ const VALIDATORS = {
   google_tasks: 'tasks.list_tasklists',
 };
 
+// Connectors the bridge can serve but Compass does not consume. A failure here
+// is information, not a problem to go and fix — reported as OPTIONAL so nobody
+// enables an API they will never call.
+const OPTIONAL_CONNECTORS = { google_tasks: true };
+
 // ---------------------------------------------------------------------------
 // SETUP / OPERATIONS
 // ---------------------------------------------------------------------------
@@ -111,7 +116,10 @@ function testBridge() {
       HANDLERS[capability](defaultProbeArgs(capability));
       console.log('ok      ' + connector + '  (' + capability + ')');
     } catch (err) {
-      console.log('FAILED  ' + connector + '  (' + capability + '): ' + err);
+      const label = OPTIONAL_CONNECTORS[connector]
+        ? 'OPTIONAL (unused by Compass, safe to ignore)'
+        : 'FAILED ';
+      console.log(label + '  ' + connector + '  (' + capability + '): ' + err);
     }
   });
   probeSheetsApi();
