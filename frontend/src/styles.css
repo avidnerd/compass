@@ -1,8 +1,10 @@
 /* ============================================================================
    Compass — One-Bit Desktop
-   Black and white only. Ordered dithers stand in for every gray. Classification
-   is carried by pattern, never colour. Text only ever sits on solid black or
-   solid white; dithers are reserved for fills, grounds, bars and shadows.
+   A two-colour press run. Plate one is black on paper, with ordered dithers
+   standing in for every gray; classification is carried by pattern, never hue.
+   Plate two is --stamp, and it marks verified evidence and nothing else.
+   Text only ever sits on solid black or solid white; dithers are reserved for
+   fills, grounds, bars and shadows.
    ========================================================================== */
 
 @font-face {
@@ -23,6 +25,10 @@
 :root {
   --ink: #000;
   --paper: #fff;
+  /* The second plate. A two-colour press run, not a palette: this ink marks
+     verified evidence and nothing else. If it is on screen, a machine checked
+     it. 5.05:1 on paper, 4.16:1 on ink. */
+  --stamp: #D8202A;
 
   /* Ordered dither tiles. Density is the only variable; there is no colour. */
   --d12: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E");
@@ -110,8 +116,15 @@ button:hover:not(:disabled) { background-image: var(--d25); background-size: 2px
 button:active:not(:disabled) { background: var(--ink); color: var(--paper); background-image: none; }
 /* The default button wears the system's double frame. */
 button.primary { box-shadow: 0 0 0 1px var(--paper), 0 0 0 2px var(--ink); margin: 2px; }
-button.danger { background-image: var(--hatch-back); background-size: 4px 4px; }
+/* Danger keeps a paper field so the label stays readable; the hatch warns from
+   a band along the foot, never from behind the type. */
+button.danger { border-width: 2px; padding-bottom: 9px; }
+button.danger::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+  background-image: var(--hatch-back); background-size: 4px 4px;
+}
 button.danger:hover:not(:disabled) { background: var(--ink); color: var(--paper); background-image: none; }
+button.danger:hover:not(:disabled)::before { filter: invert(1); }
 button:disabled { cursor: not-allowed; }
 /* Disabled is dimmed by knocking pixels out, the way this system has always done it. */
 button:disabled::after {
@@ -164,7 +177,6 @@ label { display: block; font-family: var(--chrome); font-size: 9px; text-transfo
 .menubar :focus-visible,
 .desk-icon.active:focus-visible,
 .bottom-item.active:focus-visible,
-.leaderboard-row.is-you :focus-visible,
 button.primary:active:focus-visible,
 button:active:focus-visible {
   outline-color: var(--paper);
@@ -350,6 +362,8 @@ button:active:focus-visible {
 
 .badge { display: inline-block; font-family: var(--chrome); font-size: 8px; text-transform: uppercase; padding: 3px 5px 2px; border: 1px solid var(--ink); background: var(--paper); }
 .badge-warn { background: var(--ink); color: var(--paper); }
+/* Same stamp ink, same single meaning: a machine checked this. */
+.badge-verified { border-color: var(--stamp); color: var(--stamp); }
 
 .error-note {
   border: 2px solid var(--ink); padding: 8px 10px; margin: 10px 0;
@@ -481,9 +495,14 @@ table.simple tbody tr:nth-child(even) { background-image: var(--d12); background
 .log-what strong { display: block; font-weight: 400; }
 .log-what small { font-family: var(--chrome); font-size: 8px; text-transform: uppercase; }
 .log-box { width: 14px; height: 14px; border: 1px solid var(--ink); display: grid; place-items: center; }
-/* Inverted, so the drawn check reads white out of the filled box. */
-.log-box.verified { background: var(--ink); color: var(--paper); }
+/* The stamp: the second plate lands here, and only here. */
+.log-box.verified { border-color: var(--stamp); color: var(--stamp); }
 .log-empty { padding: 14px; font-size: 12px; }
+/* Inline sample of the stamp, for explaining what the ink means. */
+.stamp-legend {
+  display: inline-grid; place-items: center; width: 14px; height: 14px;
+  border: 1px solid var(--stamp); color: var(--stamp); vertical-align: -3px; margin: 0 1px;
+}
 /* The authored moment: a verified entry prints into the log a band at a time,
    the way a line printer lays one down. Clipped, so it never covers its neighbour. */
 .log-row.fresh { animation: print 0.4s steps(5, jump-none) 1; }
@@ -558,10 +577,20 @@ table.simple tbody tr:nth-child(even) { background-image: var(--d12); background
 }
 .player-card-top { display: flex; align-items: center; gap: 9px; }
 .player-avatar { width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center; border: 1px solid var(--ink); background: var(--paper); }
-.player-avatar.palette-ember { background-image: var(--hatch); background-size: 4px 4px; }
-.player-avatar.palette-midnight { background-image: var(--d50); background-size: 2px 2px; }
-.player-avatar.palette-aurora { background-image: var(--d12); background-size: 4px 4px; }
-.player-avatar.palette-tidepool { background-image: var(--hstripe); background-size: 2px 2px; }
+/* The palette shows as a patterned footer bar, not a fill: a dense tile behind
+   a black glyph swallows it. The tile field stays paper so the icon reads. */
+.player-avatar { position: relative; overflow: hidden; }
+.player-avatar::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+  background-color: var(--paper); background-size: 4px 4px;
+}
+.player-avatar.palette-meadow::after { background-image: var(--d25); background-size: 2px 2px; }
+.player-avatar.palette-ember::after { background-image: var(--hatch); }
+.player-avatar.palette-midnight::after { background-image: var(--d50); background-size: 2px 2px; }
+.player-avatar.palette-aurora::after { background-image: var(--hatch-back); }
+.player-avatar.palette-tidepool::after { background-image: var(--hstripe); background-size: 2px 2px; }
+.player-avatar.palette-citrus::after { background-image: var(--checker4); }
+.player-avatar.palette-orchid::after { background-image: var(--vstripe); background-size: 2px 2px; }
 .player-identity { min-width: 0; }
 .player-name-row { gap: 5px; }
 .player-name-row h3 { margin: 0; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -585,66 +614,11 @@ button.player-action.selected { background: var(--ink); color: var(--paper); }
 .room-player small { font-family: var(--chrome); font-size: 8px; }
 .mini-avatar { width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center; border: 1px solid var(--ink); }
 
-/* --- League ---------------------------------------------------------------- */
-
-.leaderboard-page { padding-bottom: 8px; }
-.leaderboard-hero { align-items: center; }
-.season-stamp { flex: 0 0 auto; display: flex; flex-direction: column; min-width: 168px; padding: 9px 11px; border: 1px solid var(--ink); background: var(--paper); }
-.season-stamp span { font-family: var(--chrome); font-size: 8px; text-transform: uppercase; }
-.season-stamp strong { margin-top: 3px; font-family: var(--chrome); font-size: 12px; font-weight: 400; }
-.leaderboard-tabs { display: flex; gap: 4px; margin: 0 0 var(--gap); padding-bottom: 3px; overflow-x: auto; }
-.leaderboard-tabs button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; }
-.leaderboard-tabs button.active { background: var(--ink); color: var(--paper); }
-
-.league-podium { display: flex; justify-content: center; align-items: flex-end; gap: 10px; min-height: 210px; padding: 18px 12px 0; margin-bottom: var(--gap); border: 1px solid var(--ink); background-color: var(--paper); background-image: var(--d12); background-size: 4px 4px; }
-.league-podium-card { order: 1; position: relative; width: min(29%, 210px); min-height: 168px; padding: 12px 8px; text-align: center; border: 1px solid var(--ink); border-bottom: 0; background: var(--paper); }
-.league-podium-card.place-1 { order: 2; min-height: 206px; border-width: 2px; border-bottom: 0; }
-.league-podium-card.place-2 { order: 1; }
-.league-podium-card.place-3 { order: 3; }
-.league-place { position: absolute; top: 0; left: 0; padding: 3px 6px 2px; font-family: var(--chrome); font-size: 9px; background: var(--ink); color: var(--paper); }
-.league-avatar { display: grid; place-items: center; margin: 10px auto 8px; }
-.league-podium-card h2 { font-size: 10px; }
-.league-podium-card p { min-height: 1.6em; margin: 2px 0 8px; font-size: 11px; }
-.league-podium-card strong { font-family: var(--chrome); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
-
-.leaderboard-sheet { position: relative; border: 1px solid var(--ink); background: var(--paper); }
-.leaderboard-sheet::before { content: ''; position: absolute; top: 3px; left: 3px; right: -3px; bottom: -3px; background-image: var(--d50); background-size: 2px 2px; z-index: -1; }
-.leaderboard-sheet > header { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 5px 6px 4px 8px; background: var(--ink); color: var(--paper); }
-.leaderboard-sheet h2 { margin: 0; font-size: 10px; color: inherit; }
-.your-rank { display: flex; align-items: center; gap: 7px; font-family: var(--chrome); font-size: 8px; text-transform: uppercase; }
-.your-rank strong { display: grid; place-items: center; width: 26px; height: 20px; background: var(--paper); color: var(--ink); font-size: 11px; font-weight: 400; }
-.leaderboard-row { display: grid; grid-template-columns: 40px minmax(150px, 1fr) 58px minmax(92px, auto); align-items: center; min-height: 46px; padding: 5px 10px; border-bottom: 1px dotted var(--ink); }
-.leaderboard-row:last-child { border-bottom: 0; }
-/* Your own row is marked by inversion, the way this system marks a selection. */
-.leaderboard-row.is-you { background: var(--ink); color: var(--paper); }
-.leaderboard-row.is-you a { color: var(--paper); }
-.leaderboard-row.is-you .pixel-icon { color: var(--paper); }
-.rank-cell { font-family: var(--chrome); font-size: 13px; font-variant-numeric: tabular-nums; }
-.leaderboard-person { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.leaderboard-person > span:last-child { display: flex; flex-direction: column; min-width: 0; }
-.leaderboard-person small { font-family: var(--chrome); font-size: 8px; margin-top: 2px; }
-.trend-cell { font-family: var(--chrome); font-size: 9px; }
-.score-cell { font-family: var(--chrome); font-size: 12px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-/* Plated: running text never sits directly on the dithered desktop. */
-.leaderboard-note {
-  text-align: center; font-size: 11px; margin: 12px auto 0; max-width: 60ch;
-  background: var(--paper); border: 1px solid var(--ink); padding: 7px 10px;
-}
-
 /* --- Toaster --------------------------------------------------------------- */
 
 .toaster { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 50; max-width: 300px; }
 .toast { position: relative; background: var(--paper); border: 1px solid var(--ink); padding: 8px 10px; font-size: 12px; }
 .toast::before { content: ''; position: absolute; top: 3px; left: 3px; right: -3px; bottom: -3px; background-image: var(--d50); background-size: 2px 2px; z-index: -1; }
-
-/* --- Battle & boss --------------------------------------------------------- */
-
-.podium { display: flex; gap: 10px; align-items: flex-end; justify-content: center; margin: var(--gap) 0; }
-.podium-slot { text-align: center; }
-.podium-bar { width: 70px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ink); border-bottom: 0; font-family: var(--chrome); font-size: 12px; background-color: var(--paper); background-image: var(--d25); background-size: 2px 2px; }
-
-.boss-hp { height: 18px; border: 1px solid var(--ink); padding: 1px; background: var(--paper); overflow: hidden; }
-.boss-hp-fill { height: 100%; background-image: var(--hatch); background-size: 4px 4px; }
 
 .emote-burst { position: fixed; z-index: 60; animation: floatUp 1.4s steps(6, jump-none) forwards; }
 @keyframes floatUp { from { transform: translateY(0); } to { transform: translateY(-72px); opacity: 0; } }
@@ -684,14 +658,6 @@ code.recovery { display: block; border: 1px solid var(--ink); padding: 10px; fon
   .social-hero { flex-direction: column; align-items: flex-start; }
   .player-grid { grid-template-columns: 1fr; }
   .coop-launcher { flex-direction: column; align-items: stretch; }
-  .league-podium { gap: 4px; padding-inline: 4px; min-height: 190px; }
-  .league-podium-card { width: 32%; padding-inline: 3px; }
-  .league-podium-card h2 { font-size: 9px; }
-  .league-podium-card p { display: none; }
-  .leaderboard-row { grid-template-columns: 30px minmax(110px, 1fr) minmax(74px, auto); padding-inline: 7px; }
-  .trend-cell { display: none; }
-  .leaderboard-person small { max-width: 130px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .season-stamp { min-width: 0; }
   .win-body { padding: 10px 11px; }
 }
 

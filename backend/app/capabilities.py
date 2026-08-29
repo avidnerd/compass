@@ -23,6 +23,7 @@ CONNECTORS = [
     "gmail",
     "google_meet",
     "github",
+    "canvas",
 ]
 
 # logical capability -> the connector it belongs to.

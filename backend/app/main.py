@@ -14,8 +14,8 @@ from fastapi.staticfiles import StaticFiles
 from . import bridge, capabilities, crypto, db, focus_monitoring, github, jobs, openrouter, providers
 from .config import REPO_ROOT, settings
 from .errors import ApiError, ProviderError
-from .routers import college, game, identity, insights_router, multiplayer
-from .services import battles, postcards
+from .routers import college, game, identity, insights_router, multiplayer, canvas as canvas_router
+from .services import canvas as canvas_service, postcards
 from .ws import router as ws_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -63,15 +63,13 @@ async def lifespan(app: FastAPI):
     requeued = await jobs.resume_jobs()
     if requeued:
         logger.info("[startup] requeued %d interrupted job(s)", requeued)
-    resumed = await battles.resume_battles()
-    if resumed:
-        logger.info("[startup] resumed %d battle timer(s)", resumed)
     _background.append(asyncio.create_task(postcards.postcard_loop()))
     yield
     for t in _background:
         t.cancel()
     await jobs.stop_workers()
     await bridge.aclose()
+    await canvas_service.aclose()
     await github.aclose()
     await openrouter.aclose()
     await db.close()
@@ -131,6 +129,7 @@ app.include_router(game.router, prefix=API_PREFIX)
 app.include_router(multiplayer.router, prefix=API_PREFIX)
 app.include_router(insights_router.router, prefix=API_PREFIX)
 app.include_router(college.router, prefix=API_PREFIX)
+app.include_router(canvas_router.router, prefix=API_PREFIX)
 app.include_router(ws_router)
 
 

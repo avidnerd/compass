@@ -5,6 +5,7 @@ import type { FreeModelStatus } from '../api/types'
 import { ResetButton } from '../components/ResetButton'
 import { Card, ErrorNote } from '../components/ui'
 import { ProviderSetup } from '../components/ProviderSetup'
+import { CanvasSetup } from '../components/CanvasSetup'
 import { ConnectorList } from './OnboardingConnect'
 
 export function SettingsConnections() {
@@ -36,6 +37,7 @@ export function SettingsConnections() {
         <ConnectorList />
       </Card>
       <ProviderSetup />
+      <CanvasSetup />
       <Card title="Connector caches">
         <p className="small muted">Clearing a connector's cache bumps its generation; analytics
           recompute lazily. Manual refresh is rate-limited to once per minute per connector.</p>

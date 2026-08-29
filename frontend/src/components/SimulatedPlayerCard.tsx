@@ -35,7 +35,7 @@ export function SimulatedPlayerCard({ player, actionLabel, onAction, active = fa
       </p>
       <dl className="player-stats">
         <div><dt>Streak</dt><dd>{player.stats.focus_streak}d</dd></div>
-        <div><dt>Wins</dt><dd>{player.stats.battle_wins}</dd></div>
+        
         <div><dt>Co-op</dt><dd>{player.stats.collaboration}</dd></div>
       </dl>
       <button className={active ? 'player-action selected' : 'player-action'} onClick={onAction}

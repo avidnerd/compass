@@ -117,12 +117,6 @@ class ReactionBatch(BaseModel):
     journal_memory: str = Field(max_length=240)
 
 
-class BossTheme(BaseModel):
-    name: str = Field(max_length=60)
-    narration: str = Field(max_length=300)
-    defeat_line: str = Field(max_length=200)
-
-
 class Postcard(BaseModel):
     text: str = Field(max_length=400)
 
@@ -406,35 +400,15 @@ def fallback_reaction(persona: dict, event: dict) -> ReactionBatch:
         "not_completed": ("That one got away from us — and that's okay.",
                           "Maybe a smaller step next time? I'll be right here.",
                           "A tough session. We're learning our rhythm."),
-        "battle_lost": ("What a sprint! They edged us out, but you were brilliant.",
+        "session_missed": ("That one got away from us — the next block is a fresh start.",
                         "Rematch when you're ready — I believe in us.",
-                        "We lost a friendly battle and shook hands anyway."),
+                        "A session slipped, and that is allowed."),
         "returned": ("You're back! I kept everything cozy while you were away.",
                      "No catch-up needed — we start fresh from right here.",
                      "My favorite person came back today."),
     }
     r = lines.get(outcome, ("Nice work today!", "One small step at a time.", "A good, quiet session."))
     return ReactionBatch(reaction=r[0], encouragement=r[1], journal_memory=r[2])
-
-
-BUNDLED_BOSS_THEMES = [
-    {"name": "The Fog of Fridays", "narration": "A drowsy mist that swallows plans whole. Only steady focus burns it away.", "defeat_line": "The fog lifts — the week is yours again!"},
-    {"name": "Baron Backlog", "narration": "He hoards unfinished things in a creaking tower. Every session topples a floor.", "defeat_line": "The tower crumbles. The baron yields!"},
-    {"name": "The Scrollbeast", "narration": "It feeds on wandering attention. Starve it with quiet, verified effort.", "defeat_line": "The Scrollbeast slinks away, hungry and defeated."},
-]
-
-
-async def generate_boss_theme(profile_id: str, safe_tags: list[str]) -> tuple[BossTheme, str]:
-    user = (
-        f"Shared non-sensitive interest tags of a small party: {', '.join(safe_tags) or 'none'}.\n"
-        "Invent a whimsical, non-scary 'productivity boss' for them to defeat together: a name, "
-        "one narration sentence, and one defeat line. No real people, brands, or private details."
-    )
-    return await openrouter.call_free_structured(
-        profile_id, "boss_theme", BossTheme,
-        system="You invent cozy game flavor text. No markup, no URLs.",
-        user=user, temperature=0.8, cache_key_material={"tags": sorted(safe_tags)},
-    )
 
 
 async def generate_daily_postcard(profile_id: str, persona: dict, safe_events: list[str],

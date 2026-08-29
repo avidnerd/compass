@@ -128,6 +128,7 @@ export const CONNECTOR_LABELS: Record<string, string> = {
   gmail: 'Gmail',
   google_meet: 'Google Meet',
   github: 'GitHub',
+  canvas: 'Canvas',
 }
 
 export const EVIDENCE_LABELS: Record<string, string> = {

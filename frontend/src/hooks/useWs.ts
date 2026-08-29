@@ -11,12 +11,7 @@ const INVALIDATIONS: Record<string, string[][]> = {
   'quest.updated': [['quests'], ['quest']],
   'focus.updated': [['session'], ['sessions'], ['quests'], ['quest']],
   'verification.updated': [['session'], ['sessions'], ['character'], ['quest'], ['quests']],
-  'battle.updated': [['battle']],
-  'battle.countdown': [['battle']],
-  'battle.completed': [['battle'], ['character']],
   'party.updated': [['party'], ['parties']],
-  'boss.updated': [['party'], ['parties'], ['boss']],
-  'boss.defeated': [['party'], ['parties'], ['boss'], ['character'], ['memories']],
   'free_model.updated': [['free-models']],
 }
 

@@ -47,21 +47,6 @@ def test_primary_stat_mapping():
     assert rewards.primary_stat_for_evidence([]) is None
 
 
-def test_battle_power_bounds():
-    assert rewards.battle_power(100, "verified", False, 100) == 100
-    p = rewards.battle_power(80, "verified", True, 50)
-    assert p == min(100, round(0.75 * 80 + 8 + 5))
-    assert rewards.battle_power(0, "not_completed", False, 0) == 0
-
-
-def test_boss_damage():
-    assert rewards.boss_damage(100, 10, False) == 100
-    assert rewards.boss_damage(100, 10, True) == 80
-    assert rewards.boss_damage(0, 1, False) == 22
-    # level contribution caps at 10
-    assert rewards.boss_damage(50, 99, False) == rewards.boss_damage(50, 10, False)
-
-
 async def test_apply_rewards_idempotent(env):
     from conftest import create_profile
     data = await create_profile(env.client)

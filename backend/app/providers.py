@@ -80,7 +80,7 @@ async def credentials(profile_id: str) -> dict:
 
 
 async def save_credentials(profile_id: str, provider: str, config: dict) -> dict:
-    if provider not in (BRIDGE, "github"):
+    if provider not in (BRIDGE, "github", "canvas"):
         raise ApiError(422, "invalid_request", f"Unknown provider: {provider}")
     await db.get().execute(
         """INSERT INTO provider_credentials (profile_id, provider, config_json, status, updated_at)

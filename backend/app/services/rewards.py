@@ -138,19 +138,3 @@ async def apply_rewards(profile_id: str, source_event_key: str, xp: int, care_po
     return result
 
 
-def battle_power(focus_score: int, verification_result: str, human_confirmed: bool,
-                 relevant_stat_value: int) -> int:
-    power = 0.75 * focus_score
-    if verification_result == "verified" and not human_confirmed:
-        power += 15
-    elif verification_result == "verified" and human_confirmed:
-        power += 8
-    power += min(10, relevant_stat_value / 10)
-    return min(100, round(power))
-
-
-def boss_damage(focus_score: int, character_level: int, human_confirmed: bool) -> int:
-    damage = 20 + 0.60 * focus_score + 2 * min(character_level, 10)
-    if human_confirmed:
-        damage *= 0.8
-    return round(damage)

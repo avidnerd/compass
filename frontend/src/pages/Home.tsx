@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, idempotencyKey, resetIdempotencyKey } from '../api/client'
-import type { Character, CollegeLink, FocusSession, Quest } from '../api/types'
+import type { CanvasAssignment, Character, CollegeLink, FocusSession, Quest } from '../api/types'
 import { Companion } from '../components/Companion'
 import { PixelIcon } from '../components/PixelIcon'
 import { useFocusMonitoring } from '../components/FocusMonitoringProvider'
@@ -20,6 +20,14 @@ function day(iso: string | null) {
   const today = new Date()
   const same = d.toDateString() === today.toDateString()
   return same ? 'Today' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+}
+
+function dueIn(iso: string) {
+  const days = Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000)
+  if (days < 0) return 'overdue'
+  if (days === 0) return 'today'
+  if (days === 1) return 'tomorrow'
+  return `${days} days`
 }
 
 const SESSION_STATE: Record<string, string> = {
@@ -52,6 +60,13 @@ export function Home() {
   const college = useQuery({
     queryKey: ['college-status'],
     queryFn: () => api<CollegeLink>('/college/status'),
+    retry: false,
+  })
+  // What is actually due. Deadlines belong on the screen the student opens
+  // first, not behind another click.
+  const canvas = useQuery({
+    queryKey: ['canvas-due'],
+    queryFn: () => api<{ items: CanvasAssignment[] }>('/canvas/assignments?days=14'),
     retry: false,
   })
 
@@ -250,6 +265,27 @@ export function Home() {
           )}
         </Card>
 
+        {!!canvas.data?.data.items.length && (
+          <Card
+            title="Due soon"
+            actions={<Link to="/canvas"><button>Open Canvas</button></Link>}
+            status={[`${canvas.data.data.items.length} in 14 days`, 'From Canvas']}
+          >
+            <div className="log">
+              {canvas.data.data.items.slice(0, 4).map((a) => (
+                <div key={a.uid} className="log-row">
+                  <span className="log-box" />
+                  <span className="log-what">
+                    <strong>{a.title}</strong>
+                    <small>{a.course ?? 'No course'}</small>
+                  </span>
+                  <span className="log-stamp">{dueIn(a.due_at)}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
         {college.data?.data.status === 'linked' && (
           <Card title="College OS"
             actions={<Link to="/college"><button>Open</button></Link>}>
@@ -270,8 +306,10 @@ export function Home() {
             <div className="log">
               {recent.map((s) => (
                 <div key={s.id} className={`log-row ${fresh.has(s.id) ? 'fresh' : ''}`}>
-                  <StateBox on={s.state === 'completed'}
-                    label={s.state === 'completed' ? 'Completed' : SESSION_STATE[s.state] ?? s.state} />
+                  {/* The stamp means a machine measured this, not merely that it ended. */}
+                  <StateBox on={s.focus_score !== null}
+                    label={s.focus_score !== null ? 'Scored from your own activity'
+                      : SESSION_STATE[s.state] ?? s.state} />
                   <span className="log-what">
                     <strong>{Math.round(s.planned_seconds / 60)} min focus{s.demo ? ' (demo)' : ''}</strong>
                     <small>{SESSION_STATE[s.state] ?? s.state}

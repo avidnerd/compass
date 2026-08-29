@@ -13,16 +13,13 @@ import { Quests } from './pages/Quests'
 import { QuestNew } from './pages/QuestNew'
 import { QuestDetail } from './pages/QuestDetail'
 import { CollegeOS } from './pages/CollegeOS'
+import { CanvasPage } from './pages/Canvas'
 import { FocusSessionPage } from './pages/FocusSessionPage'
 import { CharacterCustomize } from './pages/CharacterCustomize'
 import { CharacterJournal } from './pages/CharacterJournal'
-import { BattleHub } from './pages/BattleHub'
-import { BattleRoom } from './pages/BattleRoom'
 import { PartyHub } from './pages/PartyHub'
 import { PartyDetail } from './pages/PartyDetail'
-import { BossScene } from './pages/BossScene'
 import { Insights } from './pages/Insights'
-import { Leaderboards } from './pages/Leaderboards'
 import { SettingsConnections } from './pages/SettingsConnections'
 import { SettingsPrivacy } from './pages/SettingsPrivacy'
 import { SettingsGameplay } from './pages/SettingsGameplay'
@@ -34,10 +31,9 @@ const NAV = [
   { to: '/home', label: 'Home', icon: 'home' },
   { to: '/quests', label: 'Quests', icon: 'quests' },
   { to: '/college', label: 'College', icon: 'college' },
-  { to: '/battle', label: 'Battle', icon: 'battle' },
-  { to: '/party', label: 'Party', icon: 'party' },
+  { to: '/canvas', label: 'Canvas', icon: 'clock' },
+  { to: '/party', label: 'Rooms', icon: 'party' },
   { to: '/character/journal', label: 'Journal', icon: 'journal' },
-  { to: '/leaderboards', label: 'Ranks', icon: 'ranks' },
   { to: '/insights', label: 'Insights', icon: 'insights' },
   { to: '/settings/connections', label: 'Settings', icon: 'settings' },
 ]
@@ -152,15 +148,12 @@ export default function App() {
           <Route path="/quests/new" element={<QuestNew />} />
           <Route path="/quests/:questId" element={<QuestDetail />} />
           <Route path="/college" element={<CollegeOS />} />
+          <Route path="/canvas" element={<CanvasPage />} />
           <Route path="/focus/:sessionId" element={<FocusSessionPage />} />
           <Route path="/character/customize" element={<CharacterCustomize />} />
           <Route path="/character/journal" element={<CharacterJournal />} />
-          <Route path="/leaderboards" element={<Leaderboards />} />
-          <Route path="/battle" element={<BattleHub />} />
-          <Route path="/battle/:battleId" element={<BattleRoom />} />
           <Route path="/party" element={<PartyHub />} />
           <Route path="/party/:partyId" element={<PartyDetail />} />
-          <Route path="/party/:partyId/boss/:encounterId" element={<BossScene />} />
           <Route path="/insights/*" element={<Insights />} />
           <Route path="/settings/connections" element={<SettingsConnections />} />
           <Route path="/settings/privacy" element={<SettingsPrivacy />} />

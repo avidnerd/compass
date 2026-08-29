@@ -228,10 +228,6 @@ async def env(tmp_path, monkeypatch):
         yield type("Env", (), {"client": client, "script": script, "github": gh, "llm": fake_llm})()
 
     await jobs.stop_workers()
-    from app.services import battles as battle_service
-    for task in battle_service._timers.values():
-        task.cancel()
-    battle_service._timers.clear()
     capabilities.set_registry(None)
     crypto.reset_cache()
     await bridge.aclose()
