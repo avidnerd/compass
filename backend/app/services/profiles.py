@@ -123,7 +123,19 @@ async def validate_connections(profile: dict, force: bool = False) -> list[dict]
     provider = await providers.active_provider(profile)
     for connector in capabilities.CONNECTORS:
         status, error_code, caps = "unknown", None, []
-        if provider is None:
+        if connector == "canvas":
+            # Canvas is not served by the Apps Script bridge: it is a calendar
+            # feed the student links directly, so it stands or falls on its own
+            # credential and must not inherit the bridge's status.
+            from .canvas import public_link as canvas_link
+            link = await canvas_link(profile["id"])
+            if link["status"] != "linked":
+                status = "disconnected"
+            else:
+                status = "error" if link.get("connection_status") == "error" else "connected"
+                error_code = link.get("error_code")
+            caps = ["canvas.assignments"]
+        elif provider is None:
             status, error_code = "error", "provider_not_configured"
         elif reg is None:
             status, error_code = "unknown", "capabilities_pending"

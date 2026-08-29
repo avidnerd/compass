@@ -71,7 +71,7 @@ export function SettingsPrivacy() {
           <input type="checkbox" style={{ width: 'auto' }}
             checked={profile?.share_activity_category ?? false}
             onChange={(e) => patchMe.mutate({ share_activity_category: e.target.checked })} />
-          Allow a generic activity category (like “writing”) in battles and parties. Goals,
+          Allow a generic activity category (like “writing”) in focus rooms. Goals,
           filenames, repos, messages, and evidence are never shared regardless.
         </label>
       </Card>

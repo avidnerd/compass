@@ -6,7 +6,7 @@ import { Card, ErrorNote, Meter, Spinner } from '../components/ui'
 import { PixelIcon } from '../components/PixelIcon'
 
 const KIND_ICON: Record<string, string> = {
-  reflection: 'bulb', encourage: 'envelope', postcard: 'file', boss: 'skull', battle: 'battle',
+  reflection: 'bulb', encourage: 'envelope', postcard: 'file',
 }
 
 export function CharacterJournal() {

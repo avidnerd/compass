@@ -44,6 +44,6 @@ def new_recovery_code() -> str:
 
 
 def new_room_code() -> str:
-    # Unambiguous uppercase alphabet for battle/party invite codes.
+    # Unambiguous uppercase alphabet for focus-room invite codes.
     alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
     return "".join(secrets.choice(alphabet) for _ in range(6))

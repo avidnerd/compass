@@ -115,7 +115,6 @@ export interface FocusSession {
   id: string
   quest_id: string | null
   subgoal_id: string | null
-  battle_id: string | null
   state: 'running' | 'paused' | 'ending' | 'completed' | 'canceled'
   planned_seconds: number
   started_at: string
@@ -227,54 +226,6 @@ export interface Job {
   result_id: string | null
 }
 
-export interface BattlePlayer {
-  profile_id: string
-  display_name: string
-  ready: boolean
-  left: boolean
-  has_subgoal: boolean
-  placement: number | null
-  power: number | null
-  subgoal_id?: string | null
-  session_id?: string | null
-  is_simulated?: boolean
-  avatar?: string
-  title?: string
-  status?: SimulatedPlayerStatus
-}
-
-export interface Battle {
-  id: string
-  code: string
-  host_profile_id: string
-  duration_seconds: number
-  state: 'waiting' | 'countdown' | 'active' | 'resolving' | 'completed' | 'canceled'
-  countdown_at: string | null
-  started_at: string | null
-  ends_at: string | null
-  server_time: string
-  players: BattlePlayer[]
-}
-
-export interface BossTheme {
-  name?: string
-  narration?: string
-  defeat_line?: string
-}
-
-export interface BossEncounter {
-  id: string
-  party_id: string
-  difficulty: string
-  hp_max: number
-  hp_current: number
-  state: 'active' | 'defeated' | 'expired'
-  theme: BossTheme
-  started_at: string
-  expires_at: string
-  contributions: { profile_id: string; display_name: string; damage: number; sessions: number }[]
-}
-
 export interface Party {
   id: string
   code: string
@@ -291,7 +242,6 @@ export interface Party {
     title?: string
     companion_name?: string
   }[]
-  active_boss: BossEncounter | null
   created_at: string
 }
 
@@ -300,8 +250,6 @@ export type SimulatedPlayerStatus = 'online' | 'in_focus' | 'away'
 export interface SimulatedPlayerStats {
   focus_minutes: number
   focus_streak: number
-  battle_wins: number
-  boss_damage: number
   quests_completed: number
   collaboration: number
 }
@@ -320,33 +268,6 @@ export interface SimulatedPlayer {
   palette: string
   personality: string
   stats: SimulatedPlayerStats
-}
-
-export interface LeaderboardEntry {
-  rank: number
-  profile_id: string
-  display_name: string
-  avatar: string
-  title: string
-  value: number
-  trend: number
-  is_simulated: boolean
-  is_current_user: boolean
-}
-
-export interface LeaderboardMetric {
-  id: keyof SimulatedPlayerStats
-  label: string
-  short_label: string
-  unit: string
-  icon: string
-  entries: LeaderboardEntry[]
-}
-
-export interface Leaderboards {
-  season: string
-  updated_at: string
-  metrics: LeaderboardMetric[]
 }
 
 export interface FreeModelStatus {
@@ -506,4 +427,34 @@ export interface ProviderState {
   bridge: ProviderSlot
   github: ProviderSlot
   handshake?: { ok: boolean; capabilities: string[]; timezone: string | null }
+}
+
+export interface CanvasLink {
+  status: 'linked' | 'not_linked'
+  feed: string | null
+  connection_status?: string
+  error_code?: string | null
+  last_checked_at?: string | null
+  /** Always false: a calendar feed carries due dates, never proof of work. */
+  evidence: boolean
+  evidence_note?: string
+}
+
+export interface CanvasAssignment {
+  uid: string
+  title: string
+  course: string | null
+  due_at: string
+  all_day: boolean
+  url: string | null
+  description: string | null
+  imported_quest_id?: string | null
+}
+
+export interface CanvasOverview {
+  link: CanvasLink
+  assignments: CanvasAssignment[]
+  imports: { source_key: string; quest_id: string | null }[]
+  meta?: import('./client').Meta
+  error?: { code: string; message: string } | null
 }

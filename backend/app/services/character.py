@@ -251,7 +251,7 @@ async def react(profile_id: str, kind: str, outcome: str, category: str = "gener
         batch = llm.fallback_reaction(persona, event)
     await record_memory(profile_id, kind="reflection", text=batch.journal_memory)
     expression = {"verified": "proud", "needs_confirmation": "curious",
-                  "not_completed": "gentle", "battle_lost": "warm"}.get(outcome, "content")
+                  "not_completed": "gentle", "session_missed": "warm"}.get(outcome, "content")
     await db.get().execute(
         "UPDATE characters SET expression = ?, updated_at = ? WHERE profile_id = ?",
         (expression, now_iso(), profile_id))

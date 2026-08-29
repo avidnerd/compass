@@ -256,6 +256,17 @@ async def _request_once(model_id: str, messages: list[dict], schema_model: type[
     resp.raise_for_status()
     _auth_state = "ok"
     data = resp.json()
+    # A 200 can still carry an error body: free models report rate limits and
+    # provider outages in-band. Reading ["choices"] blindly turned that into a
+    # raw KeyError that killed the job and stranded whatever queued it.
+    if "choices" not in data or not data["choices"]:
+        err = data.get("error") or {}
+        code = err.get("code")
+        message = str(err.get("message") or "no completion returned")[:200]
+        logger.warning("[openrouter] %s returned no choices: %s", model_id, message)
+        if code in (429, "429", "rate_limit_exceeded") or "rate" in message.lower():
+            raise _Transient(None)
+        raise FreeModelUnavailable(f"{model_id} returned no completion: {message}")
     return data["choices"][0]["message"]["content"]
 
 

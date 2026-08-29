@@ -60,7 +60,7 @@ async def _subgoal(profile_id: str, subgoal_id: str) -> dict:
     return dict(row)
 
 
-async def start_focus_session(profile: dict, body: dict, battle_id: str | None = None) -> dict:
+async def start_focus_session(profile: dict, body: dict) -> dict:
     profile_id = profile["id"]
     planned_minutes = int(body.get("planned_minutes") or 25)
     demo = bool(body.get("demo"))
@@ -85,10 +85,10 @@ async def start_focus_session(profile: dict, body: dict, battle_id: str | None =
     session_id = new_id()
     ts = now_iso()
     await db.get().execute(
-        """INSERT INTO focus_sessions (id, profile_id, quest_id, subgoal_id, battle_id, state,
+        """INSERT INTO focus_sessions (id, profile_id, quest_id, subgoal_id, state,
              planned_seconds, started_at, demo, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, 'running', ?, ?, ?, ?, ?)""",
-        (session_id, profile_id, quest_id, subgoal_id, battle_id, planned_seconds, ts,
+           VALUES (?, ?, ?, ?, 'running', ?, ?, ?, ?, ?)""",
+        (session_id, profile_id, quest_id, subgoal_id, planned_seconds, ts,
          1 if demo else 0, ts, ts))
     if subgoal_id:
         await db.get().execute(
@@ -427,12 +427,7 @@ async def _complete_session(profile: dict, session: dict, verification: dict,
     await character_service.react(profile_id, "session_finished", reaction_outcome, category,
                                   reward_summary)
 
-    # Multiplayer hooks (lazy imports avoid cycles).
-    if session["battle_id"]:
-        from . import battles
-        await battles.on_session_verified(profile, session, verification, score, human_confirmed)
-    from . import parties
-    await parties.apply_boss_contribution(profile, session, completed, human_confirmed, score)
+    # Focus rooms are presence-only: a verified session touches no shared state.
 
 
 @jobs.register("session_verify")
@@ -464,17 +459,6 @@ async def run_session_verify(job: dict) -> dict:
             await db.get().commit()
         await events.publish("profile", profile["id"], "verification.updated", verification["id"], {
             "result": "needs_confirmation", "session_id": session["id"]})
-        if session["battle_id"]:
-            # Battles cannot wait on a human answer: record a provisional
-            # power with no completion bonus so the room can resolve. A later
-            # confirmation still grants full personal rewards.
-            active, total = _timing({**session, "finished_at": session["finished_at"] or now_iso()})
-            prior = await rewards.prior_focus_scores(profile["id"], session["id"])
-            provisional = rewards.calculate_focus_score(
-                active, session["planned_seconds"], session["paused_total_seconds"] or 0,
-                total, 0.0, prior)
-            from . import battles
-            await battles.on_session_verified(profile, session, verification, provisional, False)
     return {"result_type": "verification", "result_id": verification["id"]}
 
 

@@ -114,3 +114,32 @@ async def test_llm_cache_avoids_second_call(env):
     r2, m2 = await openrouter.call_free_structured("p1", "test", ReactionBatch, "sys", "same-user")
     assert len(env.llm.requests) == n  # served from llm_cache
     assert r1 == r2 and m1 == m2
+
+
+# --------------------------------------------- error bodies served with a 200
+
+@pytest.mark.parametrize("body, expected", [
+    ({"error": {"code": 429, "message": "rate limit exceeded"}}, openrouter._Transient),
+    ({"error": {"message": "upstream provider is down"}}, openrouter.FreeModelUnavailable),
+    ({"choices": []}, openrouter.FreeModelUnavailable),
+    ({}, openrouter.FreeModelUnavailable),
+])
+async def test_a_200_carrying_an_error_body_is_not_a_crash(monkeypatch, body, expected):
+    """OpenRouter reports free-tier limits and provider outages in-band, with a
+    200. Reading ["choices"] blindly raised a bare KeyError that killed the
+    worker and stranded whatever queued the job — a quest stuck in 'planning'
+    forever, with nothing shown to the user."""
+    import httpx
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=body)
+
+    monkeypatch.setattr(openrouter, "_client",
+                        httpx.AsyncClient(transport=httpx.MockTransport(handler),
+                                          base_url="https://openrouter.ai/api/v1"))
+    monkeypatch.setattr(openrouter, "_auth_state", "ok")
+    with pytest.raises(expected):
+        await openrouter._request_once(
+            "google/gemma-4-26b-a4b-it:free", [{"role": "user", "content": "hi"}],
+            ReactionBatch, 0.2)
+    await openrouter._client.aclose()

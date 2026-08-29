@@ -37,6 +37,10 @@ could copy the companion or the quests, but not the combination of: no connector
 between the user and their data, no paid inference path even as a fallback, and no hosted
 server holding anyone's goals.
 
+Compass deliberately does not compete students against each other. Ranking is the obvious
+move for this category and the evidence is against it, so the social surface is co-presence
+only.
+
 ## Operating Context
 
 - Work lives in Google Workspace and GitHub; Compass reads, never authors, that work.
@@ -47,9 +51,22 @@ server holding anyone's goals.
   watches for.
 - Connected data arrives through a read-only Apps Script Web App the student deploys in their
   own Google account, plus a read-only GitHub PAT.
+- **Canvas** is read through the student's personal calendar-feed URL (Canvas → Calendar →
+  Calendar Feed). The other two doors are closed to this product and should not be
+  re-investigated: personal access tokens are capped at 120 days for student roles and can be
+  disabled per institution (some already have), and OAuth2 needs a developer key an institution
+  admin issues — Instructure's docs state plainly that an app cannot be used without the
+  institution's permission, which is the connector platform Compass refuses to be. The feed
+  carries due dates only: no submission status and no grades, so a Canvas assignment can seed a
+  quest but can never verify one.
 - Focus sessions are the unit of work, with optional screen monitoring whose frames are
   analysed and deleted rather than retained.
-- Multiplayer: synchronised focus battles and party boss encounters.
+- Focus rooms: working alongside other people, sharing only presence and a timer. Head-to-head
+  battles, party boss encounters and the league board were removed in August 2026 — competitive
+  ranking is evidence-negative for this audience (leaderboards demotivate everyone but the top
+  and reduce peer social engagement regardless of how competitive a student is), and both needed
+  a live second player Compass has no user base to supply. Co-presence, the mechanism with real
+  support behind it, is what survives.
 - Students often already hold a brief, assignment sheet or task list; those can seed a quest
   directly instead of a model inventing a breakdown.
 
@@ -104,7 +121,7 @@ story beyond running it locally.
    paid one.
 3. **The user's machine is the boundary.** Local-first, no hosted server holding anyone's
    goals, files or evidence.
-4. **Privacy survives multiplayer.** Social features expose readiness, placement and a generic
+4. **Privacy survives multiplayer.** Social features expose readiness, presence and a generic
    category — never goals, filenames, or evidence.
 5. **Say what isn't possible.** Unsupported connectors, unavailable AI and unverifiable
    evidence are reported honestly instead of quietly faked.

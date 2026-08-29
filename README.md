@@ -3,7 +3,7 @@
 Compass turns your real work telemetry into a personal, expressive companion game — entirely
 local-first. Connect Google Workspace + GitHub, set a goal, focus, and let deterministic evidence
 (interpreted by a **verified-free** OpenRouter model) feed a pixel companion that grows with you.
-Battle friends in synchronized sprints or take down party bosses together — without ever sharing
+Work alongside friends in a shared focus room — without ever sharing
 your private goals, files, or evidence.
 
 Connected data arrives through one free, self-hosted provider: **the Apps Script bridge**, a
@@ -56,7 +56,7 @@ mocked at the transport layer) plus the frontend typecheck and lint. CI runs the
 | `COMPASS_DRIVE_OWNED_ONLY` | no | Restrict Drive reads to files you own, excluding shared-in files. Off by default; requires a bridge deployed from the current `api.gs`. |
 | `OPENROUTER_MODEL` / `OPENROUTER_FALLBACK_MODELS` | no | Preference order; every candidate is re-verified as free at runtime |
 | `COMPASS_BIND_HOST`, `COMPASS_PUBLIC_MODE`, `COMPASS_FRONTEND_ORIGIN` | no | Default binding is `127.0.0.1`; public mode enforces origin checks |
-| `COMPASS_DEMO_MODE` | no | Enables 1-minute demo battles |
+| `COMPASS_DEMO_MODE` | no | Enables 1-minute demo focus sessions |
 
 Setting up connected data: follow
 [`college-os/bridge/README.md`](college-os/bridge/README.md), then paste the deployment URL and
@@ -83,9 +83,16 @@ token into Settings → Connections. Nothing else is needed.
 5. **Rewards** — deterministic focus score against *your own* recent baseline, idempotent XP /
    care points / stats. The companion never dies, never guilt-trips, and absence never drops
    mood below 30.
-6. **Multiplayer** — battles and party bosses share only timers, readiness, generic momentum,
-   podiums, and damage. Goals, filenames, repos, and evidence never enter room payloads.
-7. **College OS** — if [`college-os/`](college-os/README.md) has provisioned your Google account,
+6. **Focus rooms** — a shared room exposes only presence and a timer. Goals, filenames, repos
+   and evidence never enter a room payload. Head-to-head battles, party bosses and the league
+   board were removed: competitive ranking is evidence-negative for this audience, and both
+   needed a second live player Compass has no user base to supply.
+7. **Canvas** — paste your personal Calendar Feed URL (Canvas → Calendar → Calendar Feed) and
+   Compass reads upcoming assignments and turns them into quests with their real due dates. No
+   token and no admin approval: student access tokens are being restricted and OAuth needs an
+   institutional developer key, so the feed is the only self-serve door. It carries deadlines,
+   not proof — verification still comes from Drive, Gmail, Calendar or GitHub.
+8. **College OS** — if [`college-os/`](college-os/README.md) has provisioned your Google account,
    Compass detects the COLLEGE DASHBOARD and turns its rows into quests (see below).
 
 ## College OS
@@ -135,7 +142,7 @@ fetched uncached and held in process memory for the page render only.
   OpenRouter key was rejected (check `Settings → Connections → Free AI status`; a 401 in the
   server log means the key itself is invalid). Compass keeps working with local fallbacks:
   filename-based interest tags, manual quest plans, human-confirmed verification, template
-  dialogue, bundled boss themes. It will never silently switch to a paid model.
+  dialogue. It will never silently switch to a paid model.
 - Free endpoints rate-limit aggressively; Compass queues requests (one in flight globally),
   batches companion dialogue, caches all deterministic LLM outputs, and retries 429s with
   backoff at most twice across at most two free models.
@@ -158,8 +165,8 @@ fetched uncached and held in process memory for the page render only.
 5. Start a **1-minute demo session** from Home, make a real change in a connected app (e.g.
    create a Google Doc), finish → watch targeted refresh, the evidence card, verification, XP,
    care points, stat growth, and a new journal memory.
-6. Browser B joins a battle with the six-character code → countdown → sprint → podium.
-7. Create a party, summon a boss, and defeat it through verified contributions.
+6. Browser B joins a focus room with the six-character code → both timers run, neither side
+   can see the other's goal, file or evidence.
 8. Show Insights → System: cache savings, provider freshness, verification history.
 9. Kill the OpenRouter key/network and repeat a finish: Compass falls back safely and the UI
    says "Free AI temporarily unavailable" — no paid request is ever made.

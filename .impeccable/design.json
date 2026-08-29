@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-29T18:45:00.000Z",
+  "generatedAt": "2026-08-29T19:30:00.000Z",
   "title": "Design System: Compass",
   "extensions": {
     "colorMeta": {
@@ -15,6 +15,12 @@
         "displayName": "Bare Paper",
         "canonical": "#ffffff",
         "note": "The page ground is paper plus the 25% dither, so full-strength paper always reads as a surface lifted off the desktop."
+      },
+      "stamp": {
+        "role": "secondary",
+        "displayName": "Stamp Vermilion",
+        "canonical": "#d8202a",
+        "note": "The second plate. Marks verified evidence only \u2014 never danger, never a brand accent. 5.05:1 on paper, 4.16:1 on ink."
       }
     },
     "typographyMeta": {
@@ -36,7 +42,7 @@
       },
       "readout": {
         "displayName": "Readout",
-        "purpose": "The focus alignment score — the one number the attention view exists to deliver. Below Display, above every other numeral."
+        "purpose": "The focus alignment score \u2014 the one number the attention view exists to deliver. Below Display, above every other numeral."
       },
       "numeral": {
         "displayName": "Numeral",
@@ -52,7 +58,7 @@
       },
       "caption": {
         "displayName": "Caption",
-        "purpose": "The tertiary prose step: .small, h3, inline code, the leaderboard note. Below this, type switches to Silkscreen and uppercase."
+        "purpose": "The tertiary prose step: .small, h3, inline code. Below this, type switches to Silkscreen and uppercase."
       },
       "label": {
         "displayName": "Label",
@@ -60,7 +66,7 @@
       },
       "micro": {
         "displayName": "Micro",
-        "purpose": "Badges, stat-tile labels, presence indicators, log-row source lines, bar-chart labels. The floor — nothing goes below 8px."
+        "purpose": "Badges, stat-tile labels, presence indicators, log-row source lines, bar-chart labels. The floor \u2014 nothing goes below 8px."
       }
     },
     "fonts": [
@@ -77,7 +83,7 @@
       {
         "name": "Geneva",
         "value": "Geneva, Verdana, DejaVu Sans, sans-serif",
-        "purpose": "The body voice. Not self-hosted — unowned off macOS, where it falls to the materially wider Verdana. Known open issue, not a decision."
+        "purpose": "The body voice. Not self-hosted \u2014 unowned off macOS, where it falls to the materially wider Verdana. Known open issue, not a decision."
       }
     ],
     "ditherTiles": [
@@ -85,19 +91,19 @@
         "name": "--d12",
         "displayName": "12% Speckle",
         "tile": "4px",
-        "purpose": "Lightest tint: table row striping, list-item and player-card hover, hero and podium grounds, soft-glow habitat, the unclear attention class."
+        "purpose": "Lightest tint: table row striping, list-item and player-card hover, hero grounds, soft-glow habitat, the unclear attention class."
       },
       {
         "name": "--d25",
         "displayName": "25% Ground",
         "tile": "2px",
-        "purpose": "The desktop ground itself, the scrollbar track, podium bars, and the default button hover."
+        "purpose": "The desktop ground itself, the scrollbar track, and the default button hover."
       },
       {
         "name": "--d50",
         "displayName": "50% Half",
         "tile": "2px",
-        "purpose": "The workhorse: every drop shadow, bar-chart column, the half-lit meter cell, the supporting_work attention class, the in-focus presence dot, the companion’s cast shadow."
+        "purpose": "The workhorse: every drop shadow, bar-chart column, the half-lit meter cell, the supporting_work attention class, the in-focus presence dot, the companion\u2019s cast shadow."
       },
       {
         "name": "--d75",
@@ -145,14 +151,14 @@
         "name": "--knock50",
         "displayName": "Knockout Half",
         "tile": "2px",
-        "purpose": "The only subtractive tile. Laid over a control as a pseudo-element to dim it by removing half its pixels — this system never uses opacity."
+        "purpose": "The only subtractive tile. Laid over a control as a pseudo-element to dim it by removing half its pixels \u2014 this system never uses opacity."
       }
     ],
     "shadows": [
       {
         "name": "dithered-plate",
         "value": "::before { top: 3px; left: 3px; right: -3px; bottom: -3px; background-image: var(--d50); background-size: 2px 2px; z-index: -1 }",
-        "purpose": "The standard lift for any floating surface — windows, cards, toasts, player cards, heroes, the leaderboard sheet. A halftone plate, not a blur and not a solid offset block."
+        "purpose": "The standard lift for any floating surface \u2014 windows, cards, toasts, player cards and heroes. A halftone plate, not a blur and not a solid offset block."
       },
       {
         "name": "double-frame",
@@ -162,7 +168,7 @@
       {
         "name": "menu-drop",
         "value": "box-shadow: 3px 3px 0 -1px var(--paper), 4px 4px 0 -1px var(--ink)",
-        "purpose": "The pull-down menu’s edge: a paper gap then a 1px ink line, so the menu reads as a sheet lifted a hair above the bar."
+        "purpose": "The pull-down menu\u2019s edge: a paper gap then a 1px ink line, so the menu reads as a sheet lifted a hair above the bar."
       }
     ],
     "motion": [
@@ -174,22 +180,22 @@
       {
         "name": "breathe",
         "value": "breathe 3.6s steps(2, jump-none) infinite",
-        "purpose": "The companion’s resting 1px rise and fall. Slows to 6s in the rest animation."
+        "purpose": "The companion\u2019s resting 1px rise and fall. Slows to 6s in the rest animation."
       },
       {
         "name": "hop",
         "value": "hop 0.6s steps(3, jump-none) 3",
-        "purpose": "The companion’s bounce reaction (0.9s × 2 for the heart reaction)."
+        "purpose": "The companion\u2019s bounce reaction (0.9s \u00d7 2 for the heart reaction)."
       },
       {
         "name": "munch",
         "value": "munch 0.5s steps(2, jump-none) 4",
-        "purpose": "The companion’s feeding squash."
+        "purpose": "The companion\u2019s feeding squash."
       },
       {
         "name": "twinkle",
         "value": "twinkle 1.2s steps(2, jump-none) infinite",
-        "purpose": "The sparkle layer — a hard on/off, never a fade."
+        "purpose": "The sparkle layer \u2014 a hard on/off, never a fade."
       },
       {
         "name": "blink",
@@ -204,7 +210,7 @@
       {
         "name": "ants",
         "value": "ants 0.5s linear infinite",
-        "purpose": "Marching-ants selection — a dashed border painted as a scrolling gradient. The one non-stepped timing in the system; it is linear because the 3px dash pattern is itself the quantisation. Never eased."
+        "purpose": "Marching-ants selection \u2014 a dashed border painted as a scrolling gradient. The one non-stepped timing in the system; it is linear because the 3px dash pattern is itself the quantisation. Never eased."
       },
       {
         "name": "floatUp",
@@ -226,12 +232,12 @@
       {
         "name": "desktop-breakdown",
         "value": "760px",
-        "purpose": "Max-width: the icon column is hidden and replaced by a fixed bottom dock, the shell collapses to one content column at 12px padding, the status bar gains 56px bottom margin to clear the dock, and the menu bar drops the user’s name."
+        "purpose": "Max-width: the icon column is hidden and replaced by a fixed bottom dock, the shell collapses to one content column at 12px padding, the status bar gains 56px bottom margin to clear the dock, and the menu bar drops the user\u2019s name."
       },
       {
         "name": "phone",
         "value": "600px",
-        "purpose": "Max-width: player grid to one column, hero and co-op launcher stack, podium tightens and its blurbs hide, leaderboard drops the trend column, window body padding tightens to 10px 11px."
+        "purpose": "Max-width: player grid to one column, hero and co-op launcher stack, window body padding tightens to 10px 11px."
       }
     ],
     "grids": [
@@ -253,7 +259,7 @@
       {
         "name": "grid-tiles",
         "value": "repeat(auto-fit, minmax(112px, 1fr)); gap: 0; border: 1px solid var(--ink)",
-        "purpose": "The stat tile strip — zero gap inside one shared frame, so tiles read as one instrument rather than as separate cards."
+        "purpose": "The stat tile strip \u2014 zero gap inside one shared frame, so tiles read as one instrument rather than as separate cards."
       }
     ]
   },
@@ -262,15 +268,15 @@
       "name": "Window",
       "kind": "card",
       "refersTo": "window",
-      "description": "The system’s only container: 1px ink frame, inverted title bar, paper body, segmented status bar, hatched grip, dithered drop plate.",
-      "html": "<section class=\"ds-win\"><header class=\"ds-win-title\"><h2>Recent sessions</h2><span class=\"ds-win-actions\"><button class=\"ds-win-btn\">Open</button></span></header><div class=\"ds-win-body\"><p>The log fills itself — you can’t write to it. Every entry here was verified from evidence in your own accounts.</p></div><div class=\"ds-win-status\"><span>5 entries</span><span>Verified 3</span><span>Read-only</span></div><span class=\"ds-win-grip\" aria-hidden=\"true\"></span></section>",
+      "description": "The system\u2019s only container: 1px ink frame, inverted title bar, paper body, segmented status bar, hatched grip, dithered drop plate.",
+      "html": "<section class=\"ds-win\"><header class=\"ds-win-title\"><h2>Recent sessions</h2><span class=\"ds-win-actions\"><button class=\"ds-win-btn\">Open</button></span></header><div class=\"ds-win-body\"><p>The log fills itself \u2014 you can\u2019t write to it. Every entry here was verified from evidence in your own accounts.</p></div><div class=\"ds-win-status\"><span>5 entries</span><span>Verified 3</span><span>Read-only</span></div><span class=\"ds-win-grip\" aria-hidden=\"true\"></span></section>",
       "css": ".ds-win { --ink: #000; --paper: #fff; position: relative; background: var(--paper); color: var(--ink); border: 1px solid var(--ink); border-radius: 0; max-width: 420px; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; font-size: 13px; line-height: 1.55; }.ds-win::before { content: \"\"; position: absolute; top: 3px; left: 3px; right: -3px; bottom: -3px; background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; image-rendering: pixelated; z-index: -1; }.ds-win-title { display: flex; align-items: center; gap: 8px; min-height: 20px; padding: 5px 6px 4px 8px; background: var(--ink); color: var(--paper); font-family: 'Silkscreen', 'Courier New', monospace; font-size: 10px; }.ds-win-title h2 { margin: 0; font-family: inherit; font-size: 10px; font-weight: 400; line-height: 1.2; color: inherit; }.ds-win-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }.ds-win-btn { font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; line-height: 1; text-transform: uppercase; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; padding: 4px 8px 3px; cursor: pointer; }.ds-win-btn:hover { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; }.ds-win-btn:active { background: var(--ink); color: var(--paper); background-image: none; }.ds-win-btn:focus-visible { outline: 2px dashed var(--paper); outline-offset: 2px; }.ds-win-body { padding: 12px 14px; }.ds-win-body p { margin: 0; max-width: 68ch; }.ds-win-status { display: flex; align-items: stretch; border-top: 1px solid var(--ink); font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; text-transform: uppercase; }.ds-win-status > * { padding: 4px 8px 3px; border-right: 1px solid var(--ink); }.ds-win-status > :last-child { border-right: 0; margin-left: auto; padding-right: 18px; }.ds-win-grip { position: absolute; right: 0; bottom: 0; width: 13px; height: 13px; background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='3'%20y='3'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 4px 4px; image-rendering: pixelated; border-left: 1px solid var(--ink); border-top: 1px solid var(--ink); pointer-events: none; }"
     },
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The default action, marked by the system’s double frame rather than by colour — there is no colour to emphasise with.",
+      "description": "The default action, marked by the system\u2019s double frame rather than by colour \u2014 there is no colour to emphasise with.",
       "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 12 12\" width=\"12\" height=\"12\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"3\" y=\"0\" width=\"6\" height=\"1\"/><rect x=\"1\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"1\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"5\" y=\"3\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"4\" y=\"4\" width=\"4\" height=\"1\"/><rect x=\"11\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"11\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"7\" y=\"6\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"4\" y=\"7\" width=\"4\" height=\"1\"/><rect x=\"11\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"5\" y=\"8\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"10\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"10\" width=\"2\" height=\"1\"/><rect x=\"3\" y=\"11\" width=\"6\" height=\"1\"/></svg> Start focus session</button>",
       "css": ".ds-btn-primary { --ink: #000; --paper: #fff; position: relative; display: inline-flex; align-items: center; gap: 6px; margin: 2px; padding: 7px 12px 6px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 10px; line-height: 1; text-transform: uppercase; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; cursor: pointer; box-shadow: 0 0 0 1px var(--paper), 0 0 0 2px var(--ink); }.ds-btn-primary svg { display: block; image-rendering: pixelated; }.ds-btn-primary:hover { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; }.ds-btn-primary:active { background: var(--ink); color: var(--paper); background-image: none; }.ds-btn-primary:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }.ds-btn-primary:active:focus-visible { outline-color: var(--paper); }"
     },
@@ -287,7 +293,7 @@
       "kind": "input",
       "refersTo": "input",
       "description": "Silkscreen 9px uppercase label over a 1px framed paper field with a block caret; focus is a 2px dashed ink ring offset 2px.",
-      "html": "<div class=\"ds-field\"><label for=\"ds-goal\">Semester goal</label><input id=\"ds-goal\" type=\"text\" placeholder=\"Something worth remembering later…\" /><label for=\"ds-len\">Session length</label><select id=\"ds-len\"><option>25 minutes</option><option>50 minutes</option></select></div>",
+      "html": "<div class=\"ds-field\"><label for=\"ds-goal\">Semester goal</label><input id=\"ds-goal\" type=\"text\" placeholder=\"Something worth remembering later\u2026\" /><label for=\"ds-len\">Session length</label><select id=\"ds-len\"><option>25 minutes</option><option>50 minutes</option></select></div>",
       "css": ".ds-field { --ink: #000; --paper: #fff; max-width: 320px; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; }.ds-field label { display: block; margin: 12px 0 4px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; text-transform: uppercase; color: var(--ink); }.ds-field label:first-child { margin-top: 0; }.ds-field input, .ds-field select { width: 100%; padding: 5px 7px; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; font-size: 13px; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; caret-color: var(--ink); caret-shape: block; }.ds-field select { appearance: none; padding-right: 24px; background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='9'%20height='6'%20shape-rendering='crispEdges'%3E%3Crect%20width='9'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='7'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='5'%20height='1'%20fill='%23000'/%3E%3Crect%20x='3'%20y='3'%20width='3'%20height='1'%20fill='%23000'/%3E%3Crect%20x='4'%20y='4'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 8px center; }.ds-field ::placeholder { color: var(--ink); opacity: 1; font-style: italic; }.ds-field input:focus-visible, .ds-field select:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }"
     },
     {
@@ -303,7 +309,7 @@
       "kind": "custom",
       "refersTo": "log-row",
       "description": "A framed list of stamped entries: a one-bit state box that reports a fact, the event in body type over a Silkscreen source line, and a tabular timestamp pushed right.",
-      "html": "<div class=\"ds-log\"><div class=\"ds-log-row\"><span class=\"ds-log-box ds-log-box-on\" role=\"img\" aria-label=\"Verified\"><svg viewBox=\"0 0 12 12\" width=\"12\" height=\"12\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"10\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"2\" width=\"3\" height=\"1\"/><rect x=\"8\" y=\"3\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"7\" y=\"4\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"5\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"1\" y=\"7\" width=\"6\" height=\"1\"/><rect x=\"2\" y=\"8\" width=\"4\" height=\"1\"/><rect x=\"3\" y=\"9\" width=\"2\" height=\"1\"/></svg></span><span class=\"ds-log-what\"><strong>50 min focus</strong><small>Completed · score 82</small></span><span class=\"ds-log-stamp\">26 AUG 14:05</span></div><div class=\"ds-log-row\"><span class=\"ds-log-box\" role=\"img\" aria-label=\"Not verified\"></span><span class=\"ds-log-what\"><strong>25 min focus</strong><small>Abandoned</small></span><span class=\"ds-log-stamp\">26 AUG 09:41</span></div></div>",
+      "html": "<div class=\"ds-log\"><div class=\"ds-log-row\"><span class=\"ds-log-box ds-log-box-on\" role=\"img\" aria-label=\"Verified\"><svg viewBox=\"0 0 12 12\" width=\"12\" height=\"12\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"10\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"2\" width=\"3\" height=\"1\"/><rect x=\"8\" y=\"3\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"7\" y=\"4\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"5\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"1\" y=\"7\" width=\"6\" height=\"1\"/><rect x=\"2\" y=\"8\" width=\"4\" height=\"1\"/><rect x=\"3\" y=\"9\" width=\"2\" height=\"1\"/></svg></span><span class=\"ds-log-what\"><strong>50 min focus</strong><small>Completed \u00b7 score 82</small></span><span class=\"ds-log-stamp\">26 AUG 14:05</span></div><div class=\"ds-log-row\"><span class=\"ds-log-box\" role=\"img\" aria-label=\"Not verified\"></span><span class=\"ds-log-what\"><strong>25 min focus</strong><small>Abandoned</small></span><span class=\"ds-log-stamp\">26 AUG 09:41</span></div></div>",
       "css": ".ds-log { --ink: #000; --paper: #fff; max-width: 380px; border: 1px solid var(--ink); background: var(--paper); overflow: hidden; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; }.ds-log-row { display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 9px; padding: 6px 8px; border-bottom: 1px dotted var(--ink); font-size: 12px; color: var(--ink); }.ds-log-row:last-child { border-bottom: 0; }.ds-log-row:hover { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 4px 4px; image-rendering: pixelated; }.ds-log-box { width: 14px; height: 14px; display: grid; place-items: center; border: 1px solid var(--ink); border-radius: 0; }.ds-log-box-on { background: var(--ink); color: var(--paper); }.ds-log-box svg { display: block; image-rendering: pixelated; }.ds-log-what { min-width: 0; }.ds-log-what strong { display: block; font-weight: 400; }.ds-log-what small { font-family: 'Silkscreen', 'Courier New', monospace; font-size: 8px; text-transform: uppercase; }.ds-log-stamp { font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; font-variant-numeric: tabular-nums; white-space: nowrap; }"
     },
     {
@@ -318,8 +324,8 @@
       "name": "Cache Badge",
       "kind": "chip",
       "refersTo": "badge",
-      "description": "Silkscreen 8px uppercase in a 1px frame. The warning variant is the same badge inverted — severity is inversion, never a colour.",
-      "html": "<span class=\"ds-badge-row\"><span class=\"ds-badge\">fresh</span><span class=\"ds-badge\">cached</span><span class=\"ds-badge ds-badge-warn\">stale — provider unreachable</span></span>",
+      "description": "Silkscreen 8px uppercase in a 1px frame. The warning variant is the same badge inverted \u2014 severity is inversion, never a colour.",
+      "html": "<span class=\"ds-badge-row\"><span class=\"ds-badge\">fresh</span><span class=\"ds-badge\">cached</span><span class=\"ds-badge ds-badge-warn\">stale \u2014 provider unreachable</span></span>",
       "css": ".ds-badge-row { --ink: #000; --paper: #fff; display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }.ds-badge { display: inline-block; padding: 3px 5px 2px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 8px; text-transform: uppercase; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; }.ds-badge-warn { background: var(--ink); color: var(--paper); }"
     },
     {
@@ -332,7 +338,7 @@
   ],
   "narrative": {
     "northStar": "The Printed Desktop",
-    "overview": "Compass is drawn the way a one-bit workstation was drawn: one ink on one paper, with every intermediate value achieved by knocking pixels out of a tile rather than by mixing. The two tokens are literally named --ink and --paper, and that naming is the whole thesis — this is not a palette that happens to be monochrome, it is a printing process with a single plate. Grays do not exist; ordered dithers stand in for all of them. The desktop ground itself is a 25% dither, so every window sits on visible tooth rather than on flat white.\n\nThe lineage is the early one-bit desktop operating system: a sticky menu bar with a working pull-down, an icon column where destinations are objects you select, one-pixel window chrome with an inverted title bar, a segmented status bar along a window’s foot, a hatched resize grip in its trailing corner, and marching ants around a selection. Density is tight and instrumented — 13px body text, 8-to-10px chrome type, 1px rules, 16px between windows — because the system’s job is to show counted, stamped, verified quantities rather than to breathe. Nothing eases: there is not one transition declaration in the stylesheet, so state changes snap, and the animations that do exist run on steps().\n\nThe confirmed anti-reference is the cream-and-sage rounded-card rendition this world replaced: a #f6f3ec ground, a #4c8a3f sage accent, Segoe UI over Georgia, soft radii and an even grid of equal cards. That was the AI-default look, and escaping it is the reason this world exists. Any drift back toward a warm neutral background, a single tasteful accent hue, a system-UI/serif pairing, or a page built as a lawn of identical rounded panels is a regression, not a variation.",
+    "overview": "Compass is drawn the way a one-bit workstation was drawn: one ink on one paper, with every intermediate value achieved by knocking pixels out of a tile rather than by mixing. The two tokens are literally named --ink and --paper, and that naming is the whole thesis \u2014 this is not a palette that happens to be monochrome, it is a printing process with a single plate. Grays do not exist; ordered dithers stand in for all of them. The desktop ground itself is a 25% dither, so every window sits on visible tooth rather than on flat white.\n\nThe lineage is the early one-bit desktop operating system: a sticky menu bar with a working pull-down, an icon column where destinations are objects you select, one-pixel window chrome with an inverted title bar, a segmented status bar along a window\u2019s foot, a hatched resize grip in its trailing corner, and marching ants around a selection. Density is tight and instrumented \u2014 13px body text, 8-to-10px chrome type, 1px rules, 16px between windows \u2014 because the system\u2019s job is to show counted, stamped, verified quantities rather than to breathe. Nothing eases: there is not one transition declaration in the stylesheet, so state changes snap, and the animations that do exist run on steps().\n\nThe confirmed anti-reference is the cream-and-sage rounded-card rendition this world replaced: a #f6f3ec ground, a #4c8a3f sage accent, Segoe UI over Georgia, soft radii and an even grid of equal cards. That was the AI-default look, and escaping it is the reason this world exists. Any drift back toward a warm neutral background, a single tasteful accent hue, a system-UI/serif pairing, or a page built as a lawn of identical rounded panels is a regression, not a variation.",
     "keyCharacteristics": [
       "Two inks and no third colour anywhere in the system.",
       "Ordered dither tiles instead of grays, used for fills, grounds, bars and shadows.",
@@ -345,17 +351,17 @@
     "rules": [
       {
         "name": "The Two-Ink Rule",
-        "body": "There are exactly two colour values in this system: #000000 and #ffffff. No third colour token exists, and none may be introduced — not for a brand accent, not for success or danger, not for a chart series. If a design needs another value, it needs another pattern.",
+        "body": "There are exactly two colour values in this system: #000000 and #ffffff. No third colour token exists, and none may be introduced \u2014 not for a brand accent, not for success or danger, not for a chart series. If a design needs another value, it needs another pattern.",
         "section": "colors"
       },
       {
         "name": "The Pattern-Not-Colour Rule",
-        "body": "Categorical meaning is carried by dither pattern and always accompanied by a labelled key. The five-class focus attention timeline is the reference implementation: direct_work is solid ink, supporting_work is 50% dither, off_task is back-hatch, unclear is 12% dither, unmonitored is vertical stripe — each swatch repeated at 11px in a legend beneath the bar. Any new classification follows the same shape: distinct tile, visible legend.",
+        "body": "Categorical meaning is carried by dither pattern and always accompanied by a labelled key. The five-class focus attention timeline is the reference implementation: direct_work is solid ink, supporting_work is 50% dither, off_task is back-hatch, unclear is 12% dither, unmonitored is vertical stripe \u2014 each swatch repeated at 11px in a legend beneath the bar. Any new classification follows the same shape: distinct tile, visible legend.",
         "section": "colors"
       },
       {
         "name": "The Solid Ground Rule",
-        "body": "Text sits only on solid black or solid white — never on a dither. Dithers are for fills, grounds, bars and shadows. Where prose has to appear over a dithered surface it gets plated first: the hero paragraph, the desk-icon label and the leaderboard note all carry their own paper background, and inverting to ink-on-paper is always preferred to dithering behind type.",
+        "body": "Text sits only on solid black or solid white \u2014 never on a dither. Dithers are for fills, grounds, bars and shadows. Where prose has to appear over a dithered surface it gets plated first: the hero paragraph and the desk-icon label both carry their own paper background, and inverting to ink-on-paper is always preferred to dithering behind type.",
         "section": "colors"
       },
       {
@@ -365,7 +371,7 @@
       },
       {
         "name": "The Tabular Readout Rule",
-        "body": "Any number that changes in place — timers, XP, scores, ranks, meter values — is set with font-variant-numeric: tabular-nums so digits do not shift the layout as they tick.",
+        "body": "Any number that changes in place \u2014 timers, XP, scores, ranks, meter values \u2014 is set with font-variant-numeric: tabular-nums so digits do not shift the layout as they tick.",
         "section": "typography"
       },
       {
@@ -385,7 +391,7 @@
       },
       {
         "name": "The One-Pixel Chrome Rule",
-        "body": "Structural borders are 1px solid var(--ink). 2px is the only escalation and it means urgency or rank: an error note, a live monitor that is actively sharing, a first-place podium card. Dotted 1px is the de-escalation, used for divisions inside a surface — list rows, log rows, leaderboard rows, rules, and advisory boxes.",
+        "body": "Structural borders are 1px solid var(--ink). 2px is the only escalation and it means urgency: an error note, a live monitor that is actively sharing, a danger button. Dotted 1px is the de-escalation, used for divisions inside a surface \u2014 list rows, log rows, rules, and advisory boxes.",
         "section": "elevation"
       },
       {
@@ -395,7 +401,7 @@
       },
       {
         "name": "The Twelve Grid Rule",
-        "body": "Any new icon is authored as a 12×12 string grid of # and . in PixelIcon.tsx, alongside the existing 50 glyphs — not imported from an icon library, not traced from an SVG, not set as a font glyph.",
+        "body": "Any new icon is authored as a 12\u00d712 string grid of # and . in PixelIcon.tsx, alongside the existing 50 glyphs \u2014 not imported from an icon library, not traced from an SVG, not set as a font glyph.",
         "section": "shapes"
       },
       {
@@ -410,7 +416,7 @@
       },
       {
         "name": "The Knockout Rule",
-        "body": "A disabled or dimmed control is dimmed by knocking pixels out of it with the --knock50 tile laid over it as a pseudo-element. Never opacity, never a lighter ink — neither exists in a one-bit world.",
+        "body": "A disabled or dimmed control is dimmed by knocking pixels out of it with the --knock50 tile laid over it as a pseudo-element. Never opacity, never a lighter ink \u2014 neither exists in a one-bit world.",
         "section": "components"
       }
     ],
@@ -419,22 +425,22 @@
       "Do express every intermediate value as an ordered dither tile from the existing set (--d12, --d25, --d50, --d75, --d87, --hatch, --hatch-back, --vstripe, --hstripe, --checker4), painted with background-size matched to the tile.",
       "Do carry classification with pattern plus a labelled legend, following the five-class attention timeline: solid ink, 50% dither, back-hatch, 12% dither, vertical stripe.",
       "Do keep text on solid black or solid white; plate it with its own paper background if it must sit over a dithered surface.",
-      "Do mark selection and active state by inversion — ink ground, paper text — and mark an in-progress selection with the travelling marching-ants border (0.5s linear infinite, 3px dashes on a scrolling gradient).",
+      "Do mark selection and active state by inversion \u2014 ink ground, paper text \u2014 and mark an in-progress selection with the travelling marching-ants border (0.5s linear infinite, 3px dashes on a scrolling gradient).",
       "Do dim disabled controls with the --knock50 overlay.",
       "Do set every number that ticks in font-variant-numeric: tabular-nums.",
-      "Do author new icons as 12×12 string grids in PixelIcon.tsx and render them at integer multiples of 12.",
+      "Do author new icons as 12\u00d712 string grids in PixelIcon.tsx and render them at integer multiples of 12.",
       "Do step motion (steps(n, jump-none)) and honour both prefers-reduced-motion: reduce and :root[data-motion='off'], which switch every animation off."
     ],
     "donts": [
-      "Don’t introduce a third colour. There are two values, #000000 and #ffffff, and no colour token exists to extend.",
-      "Don’t encode meaning in hue, tint or saturation — there is none to encode with. Pattern carries classification.",
-      "Don’t set type over a dither, and don’t use a dither as a \"light gray text\" substitute.",
-      "Don’t add a corner radius. Everything is square except input[type='radio'].",
-      "Don’t use blur, opacity ramps, gradients (other than the marching-ants dash pattern), or a solid offset block for depth. Depth is the 3px 50%-dither plate.",
-      "Don’t ease anything. There is not one transition in the stylesheet; state changes are instant and animations run on steps() — the single exception is marching ants at linear, where the 3px dash pattern is itself the quantisation.",
-      "Don’t render an emoji, an icon font, or an imported SVG icon set.",
-      "Don’t promote a window title bar to the page heading, or add a visible page banner alongside the hidden PageTitle h1.",
-      "Don’t drift back to the anti-reference: no #f6f3ec cream ground, no #4c8a3f sage accent, no Segoe UI over Georgia, no grid of equal rounded cards."
+      "Don\u2019t introduce a third colour. There are two values, #000000 and #ffffff, and no colour token exists to extend.",
+      "Don\u2019t encode meaning in hue, tint or saturation \u2014 there is none to encode with. Pattern carries classification.",
+      "Don\u2019t set type over a dither, and don\u2019t use a dither as a \"light gray text\" substitute.",
+      "Don\u2019t add a corner radius. Everything is square except input[type='radio'].",
+      "Don\u2019t use blur, opacity ramps, gradients (other than the marching-ants dash pattern), or a solid offset block for depth. Depth is the 3px 50%-dither plate.",
+      "Don\u2019t ease anything. There is not one transition in the stylesheet; state changes are instant and animations run on steps() \u2014 the single exception is marching ants at linear, where the 3px dash pattern is itself the quantisation.",
+      "Don\u2019t render an emoji, an icon font, or an imported SVG icon set.",
+      "Don\u2019t promote a window title bar to the page heading, or add a visible page banner alongside the hidden PageTitle h1.",
+      "Don\u2019t drift back to the anti-reference: no #f6f3ec cream ground, no #4c8a3f sage accent, no Segoe UI over Georgia, no grid of equal rounded cards."
     ]
   }
 }

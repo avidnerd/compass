@@ -4,8 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { Party, SimulatedPlayer } from '../api/types'
 import { SimulatedPlayerCard } from '../components/SimulatedPlayerCard'
-import { Card, ErrorNote, Spinner } from '../components/ui'
-import { PixelIcon } from '../components/PixelIcon'
+import { Card, ErrorNote, PageTitle, Spinner } from '../components/ui'
+
+/** Focus rooms: working alongside other people, which is the one social
+ *  mechanism with real evidence behind it. No ranking, no scores, no contest. */
 
 export function PartyHub() {
   const navigate = useNavigate()
@@ -19,28 +21,23 @@ export function PartyHub() {
     queryKey: ['multiplayer-players'],
     queryFn: () => api<SimulatedPlayer[]>('/multiplayer/players'),
   })
+  const afterCreate = (resp: { data: Party }) => {
+    queryClient.invalidateQueries({ queryKey: ['parties'] })
+    navigate(`/party/${resp.data.id}`)
+  }
   const create = useMutation({
     mutationFn: () => api<Party>('/parties', { body: { name } }),
-    onSuccess: (resp) => {
-      queryClient.invalidateQueries({ queryKey: ['parties'] })
-      navigate(`/party/${resp.data.id}`)
-    },
+    onSuccess: afterCreate,
   })
   const join = useMutation({
     mutationFn: () => api<Party>('/parties:join', { body: { code } }),
-    onSuccess: (resp) => {
-      queryClient.invalidateQueries({ queryKey: ['parties'] })
-      navigate(`/party/${resp.data.id}`)
-    },
+    onSuccess: afterCreate,
   })
-  const createCoop = useMutation({
+  const createDemo = useMutation({
     mutationFn: () => api<Party>('/parties', {
-      body: { name: 'The Trailblazers', theme: 'meadow', simulated_player_ids: selectedPlayers },
+      body: { name: 'Study room', theme: 'meadow', simulated_player_ids: selectedPlayers },
     }),
-    onSuccess: (resp) => {
-      queryClient.invalidateQueries({ queryKey: ['parties'] })
-      navigate(`/party/${resp.data.id}`)
-    },
+    onSuccess: afterCreate,
   })
 
   const togglePlayer = (playerId: string) => {
@@ -51,79 +48,74 @@ export function PartyHub() {
 
   return (
     <>
-      <header className="social-hero party-hero">
-        <div>
-          <h1>Parties</h1>
-          <p>Gather a small crew, turn verified focus into boss damage, and keep every private goal private.</p>
-        </div>
-        <Link className="hero-link" to="/leaderboards">View league board <PixelIcon name="right" /></Link>
-      </header>
+      <PageTitle>Focus rooms</PageTitle>
 
-      <section className="social-section">
-        <div className="section-heading">
-          <div><h2>Choose your co-op crew</h2></div>
-          <span className="selection-count">{selectedPlayers.length}/3 selected</span>
-        </div>
-        <p className="muted small">Pick up to three simulated teammates. They join instantly and
-          land an opening hit when you summon a boss.</p>
-        {players.isPending && <Spinner label="Checking the clubhouse…" />}
+      <Card title="Focus rooms" status={[`${parties.data?.data.length ?? 0} joined`]}>
+        <p>Working alongside other people makes it easier to start and easier to keep going.
+          A room shares only that you are focusing and for how long — never the goal, the file
+          or the evidence behind it.</p>
+      </Card>
+
+      <div className="grid-2">
+        <Card title="Start a room">
+          <label htmlFor="pname">Room name</label>
+          <input id="pname" value={name} onChange={(e) => setName(e.target.value)} maxLength={60}
+            placeholder="Thursday afternoon" />
+          <ErrorNote error={create.error} />
+          <button className="primary" style={{ marginTop: 12 }} onClick={() => create.mutate()}
+            disabled={create.isPending || !name.trim()}>Create</button>
+        </Card>
+        <Card title="Join a room">
+          <label htmlFor="pcode">Invite code</label>
+          <input id="pcode" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())}
+            maxLength={6} placeholder="ABC123" />
+          <ErrorNote error={join.error} />
+          <button className="primary" style={{ marginTop: 12 }} onClick={() => join.mutate()}
+            disabled={join.isPending || code.length < 6}>Join</button>
+        </Card>
+      </div>
+
+      {!!parties.data?.data.length && (
+        <Card title="Your rooms" status={[`${parties.data.data.length} joined`]}>
+          {parties.data.data.map((p) => (
+            <div key={p.id} className="list-item">
+              <span>
+                <Link to={`/party/${p.id}`}><strong>{p.name}</strong></Link>
+                <span className="small"> · {p.members.length} here</span>
+              </span>
+              <Link to={`/party/${p.id}`}><button>Open</button></Link>
+            </div>
+          ))}
+        </Card>
+      )}
+      {parties.isPending && <Spinner />}
+
+      <Card
+        title="Try it with demo company"
+        status={[`${selectedPlayers.length}/3 chosen`]}
+      >
+        <p className="small">Compass has no other real users yet, so these are simulated
+          companions for trying the room out. They are clearly marked as demo everywhere
+          they appear.</p>
+        {players.isPending && <Spinner label="Loading…" />}
         <ErrorNote error={players.error} />
         <div className="player-grid">
           {players.data?.data.map((player) => {
             const selected = selectedPlayers.includes(player.id)
-            return <SimulatedPlayerCard key={player.id} player={player} actionLabel="Add to party"
+            return <SimulatedPlayerCard key={player.id} player={player} actionLabel="Add"
               active={selected} onAction={() => togglePlayer(player.id)}
               disabled={!selected && selectedPlayers.length >= 3} />
           })}
         </div>
         <div className="coop-launcher">
-          <div><strong>{selectedPlayers.length ? 'Your crew is ready.' : 'Choose at least one teammate.'}</strong>
-            <span> You can still invite real friends afterward.</span></div>
-          <button className="primary" onClick={() => createCoop.mutate()}
-            disabled={!selectedPlayers.length || createCoop.isPending}>
-            {createCoop.isPending ? 'Forming party…' : `Start co-op party${selectedPlayers.length ? ` · ${selectedPlayers.length + 1}` : ''}`}
+          <span>{selectedPlayers.length ? 'Ready when you are.' : 'Choose at least one.'}</span>
+          <button className="primary" onClick={() => createDemo.mutate()}
+            disabled={!selectedPlayers.length || createDemo.isPending}>
+            {createDemo.isPending ? 'Opening room…' : 'Open demo room'}
           </button>
         </div>
-        <ErrorNote error={createCoop.error} />
-      </section>
-
-      <div className="section-heading standard-match-heading">
-        <div><h2>Create or join with a code</h2></div>
-      </div>
-      <div className="grid-2">
-        <Card title="Create a party">
-          <label htmlFor="pname">Party name</label>
-          <input id="pname" value={name} onChange={(e) => setName(e.target.value)} maxLength={60}
-            placeholder="The Focus Friends" />
-          <ErrorNote error={create.error} />
-          <button className="primary" style={{ marginTop: '0.8rem' }} onClick={() => create.mutate()}
-            disabled={create.isPending || !name.trim()}>Create</button>
-        </Card>
-        <Card title="Join a party">
-          <label htmlFor="pcode">Invite code</label>
-          <input id="pcode" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())}
-            maxLength={6} placeholder="ABC123" />
-          <ErrorNote error={join.error} />
-          <button className="primary" style={{ marginTop: '0.8rem' }} onClick={() => join.mutate()}
-            disabled={join.isPending || code.length < 6}>Join</button>
-        </Card>
-      </div>
-      {parties.isPending && <Spinner />}
-      {!!parties.data?.data.length && <div className="section-heading"><h2>Your parties</h2></div>}
-      {parties.data?.data.map((p) => (
-        <Card key={p.id}>
-          <div className="row spread">
-            <div>
-              <Link to={`/party/${p.id}`}><strong>{p.name}</strong></Link>
-              <p className="small muted" style={{ margin: 0 }}>
-                {p.members.length} member(s) · theme {p.theme}
-                {p.active_boss?.state === 'active' && ' · boss active'}
-              </p>
-            </div>
-            <Link to={`/party/${p.id}`}><button>Open</button></Link>
-          </div>
-        </Card>
-      ))}
+        <ErrorNote error={createDemo.error} />
+      </Card>
     </>
   )
 }

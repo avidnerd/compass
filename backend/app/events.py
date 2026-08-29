@@ -29,10 +29,7 @@ async def _audience_profiles(audience_type: str, audience_id: str) -> list[str]:
     if audience_type == "profile":
         return [audience_id]
     conn = db.get()
-    if audience_type == "battle":
-        cur = await conn.execute(
-            "SELECT profile_id FROM battle_players WHERE battle_id = ? AND left_at IS NULL", (audience_id,))
-    elif audience_type == "party":
+    if audience_type == "party":
         cur = await conn.execute("SELECT profile_id FROM party_members WHERE party_id = ?", (audience_id,))
     else:
         return []
@@ -74,14 +71,12 @@ async def replay(profile_id: str, after_event_id: int, limit: int = 500) -> list
         SELECT e.* FROM game_events e
         WHERE e.id > ? AND (
           (e.audience_type = 'profile' AND e.audience_id = ?)
-          OR (e.audience_type = 'battle' AND e.audience_id IN (
-                SELECT battle_id FROM battle_players WHERE profile_id = ?))
           OR (e.audience_type = 'party' AND e.audience_id IN (
                 SELECT party_id FROM party_members WHERE profile_id = ?))
         )
         ORDER BY e.id ASC LIMIT ?
         """,
-        (after_event_id, profile_id, profile_id, profile_id, limit),
+        (after_event_id, profile_id, profile_id, limit),
     )
     rows = await cur.fetchall()
     return [
