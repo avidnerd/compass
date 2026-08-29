@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { CollegeImportResult, CollegeLink, CollegeOverview } from '../api/types'
 import { Card, ErrorNote, EVIDENCE_LABELS, Meter, Spinner, StatTile } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 
 const TAB_ORDER = ['THIS WEEK', 'SEMESTER GOALS', 'OPPORTUNITIES']
 
@@ -95,7 +96,7 @@ export function CollegeOS() {
         )}
         <div className="row">
           <button className="primary" onClick={() => detect.mutate()} disabled={detect.isPending}>
-            {detect.isPending ? 'Scanning Drive…' : '🔎 Detect College OS'}
+            {detect.isPending ? 'Scanning Drive…' : <><PixelIcon name="scan" /> Detect College OS</>}
           </button>
         </div>
         <ErrorNote error={detect.error} />
@@ -114,7 +115,7 @@ export function CollegeOS() {
         actions={
           <div className="row">
             <button onClick={() => refresh.mutate()} disabled={refresh.isPending}>
-              {refresh.isPending ? 'Reading sheet…' : '↻ Re-read dashboard'}
+              {refresh.isPending ? 'Reading sheet…' : <><PixelIcon name="refresh" /> Re-read dashboard</>}
             </button>
             <button onClick={() => detect.mutate()} disabled={detect.isPending}>Re-detect</button>
           </div>
@@ -132,7 +133,9 @@ export function CollegeOS() {
         </div>
         {link.calendars.length > 0 && (
           <p className="small muted">
-            Calendars: {link.calendars.map((c) => `${c.present ? '✓' : '✗'} ${c.name}`).join(' · ')}
+            Calendars: {link.calendars.map((c, i) => (
+              <span key={c.name}>{i > 0 ? ' · ' : ''}<PixelIcon name={c.present ? 'check' : 'cross'} label={c.present ? 'Present' : 'Missing'} /> {c.name}</span>
+            ))}
           </p>
         )}
         {data.dashboard && data.dashboard.missing_tabs.length > 0 && (
@@ -185,7 +188,7 @@ export function CollegeOS() {
         actions={
           <button className="primary" disabled={selected.size === 0 || runImport.isPending}
             onClick={() => runImport.mutate([...selected])}>
-            {runImport.isPending ? 'Importing…' : `Import ${selected.size || ''} →`}
+            {runImport.isPending ? 'Importing…' : <>Import {selected.size || ''} <PixelIcon name="right" /></>}
           </button>
         }
       >

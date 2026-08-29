@@ -5,6 +5,7 @@ import { api, idempotencyKey, resetIdempotencyKey } from '../api/client'
 import type { FocusSession, Quest, Subgoal } from '../api/types'
 import { Card, ErrorNote, EVIDENCE_LABELS, Spinner } from '../components/ui'
 import { useFocusMonitoring } from '../components/FocusMonitoringProvider'
+import { PixelIcon } from '../components/PixelIcon'
 
 function SubgoalEditor({ subgoal, onChange, onDelete }: {
   subgoal: Subgoal
@@ -122,7 +123,7 @@ export function QuestDetail() {
               <span className={`badge ${sg.state === 'needs_confirmation' ? 'badge-warn' : ''}`}>{sg.state}</span>
               <p className="small muted" style={{ margin: '0.25rem 0 0' }}>{sg.rationale}</p>
               <p className="small" style={{ margin: '0.25rem 0 0' }}>
-                ✅ Done when: {sg.acceptance_criterion}</p>
+                <PixelIcon name="check" /> Done when: {sg.acceptance_criterion}</p>
               <p className="small muted" style={{ margin: '0.25rem 0 0' }}>
                 Evidence: {sg.evidence_specs.map((e) => EVIDENCE_LABELS[e] ?? e).join(', ')}</p>
             </div>

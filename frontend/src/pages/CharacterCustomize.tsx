@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import type { Character } from '../api/types'
 import { Companion } from '../components/Companion'
 import { Card, ErrorNote, Spinner } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 
 const FIELDS: Record<string, string[]> = {
   palette: ['meadow', 'ember', 'tide', 'dusk', 'citrus', 'orchid'],
@@ -50,7 +51,7 @@ export function CharacterCustomize() {
 
   return (
     <div className="grid-2">
-      <Card title="Customize">
+      <Card title="Customize" status={[`${ch.species}`, `Level ${ch.level}`]}>
         <label htmlFor="name">Name</label>
         <input id="name" defaultValue={ch.name}
           onChange={(e) => setPatch((p) => ({ ...p, name: e.target.value }))} maxLength={40} />
@@ -79,13 +80,13 @@ export function CharacterCustomize() {
         </div>
       </Card>
       <div>
-        <Card title="Preview">
+        <Card title="Preview" status={[`${preview.palette} coat`, `${preview.aura} habitat`]}>
           <Companion character={preview} size={240} />
         </Card>
-        <Card title="Evolution">
+        <Card title="Evolution" status={[`Stage ${ch.evolution_stage}`]}>
           {unlocks.data?.data.evolution_available ? (
             <>
-              <p>✨ {ch.name} can evolve! Both forms are purely cosmetic and previous looks stay
+              <p><PixelIcon name="sparkle" /> {ch.name} can evolve! Both forms are purely cosmetic and previous looks stay
                 available forever.</p>
               {unlocks.data.data.forms.map((f) => (
                 <button key={f.id} className="primary" style={{ marginRight: 8 }}

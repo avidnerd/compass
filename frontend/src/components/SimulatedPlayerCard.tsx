@@ -1,4 +1,5 @@
 import type { SimulatedPlayer } from '../api/types'
+import { PixelIcon, iconFor } from './PixelIcon'
 
 const STATUS_LABELS = {
   online: 'Online',
@@ -17,7 +18,7 @@ export function SimulatedPlayerCard({ player, actionLabel, onAction, active = fa
   return (
     <article className={`player-card ${active ? 'selected' : ''}`}>
       <div className="player-card-top">
-        <div className={`player-avatar palette-${player.palette}`} aria-hidden="true">{player.avatar}</div>
+        <div className={`player-avatar palette-${player.palette}`} aria-hidden="true"><PixelIcon name={iconFor(player.avatar)} size={24} /></div>
         <div className="player-identity">
           <div className="row player-name-row">
             <h3>{player.display_name}</h3>
@@ -39,7 +40,7 @@ export function SimulatedPlayerCard({ player, actionLabel, onAction, active = fa
       </dl>
       <button className={active ? 'player-action selected' : 'player-action'} onClick={onAction}
         disabled={disabled} aria-pressed={active}>
-        {active ? '✓ Selected' : actionLabel}
+        {active ? 'Selected' : actionLabel}
       </button>
     </article>
   )

@@ -5,6 +5,7 @@ import { api, idempotencyKey, resetIdempotencyKey } from '../api/client'
 import type { Battle, SimulatedPlayer } from '../api/types'
 import { SimulatedPlayerCard } from '../components/SimulatedPlayerCard'
 import { Card, ErrorNote, Spinner } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 
 export function BattleHub() {
   const navigate = useNavigate()
@@ -37,16 +38,15 @@ export function BattleHub() {
     <>
       <header className="social-hero battle-hero">
         <div>
-          <p className="social-kicker">Friendly competition</p>
           <h1>Focus battles</h1>
           <p>A synchronized sprint where your work stays private and only the momentum is shared.</p>
         </div>
-        <Link className="hero-link" to="/leaderboards">View league board <span aria-hidden="true">→</span></Link>
+        <Link className="hero-link" to="/leaderboards">View league board <PixelIcon name="right" /></Link>
       </header>
 
       <section className="social-section">
         <div className="section-heading">
-          <div><p className="social-kicker">Ready to spar</p><h2>Choose a demo rival</h2></div>
+          <div><h2>Choose a demo rival</h2></div>
           <span className="badge">1-minute quick match</span>
         </div>
         <p className="muted small">These simulated players arrive ready. Pick a rival, ready up in
@@ -64,7 +64,7 @@ export function BattleHub() {
       </section>
 
       <div className="section-heading standard-match-heading">
-        <div><p className="social-kicker">Bring your own crew</p><h2>Host or join a friend</h2></div>
+        <div><h2>Host or join a friend</h2></div>
       </div>
       <div className="grid-2">
         <Card title="Host a battle">

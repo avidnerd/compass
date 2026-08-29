@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { BossEncounter } from '../api/types'
 import { Card, ErrorNote, Spinner } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 
 export function BossScene() {
   const { partyId, encounterId } = useParams()
@@ -22,7 +23,7 @@ export function BossScene() {
       <h1>{b.theme.name ?? 'The Boss'}</h1>
       <p className="muted">{b.theme.narration}</p>
       <div style={{ fontSize: '5rem' }} aria-hidden="true">
-        {b.state === 'defeated' ? '💥' : pct > 66 ? '🐲' : pct > 33 ? '😤' : '🥵'}
+        <PixelIcon size={48} name={b.state === 'defeated' ? 'sparkle' : pct > 66 ? 'skull' : pct > 33 ? 'fire' : 'bolt'} />
       </div>
       <div className="boss-hp" role="meter" aria-valuenow={b.hp_current} aria-valuemin={0}
         aria-valuemax={b.hp_max} aria-label="Boss HP">
@@ -31,7 +32,7 @@ export function BossScene() {
       <p>{b.hp_current} / {b.hp_max} HP</p>
       {b.state === 'defeated' && (
         <Card>
-          <h2>🎉 Defeated!</h2>
+          <h2>Defeated</h2>
           <p>{b.theme.defeat_line ?? 'The party stands victorious.'}</p>
           <p className="small muted">Everyone who contributed earned a cosmetic crown, a trophy
             prop, and a journal memory.</p>

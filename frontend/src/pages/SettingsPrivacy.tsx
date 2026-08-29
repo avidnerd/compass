@@ -5,6 +5,7 @@ import { api } from '../api/client'
 import type { Job, Profile } from '../api/types'
 import { Card, ErrorNote } from '../components/ui'
 import { useFocusMonitoring } from '../components/FocusMonitoringProvider'
+import { PixelIcon } from '../components/PixelIcon'
 
 export function SettingsPrivacy() {
   const navigate = useNavigate()
@@ -88,7 +89,7 @@ export function SettingsPrivacy() {
       <Card title="Your data">
         <div className="row">
           <button onClick={() => exportData.mutate()} disabled={exportData.isPending}>
-            ⬇ Export everything as JSON
+            <PixelIcon name="down" /> Export everything as JSON
           </button>
         </div>
         <p className="small muted">Memories can be edited or deleted in the

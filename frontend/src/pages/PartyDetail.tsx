@@ -3,10 +3,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { Party } from '../api/types'
 import { Card, ErrorNote, Spinner } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 
 const EMOTES = [
-  { id: 'cheer', glyph: '📣' }, { id: 'heart', glyph: '💛' }, { id: 'spark', glyph: '✨' },
-  { id: 'flex', glyph: '💪' }, { id: 'tea', glyph: '🍵' }, { id: 'confetti', glyph: '🎊' },
+  { id: 'cheer', glyph: 'megaphone' }, { id: 'heart', glyph: 'heart' }, { id: 'spark', glyph: 'sparkle' },
+  { id: 'flex', glyph: 'bolt' }, { id: 'tea', glyph: 'kettle' }, { id: 'confetti', glyph: 'sparkle' },
 ]
 
 export function PartyDetail() {
@@ -44,7 +45,7 @@ export function PartyDetail() {
       </div>
 
       {boss && boss.state === 'active' ? (
-        <Card title={`⚔️ ${boss.theme.name ?? 'A mysterious boss'}`}>
+        <Card title={`${boss.theme.name ?? 'A mysterious boss'}`}>
           <p className="muted">{boss.theme.narration}</p>
           <div className="boss-hp" role="meter" aria-valuenow={boss.hp_current}
             aria-valuemin={0} aria-valuemax={boss.hp_max} aria-label="Boss HP">
@@ -58,13 +59,13 @@ export function PartyDetail() {
         </Card>
       ) : (
         <Card title="Summon a boss">
-          {boss?.state === 'defeated' && <p>🎉 Last boss defeated! Ready for another?</p>}
+          {boss?.state === 'defeated' && <p>Last boss defeated. Ready for another?</p>}
           {boss?.state === 'expired' && <p className="muted">The last boss wandered off (no harm
             done). Summon a fresh one?</p>}
           <div className="row">
             {['easy', 'standard', 'epic'].map((d) => (
               <button key={d} onClick={() => startBoss.mutate(d)} disabled={startBoss.isPending}>
-                {d === 'easy' ? '🌱' : d === 'standard' ? '🔥' : '🌋'} {d}
+                <PixelIcon name={d === 'easy' ? 'leaf' : d === 'standard' ? 'fire' : 'skull'} /> {d}
               </button>
             ))}
           </div>
@@ -77,8 +78,8 @@ export function PartyDetail() {
           {p.members.map((m) => (
             <div key={m.profile_id} className="list-item">
               <span className="room-player">
-                <span className="mini-avatar" aria-hidden="true">{m.avatar ?? '🧭'}</span>
-                <span><strong>{m.display_name}</strong>{m.profile_id === p.owner_profile_id ? ' 👑' : ''}
+                <span className="mini-avatar" aria-hidden="true"><PixelIcon name="compass" size={24} /></span>
+                <span><strong>{m.display_name}</strong>{m.profile_id === p.owner_profile_id ? <> <PixelIcon name="crown" label="Party owner" /></> : null}
                   {m.title && <small>{m.title}</small>}</span>
               </span>
               {m.is_simulated && <span className="badge">co-op teammate</span>}

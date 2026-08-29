@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { Battle, Profile, Quest, Subgoal } from '../api/types'
 import { Card, ErrorNote, Spinner } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 import { formatSeconds, useServerNow } from '../hooks/useServerTimer'
 
 export function BattleRoom() {
@@ -120,7 +121,7 @@ export function BattleRoom() {
             {[...b.players].filter((p) => !p.left).sort((a, c) => (a.placement ?? 9) - (c.placement ?? 9))
               .map((p) => (
                 <div key={p.profile_id} className="podium-slot">
-                  <div>{p.placement === 1 ? '👑' : p.placement === 2 ? '🥈' : '🥉'}</div>
+                  <div><PixelIcon size={24} name={p.placement === 1 ? 'crown' : 'medal'} label={`Placement ${p.placement}`} /></div>
                   <div className="podium-bar" style={{ height: 30 + (p.power ?? 0) }}>
                     {p.power ?? '—'}
                   </div>
@@ -146,7 +147,7 @@ export function BattleRoom() {
         {b.players.map((p) => (
           <div key={p.profile_id} className="list-item">
             <span className="room-player">
-              <span className="mini-avatar" aria-hidden="true">{p.avatar ?? '🧭'}</span>
+              <span className="mini-avatar" aria-hidden="true"><PixelIcon name="compass" size={24} /></span>
               <span><strong>{p.display_name}</strong>{p.profile_id === b.host_profile_id ? ' (host)' : ''}
                 {p.left ? ' — left' : ''}
                 {p.title && <small>{p.title}</small>}</span>

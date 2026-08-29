@@ -10,7 +10,7 @@ const CONFIRM_MESSAGE =
 /** Always-reachable "start over" action: same DELETE /me the Settings →
  * Privacy page offers, but one click + a native confirm instead of typing
  * "delete" — handy for demos and quick resets. */
-export function ResetButton({ className, label = '↺ Start over' }: {
+export function ResetButton({ className, label = 'Start over' }: {
   className?: string
   label?: string
 }) {

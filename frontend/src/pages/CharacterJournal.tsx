@@ -3,9 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { Character, Memory } from '../api/types'
 import { Card, ErrorNote, Meter, Spinner } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 
 const KIND_ICON: Record<string, string> = {
-  reflection: '💭', encourage: '💌', postcard: '📮', boss: '🐲', battle: '⚔️',
+  reflection: 'bulb', encourage: 'envelope', postcard: 'file', boss: 'skull', battle: 'battle',
 }
 
 export function CharacterJournal() {
@@ -56,8 +57,8 @@ export function CharacterJournal() {
               ) : (
                 <>
                   <span style={{ flex: 1 }}>
-                    <span aria-hidden="true">{KIND_ICON[m.kind] ?? '✨'}</span> {m.text}
-                    <span className="small muted"> · {new Date(m.created_at).toLocaleDateString()}</span>
+                    <PixelIcon name={KIND_ICON[m.kind] ?? 'sparkle'} /> {m.text}
+                    <span className="small"> · {new Date(m.created_at).toLocaleDateString()}</span>
                   </span>
                   <span className="row">
                     <button onClick={() => { setEditId(m.id); setEditText(m.text) }}>Edit</button>
@@ -84,7 +85,7 @@ export function CharacterJournal() {
         )}
         <Card title="Postcards">
           {memories.data?.data.items.filter((m) => m.kind === 'postcard').slice(0, 5).map((m) => (
-            <p key={m.id}>📮 {m.text}</p>
+            <p key={m.id}><PixelIcon name="file" /> {m.text}</p>
           ))}
           {memories.data?.data.items.filter((m) => m.kind === 'postcard').length === 0 && (
             <p className="muted">Your companion writes one postcard per day you focus.</p>

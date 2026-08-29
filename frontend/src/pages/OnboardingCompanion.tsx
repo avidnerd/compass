@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { api } from '../api/client'
+import { api, ApiError } from '../api/client'
 import type { Character, InterestProfile } from '../api/types'
 import { Companion } from '../components/Companion'
 import { Card, ErrorNote } from '../components/ui'
@@ -29,6 +29,15 @@ export function OnboardingCompanion() {
     retry: false,
   })
   const suggestion = interest.data?.data
+
+  // A companion can only be hatched once. If this profile already has one,
+  // this step is already done and must offer a way onward rather than a
+  // button that can only ever fail.
+  const existing = useQuery({
+    queryKey: ['character'],
+    queryFn: () => api<Character>('/character'),
+    retry: false,
+  })
 
   const [species, setSpecies] = useState('sproutling')
   const [name, setName] = useState('')
@@ -59,7 +68,37 @@ export function OnboardingCompanion() {
       await queryClient.invalidateQueries()
       navigate('/quests/new')
     },
+    onError: (err) => {
+      // Already hatched (a double submit, a back-button return, a stale tab):
+      // refetch so the "already hatched" branch below takes over.
+      if (err instanceof ApiError && err.code === 'character_exists') {
+        queryClient.invalidateQueries({ queryKey: ['character'] })
+      }
+    },
   })
+
+  const hatched = existing.data?.data
+  if (hatched) {
+    return (
+      <Card title="Companion already hatched" status={[hatched.species, `Level ${hatched.level}`]}>
+        <StepDots step={3} />
+        <div className="grid-2">
+          <div>
+            <p><strong>{hatched.name}</strong> is already yours — this step is done. You can keep
+              going, or change their look any time.</p>
+            <div className="row" style={{ marginTop: 12 }}>
+              <Link to="/quests/new"><button className="primary">Continue to your first quest</button></Link>
+              <Link to="/home"><button>Go to home</button></Link>
+              <Link to="/character/customize"><button>Customize</button></Link>
+            </div>
+          </div>
+          <div>
+            <Companion character={hatched} />
+          </div>
+        </div>
+      </Card>
+    )
+  }
 
   return (
     <Card title="Choose your companion">

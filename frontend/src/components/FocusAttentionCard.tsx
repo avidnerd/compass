@@ -1,5 +1,6 @@
 import type { FocusEvaluation } from '../api/types'
 import { Card, StatTile } from './ui'
+import { PixelIcon } from './PixelIcon'
 
 const LABELS: Record<string, string> = {
   direct_work: 'Direct work', supporting_work: 'Supporting work',
@@ -62,7 +63,10 @@ export function FocusAttentionCard({ evaluation }: { evaluation: FocusEvaluation
         </>
       )}
 
-      <p className="monitoring-recommendation">💡 {evaluation.summary.next_session_recommendation}</p>
+      <p className="monitoring-recommendation">
+        <PixelIcon name="idea" size={12} />
+        <span>{evaluation.summary.next_session_recommendation}</span>
+      </p>
       <p className="small muted">
         {evaluation.frames_analyzed} of {evaluation.frames_captured} sampled moments analyzed
         {evaluation.model_id ? <> by <code>{evaluation.model_id}</code></> : ''}.

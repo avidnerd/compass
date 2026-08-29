@@ -8,6 +8,7 @@ import { FocusAttentionCard } from '../components/FocusAttentionCard'
 import { useFocusMonitoring } from '../components/FocusMonitoringProvider'
 import { Card, CONNECTOR_LABELS, ErrorNote, EVIDENCE_LABELS, Spinner } from '../components/ui'
 import { formatSeconds, useServerNow } from '../hooks/useServerTimer'
+import { PixelIcon } from '../components/PixelIcon'
 
 function EvidenceCard({ verification }: { verification: Verification }) {
   return (
@@ -158,12 +159,12 @@ export function FocusSessionPage() {
           </div>
           <div className="row" style={{ justifyContent: 'center' }}>
             {session.state === 'running'
-              ? <button onClick={() => act.mutate('pause')}>⏸ Pause</button>
-              : <button onClick={() => act.mutate('resume')}>▶ Resume</button>}
+              ? <button onClick={() => act.mutate('pause')}>Pause</button>
+              : <button onClick={() => act.mutate('resume')}><PixelIcon name="run" /> Resume</button>}
             <button className="primary" onClick={() => finish.mutate()} disabled={finish.isPending}>
-              ✅ Finish & verify
+              <PixelIcon name="check" /> Finish & verify
             </button>
-            <button onClick={() => cancel.mutate()} disabled={cancel.isPending}>✖ Cancel</button>
+            <button onClick={() => cancel.mutate()} disabled={cancel.isPending}>Cancel</button>
           </div>
           <ErrorNote error={act.error || finish.error || cancel.error} />
         </Card>
@@ -205,8 +206,8 @@ export function FocusSessionPage() {
 
       {session.state === 'completed' && (
         <>
-          <Card title={verification?.result === 'verified' ? '🎉 Verified!' :
-            verification?.human_confirmed ? '👍 Counted (you confirmed it)' : 'Session complete'}>
+          <Card title={verification?.result === 'verified' ? 'Verified' :
+            verification?.human_confirmed ? 'Counted — you confirmed it' : 'Session complete'}>
             <div className="grid-tiles">
               <div className="stat-tile"><div className="stat-value">{session.focus_score ?? '—'}</div>
                 <div className="stat-label">Focus score</div></div>
@@ -215,7 +216,7 @@ export function FocusSessionPage() {
             </div>
             {verification?.result === 'not_completed' && (
               <p>This one didn't land — that's okay. Maybe pick a smaller slice next session;
-                your companion suggests just opening the file counts as a start. 💛</p>
+                your companion suggests just opening the file counts as a start.</p>
             )}
             <div className="row">
               <button className="primary" onClick={() => navigate(session.quest_id ? `/quests/${session.quest_id}` : '/home')}>

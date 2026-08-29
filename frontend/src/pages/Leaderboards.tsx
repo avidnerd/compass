@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { Leaderboards as LeaderboardsData } from '../api/types'
 import { ErrorNote, Spinner } from '../components/ui'
+import { PixelIcon, iconFor } from '../components/PixelIcon'
 
 function formatValue(value: number, unit: string) {
   return `${value.toLocaleString()} ${unit}`
@@ -28,7 +29,6 @@ export function Leaderboards() {
     <div className="leaderboard-page">
       <header className="social-hero leaderboard-hero">
         <div>
-          <p className="social-kicker">The clubhouse</p>
           <h1>League board</h1>
           <p>See who is finding their rhythm — from quiet streak-builders to boss-breaking regulars.</p>
         </div>
@@ -40,7 +40,7 @@ export function Leaderboards() {
           <button key={metric.id} role="tab" aria-selected={active.id === metric.id}
             className={active.id === metric.id ? 'active' : ''}
             onClick={() => setSelectedMetric(metric.id)}>
-            <span aria-hidden="true">{metric.icon}</span>{metric.short_label}
+            <PixelIcon name={iconFor(metric.icon)} /> {metric.short_label}
           </button>
         ))}
       </div>
@@ -49,7 +49,7 @@ export function Leaderboards() {
         {topThree.map((entry, index) => (
           <article key={entry.profile_id} className={`league-podium-card place-${index + 1}`}>
             <span className="league-place">#{entry.rank}</span>
-            <div className="league-avatar" aria-hidden="true">{entry.avatar}</div>
+            <div className="league-avatar" aria-hidden="true"><PixelIcon name={iconFor(entry.avatar)} size={36} /></div>
             <h2>{entry.display_name}</h2>
             <p>{entry.title}</p>
             <strong>{formatValue(entry.value, active.unit)}</strong>
@@ -59,7 +59,7 @@ export function Leaderboards() {
 
       <section className="leaderboard-sheet">
         <header>
-          <div><p className="social-kicker">This season</p><h2>{active.icon} {active.label}</h2></div>
+          <div><h2><PixelIcon name={iconFor(active.icon)} /> {active.label}</h2></div>
           {current && <div className="your-rank"><span>Your rank</span><strong>#{current.rank}</strong></div>}
         </header>
         <div className="leaderboard-list" role="table" aria-label={`${active.label} standings`}>
@@ -68,12 +68,12 @@ export function Leaderboards() {
               role="row">
               <div className="rank-cell" role="cell">{entry.rank}</div>
               <div className="leaderboard-person" role="cell">
-                <span className="mini-avatar" aria-hidden="true">{entry.avatar}</span>
+                <span className="mini-avatar" aria-hidden="true"><PixelIcon name={iconFor(entry.avatar)} size={24} /></span>
                 <span><strong>{entry.display_name}</strong>
                   <small>{entry.is_current_user ? 'You' : entry.title}</small></span>
               </div>
               <div className="trend-cell" role="cell" aria-label={entry.trend > 0 ? 'Up one place' : entry.trend < 0 ? 'Down one place' : 'No rank change'}>
-                {entry.trend > 0 ? '↑ 1' : entry.trend < 0 ? '↓ 1' : '—'}
+                {entry.trend === 0 ? '—' : <><PixelIcon name={entry.trend > 0 ? 'up' : 'down'} /> 1</>}
               </div>
               <div className="score-cell" role="cell">{formatValue(entry.value, active.unit)}</div>
             </div>

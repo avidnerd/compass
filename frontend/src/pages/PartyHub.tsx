@@ -5,6 +5,7 @@ import { api } from '../api/client'
 import type { Party, SimulatedPlayer } from '../api/types'
 import { SimulatedPlayerCard } from '../components/SimulatedPlayerCard'
 import { Card, ErrorNote, Spinner } from '../components/ui'
+import { PixelIcon } from '../components/PixelIcon'
 
 export function PartyHub() {
   const navigate = useNavigate()
@@ -52,16 +53,15 @@ export function PartyHub() {
     <>
       <header className="social-hero party-hero">
         <div>
-          <p className="social-kicker">Better together</p>
           <h1>Parties</h1>
           <p>Gather a small crew, turn verified focus into boss damage, and keep every private goal private.</p>
         </div>
-        <Link className="hero-link" to="/leaderboards">View league board <span aria-hidden="true">→</span></Link>
+        <Link className="hero-link" to="/leaderboards">View league board <PixelIcon name="right" /></Link>
       </header>
 
       <section className="social-section">
         <div className="section-heading">
-          <div><p className="social-kicker">Build a demo party</p><h2>Choose your co-op crew</h2></div>
+          <div><h2>Choose your co-op crew</h2></div>
           <span className="selection-count">{selectedPlayers.length}/3 selected</span>
         </div>
         <p className="muted small">Pick up to three simulated teammates. They join instantly and
@@ -88,7 +88,7 @@ export function PartyHub() {
       </section>
 
       <div className="section-heading standard-match-heading">
-        <div><p className="social-kicker">Invite your people</p><h2>Create or join with a code</h2></div>
+        <div><h2>Create or join with a code</h2></div>
       </div>
       <div className="grid-2">
         <Card title="Create a party">
@@ -117,7 +117,7 @@ export function PartyHub() {
               <Link to={`/party/${p.id}`}><strong>{p.name}</strong></Link>
               <p className="small muted" style={{ margin: 0 }}>
                 {p.members.length} member(s) · theme {p.theme}
-                {p.active_boss?.state === 'active' && ' · ⚔️ boss active!'}
+                {p.active_boss?.state === 'active' && ' · boss active'}
               </p>
             </div>
             <Link to={`/party/${p.id}`}><button>Open</button></Link>

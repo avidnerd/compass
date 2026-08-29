@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "codex-grid-background",
+        "value": "two-axis grid-line gradient background",
+        "createdAt": "2026-08-29T18:39:15.018Z",
+        "reason": "Marching-ants selection border, not a grid field: background-size confines each of the four gradients to a 1px edge strip with background-repeat:no-repeat, so no field is painted. It is the selection affordance the One-Bit Desktop world names in its direction contract. Independently ruled a false positive by the impeccable finish reviewer."
+      }
+    ]
+  }
+}

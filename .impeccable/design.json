@@ -1,0 +1,440 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-29T18:45:00.000Z",
+  "title": "Design System: Compass",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Absolute Ink",
+        "canonical": "#000000",
+        "note": "This system has no tonal ramp. Every intermediate value is an ordered dither tile (see extensions.ditherTiles), not a lighter ink."
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Bare Paper",
+        "canonical": "#ffffff",
+        "note": "The page ground is paper plus the 25% dither, so full-strength paper always reads as a surface lifted off the desktop."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The focus session timer, and nothing else. The largest type in the system."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The h1 element. Usually visually hidden on window-structured screens; visible on hero surfaces, which scale it clamp(20px, 4vw, 30px). Scales clamp(20px, 4vw, 30px); visible mainly on hero surfaces, since window-structured screens hide the h1."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "The h2 element in document flow, e.g. a social section heading."
+      },
+      "chrome": {
+        "displayName": "Chrome",
+        "purpose": "Window title bars, buttons, menu-bar items, pull-down entries, hero links, timer state. Uppercase on controls, sentence case in a window title."
+      },
+      "readout": {
+        "displayName": "Readout",
+        "purpose": "The focus alignment score — the one number the attention view exists to deliver. Below Display, above every other numeral."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Stat tile values and other tabular readouts. Always font-variant-numeric: tabular-nums."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All running prose, max 68ch. Steps to 12px (.muted) and 11px (.small)."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "The systematic secondary prose step: .muted, table cells, list-item text, monitoring disclosures."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "The tertiary prose step: .small, h3, inline code, the leaderboard note. Below this, type switches to Silkscreen and uppercase."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form labels, window and desktop status fields, meter heads, table headers, legend keys, desk-icon labels."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Badges, stat-tile labels, presence indicators, log-row source lines, bar-chart labels. The floor — nothing goes below 8px."
+      }
+    },
+    "fonts": [
+      {
+        "name": "Silkscreen 400",
+        "value": "/fonts/silkscreen-400.woff2",
+        "purpose": "Self-hosted and preloaded. The chrome voice."
+      },
+      {
+        "name": "Silkscreen 700",
+        "value": "/fonts/silkscreen-700.woff2",
+        "purpose": "Self-hosted and preloaded. Used for the menu-bar brand and bold body emphasis."
+      },
+      {
+        "name": "Geneva",
+        "value": "Geneva, Verdana, DejaVu Sans, sans-serif",
+        "purpose": "The body voice. Not self-hosted — unowned off macOS, where it falls to the materially wider Verdana. Known open issue, not a decision."
+      }
+    ],
+    "ditherTiles": [
+      {
+        "name": "--d12",
+        "displayName": "12% Speckle",
+        "tile": "4px",
+        "purpose": "Lightest tint: table row striping, list-item and player-card hover, hero and podium grounds, soft-glow habitat, the unclear attention class."
+      },
+      {
+        "name": "--d25",
+        "displayName": "25% Ground",
+        "tile": "2px",
+        "purpose": "The desktop ground itself, the scrollbar track, podium bars, and the default button hover."
+      },
+      {
+        "name": "--d50",
+        "displayName": "50% Half",
+        "tile": "2px",
+        "purpose": "The workhorse: every drop shadow, bar-chart column, the half-lit meter cell, the supporting_work attention class, the in-focus presence dot, the companion’s cast shadow."
+      },
+      {
+        "name": "--d75",
+        "displayName": "75% Dense",
+        "tile": "2px",
+        "purpose": "Dark end of the ladder, for fills that must read as almost-ink without being ink."
+      },
+      {
+        "name": "--d87",
+        "displayName": "87% Near-Solid",
+        "tile": "4px",
+        "purpose": "Darkest tile short of solid ink."
+      },
+      {
+        "name": "--hatch",
+        "displayName": "Forward Hatch",
+        "tile": "4px",
+        "purpose": "Window resize grip, boss HP fill, ember habitat and ember avatar."
+      },
+      {
+        "name": "--hatch-back",
+        "displayName": "Back Hatch",
+        "tile": "4px",
+        "purpose": "Reserved for opposition: the off_task attention class and the destructive button."
+      },
+      {
+        "name": "--vstripe",
+        "displayName": "Vertical Stripe",
+        "tile": "2px",
+        "purpose": "The unmonitored attention class."
+      },
+      {
+        "name": "--hstripe",
+        "displayName": "Horizontal Stripe",
+        "tile": "2px",
+        "purpose": "Bubbles habitat and tidepool avatars."
+      },
+      {
+        "name": "--checker4",
+        "displayName": "4px Checker",
+        "tile": "4px",
+        "purpose": "The coarsest tile, available as a coat and fill pattern."
+      },
+      {
+        "name": "--knock50",
+        "displayName": "Knockout Half",
+        "tile": "2px",
+        "purpose": "The only subtractive tile. Laid over a control as a pseudo-element to dim it by removing half its pixels — this system never uses opacity."
+      }
+    ],
+    "shadows": [
+      {
+        "name": "dithered-plate",
+        "value": "::before { top: 3px; left: 3px; right: -3px; bottom: -3px; background-image: var(--d50); background-size: 2px 2px; z-index: -1 }",
+        "purpose": "The standard lift for any floating surface — windows, cards, toasts, player cards, heroes, the leaderboard sheet. A halftone plate, not a blur and not a solid offset block."
+      },
+      {
+        "name": "double-frame",
+        "value": "box-shadow: 0 0 0 1px var(--paper), 0 0 0 2px var(--ink)",
+        "purpose": "The default-button ring on .primary, with margin: 2px reserving room for it. Marks the action the Return key would press."
+      },
+      {
+        "name": "menu-drop",
+        "value": "box-shadow: 3px 3px 0 -1px var(--paper), 4px 4px 0 -1px var(--ink)",
+        "purpose": "The pull-down menu’s edge: a paper gap then a 1px ink line, so the menu reads as a sheet lifted a hair above the bar."
+      }
+    ],
+    "motion": [
+      {
+        "name": "no-transition",
+        "value": "none",
+        "purpose": "There is not one transition declaration in the stylesheet. State changes are instant."
+      },
+      {
+        "name": "breathe",
+        "value": "breathe 3.6s steps(2, jump-none) infinite",
+        "purpose": "The companion’s resting 1px rise and fall. Slows to 6s in the rest animation."
+      },
+      {
+        "name": "hop",
+        "value": "hop 0.6s steps(3, jump-none) 3",
+        "purpose": "The companion’s bounce reaction (0.9s × 2 for the heart reaction)."
+      },
+      {
+        "name": "munch",
+        "value": "munch 0.5s steps(2, jump-none) 4",
+        "purpose": "The companion’s feeding squash."
+      },
+      {
+        "name": "twinkle",
+        "value": "twinkle 1.2s steps(2, jump-none) infinite",
+        "purpose": "The sparkle layer — a hard on/off, never a fade."
+      },
+      {
+        "name": "blink",
+        "value": "blink 1.4s steps(2, jump-none) infinite",
+        "purpose": "The live monitor dot while a session is sharing the screen."
+      },
+      {
+        "name": "print",
+        "value": "print 0.4s steps(5, jump-none) 1",
+        "purpose": "The authored moment: a verified log entry prints in a band at a time via a clip-path inset, the way a line printer lays one down. Clipped so it never covers its neighbour."
+      },
+      {
+        "name": "ants",
+        "value": "ants 0.5s linear infinite",
+        "purpose": "Marching-ants selection — a dashed border painted as a scrolling gradient. The one non-stepped timing in the system; it is linear because the 3px dash pattern is itself the quantisation. Never eased."
+      },
+      {
+        "name": "floatUp",
+        "value": "floatUp 1.4s steps(6, jump-none) forwards",
+        "purpose": "The emote burst rising 72px and vanishing."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce, and :root[data-motion=\"off\"]",
+        "purpose": "Both switch every animation in the system off with animation: none !important. New animations must be added to both lists."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "900px",
+        "purpose": "Max-width: the three-up player grid drops to two columns."
+      },
+      {
+        "name": "desktop-breakdown",
+        "value": "760px",
+        "purpose": "Max-width: the icon column is hidden and replaced by a fixed bottom dock, the shell collapses to one content column at 12px padding, the status bar gains 56px bottom margin to clear the dock, and the menu bar drops the user’s name."
+      },
+      {
+        "name": "phone",
+        "value": "600px",
+        "purpose": "Max-width: player grid to one column, hero and co-op launcher stack, podium tightens and its blurbs hide, leaderboard drops the trend column, window body padding tightens to 10px 11px."
+      }
+    ],
+    "grids": [
+      {
+        "name": "app-shell",
+        "value": "grid-template-columns: 104px 1fr; grid-template-rows: 25px 1fr auto",
+        "purpose": "Sticky 25px menu bar spanning full width, a sticky 104px icon column beside a fluid main panel, and a full-width desktop status bar along the foot."
+      },
+      {
+        "name": "main-panel",
+        "value": "max-width: 1180px; padding: 16px 16px 40px",
+        "purpose": "The content column that holds the windows."
+      },
+      {
+        "name": "grid-2",
+        "value": "repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start",
+        "purpose": "The two-column window layout."
+      },
+      {
+        "name": "grid-tiles",
+        "value": "repeat(auto-fit, minmax(112px, 1fr)); gap: 0; border: 1px solid var(--ink)",
+        "purpose": "The stat tile strip — zero gap inside one shared frame, so tiles read as one instrument rather than as separate cards."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Window",
+      "kind": "card",
+      "refersTo": "window",
+      "description": "The system’s only container: 1px ink frame, inverted title bar, paper body, segmented status bar, hatched grip, dithered drop plate.",
+      "html": "<section class=\"ds-win\"><header class=\"ds-win-title\"><h2>Recent sessions</h2><span class=\"ds-win-actions\"><button class=\"ds-win-btn\">Open</button></span></header><div class=\"ds-win-body\"><p>The log fills itself — you can’t write to it. Every entry here was verified from evidence in your own accounts.</p></div><div class=\"ds-win-status\"><span>5 entries</span><span>Verified 3</span><span>Read-only</span></div><span class=\"ds-win-grip\" aria-hidden=\"true\"></span></section>",
+      "css": ".ds-win { --ink: #000; --paper: #fff; position: relative; background: var(--paper); color: var(--ink); border: 1px solid var(--ink); border-radius: 0; max-width: 420px; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; font-size: 13px; line-height: 1.55; }.ds-win::before { content: \"\"; position: absolute; top: 3px; left: 3px; right: -3px; bottom: -3px; background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; image-rendering: pixelated; z-index: -1; }.ds-win-title { display: flex; align-items: center; gap: 8px; min-height: 20px; padding: 5px 6px 4px 8px; background: var(--ink); color: var(--paper); font-family: 'Silkscreen', 'Courier New', monospace; font-size: 10px; }.ds-win-title h2 { margin: 0; font-family: inherit; font-size: 10px; font-weight: 400; line-height: 1.2; color: inherit; }.ds-win-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }.ds-win-btn { font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; line-height: 1; text-transform: uppercase; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; padding: 4px 8px 3px; cursor: pointer; }.ds-win-btn:hover { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; }.ds-win-btn:active { background: var(--ink); color: var(--paper); background-image: none; }.ds-win-btn:focus-visible { outline: 2px dashed var(--paper); outline-offset: 2px; }.ds-win-body { padding: 12px 14px; }.ds-win-body p { margin: 0; max-width: 68ch; }.ds-win-status { display: flex; align-items: stretch; border-top: 1px solid var(--ink); font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; text-transform: uppercase; }.ds-win-status > * { padding: 4px 8px 3px; border-right: 1px solid var(--ink); }.ds-win-status > :last-child { border-right: 0; margin-left: auto; padding-right: 18px; }.ds-win-grip { position: absolute; right: 0; bottom: 0; width: 13px; height: 13px; background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='3'%20y='3'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 4px 4px; image-rendering: pixelated; border-left: 1px solid var(--ink); border-top: 1px solid var(--ink); pointer-events: none; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The default action, marked by the system’s double frame rather than by colour — there is no colour to emphasise with.",
+      "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 12 12\" width=\"12\" height=\"12\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"3\" y=\"0\" width=\"6\" height=\"1\"/><rect x=\"1\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"1\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"5\" y=\"3\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"4\" y=\"4\" width=\"4\" height=\"1\"/><rect x=\"11\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"11\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"7\" y=\"6\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"4\" y=\"7\" width=\"4\" height=\"1\"/><rect x=\"11\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"5\" y=\"8\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"10\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"10\" width=\"2\" height=\"1\"/><rect x=\"3\" y=\"11\" width=\"6\" height=\"1\"/></svg> Start focus session</button>",
+      "css": ".ds-btn-primary { --ink: #000; --paper: #fff; position: relative; display: inline-flex; align-items: center; gap: 6px; margin: 2px; padding: 7px 12px 6px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 10px; line-height: 1; text-transform: uppercase; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; cursor: pointer; box-shadow: 0 0 0 1px var(--paper), 0 0 0 2px var(--ink); }.ds-btn-primary svg { display: block; image-rendering: pixelated; }.ds-btn-primary:hover { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; }.ds-btn-primary:active { background: var(--ink); color: var(--paper); background-image: none; }.ds-btn-primary:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }.ds-btn-primary:active:focus-visible { outline-color: var(--paper); }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Square, 1px framed, uppercase Silkscreen. Hover dithers, active inverts, disabled knocks half the pixels out.",
+      "html": "<span class=\"ds-btn-row\"><button class=\"ds-btn\"><svg viewBox=\"0 0 12 12\" width=\"12\" height=\"12\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"1\" y=\"0\" width=\"10\" height=\"1\"/><rect x=\"1\" y=\"1\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"1\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"2\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"2\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"3\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"3\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"6\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"8\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"8\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"9\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"9\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"10\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"10\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"11\" width=\"10\" height=\"1\"/></svg> New quest</button><button class=\"ds-btn ds-btn-danger\">Delete</button><button class=\"ds-btn\" disabled>Verify</button></span>",
+      "css": ".ds-btn-row { --ink: #000; --paper: #fff; display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }.ds-btn { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px 6px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 10px; line-height: 1; text-transform: uppercase; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; cursor: pointer; }.ds-btn svg { display: block; image-rendering: pixelated; }.ds-btn:hover:not(:disabled) { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; }.ds-btn:active:not(:disabled) { background: var(--ink); color: var(--paper); background-image: none; }.ds-btn:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }.ds-btn:active:focus-visible { outline-color: var(--paper); }.ds-btn-danger { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20x='3'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20y='3'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 4px 4px; }.ds-btn-danger:hover:not(:disabled) { background: var(--ink); color: var(--paper); background-image: none; }.ds-btn:disabled { cursor: not-allowed; }.ds-btn:disabled::after { content: \"\"; position: absolute; inset: 0; background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20x='1'%20width='1'%20height='1'%20fill='%23fff'/%3E%3Crect%20y='1'%20width='1'%20height='1'%20fill='%23fff'/%3E%3C/svg%3E\"); background-size: 2px 2px; image-rendering: pixelated; pointer-events: none; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Silkscreen 9px uppercase label over a 1px framed paper field with a block caret; focus is a 2px dashed ink ring offset 2px.",
+      "html": "<div class=\"ds-field\"><label for=\"ds-goal\">Semester goal</label><input id=\"ds-goal\" type=\"text\" placeholder=\"Something worth remembering later…\" /><label for=\"ds-len\">Session length</label><select id=\"ds-len\"><option>25 minutes</option><option>50 minutes</option></select></div>",
+      "css": ".ds-field { --ink: #000; --paper: #fff; max-width: 320px; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; }.ds-field label { display: block; margin: 12px 0 4px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; text-transform: uppercase; color: var(--ink); }.ds-field label:first-child { margin-top: 0; }.ds-field input, .ds-field select { width: 100%; padding: 5px 7px; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; font-size: 13px; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; caret-color: var(--ink); caret-shape: block; }.ds-field select { appearance: none; padding-right: 24px; background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='9'%20height='6'%20shape-rendering='crispEdges'%3E%3Crect%20width='9'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='7'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='5'%20height='1'%20fill='%23000'/%3E%3Crect%20x='3'%20y='3'%20width='3'%20height='1'%20fill='%23000'/%3E%3Crect%20x='4'%20y='4'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 8px center; }.ds-field ::placeholder { color: var(--ink); opacity: 1; font-style: italic; }.ds-field input:focus-visible, .ds-field select:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }"
+    },
+    {
+      "name": "Counted Meter",
+      "kind": "custom",
+      "refersTo": "meter-track",
+      "description": "Twenty cells you can count. With no fill colour there is no percentage to judge, so the quantity is shown as squares; the trailing cell takes the 50% dither.",
+      "html": "<div class=\"ds-meter\"><div class=\"ds-meter-head\"><span>Energy</span><span class=\"ds-meter-num\">68</span></div><div class=\"ds-meter-track\"><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-on\"></span><span class=\"ds-meter-cell ds-meter-cell-half\"></span><span class=\"ds-meter-cell\"></span><span class=\"ds-meter-cell\"></span><span class=\"ds-meter-cell\"></span><span class=\"ds-meter-cell\"></span><span class=\"ds-meter-cell\"></span><span class=\"ds-meter-cell\"></span></div></div>",
+      "css": ".ds-meter { --ink: #000; --paper: #fff; max-width: 280px; margin: 0 0 8px; }.ds-meter-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 3px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; text-transform: uppercase; color: var(--ink); }.ds-meter-num { font-variant-numeric: tabular-nums; }.ds-meter-track { display: flex; gap: 1px; height: 11px; padding: 1px; border: 1px solid var(--ink); background: var(--paper); }.ds-meter-cell { flex: 1; background: var(--paper); }.ds-meter-cell-on { background: var(--ink); }.ds-meter-cell-half { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; image-rendering: pixelated; }"
+    },
+    {
+      "name": "Evidence Log Row",
+      "kind": "custom",
+      "refersTo": "log-row",
+      "description": "A framed list of stamped entries: a one-bit state box that reports a fact, the event in body type over a Silkscreen source line, and a tabular timestamp pushed right.",
+      "html": "<div class=\"ds-log\"><div class=\"ds-log-row\"><span class=\"ds-log-box ds-log-box-on\" role=\"img\" aria-label=\"Verified\"><svg viewBox=\"0 0 12 12\" width=\"12\" height=\"12\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"10\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"2\" width=\"3\" height=\"1\"/><rect x=\"8\" y=\"3\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"7\" y=\"4\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"0\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"5\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"1\" y=\"7\" width=\"6\" height=\"1\"/><rect x=\"2\" y=\"8\" width=\"4\" height=\"1\"/><rect x=\"3\" y=\"9\" width=\"2\" height=\"1\"/></svg></span><span class=\"ds-log-what\"><strong>50 min focus</strong><small>Completed · score 82</small></span><span class=\"ds-log-stamp\">26 AUG 14:05</span></div><div class=\"ds-log-row\"><span class=\"ds-log-box\" role=\"img\" aria-label=\"Not verified\"></span><span class=\"ds-log-what\"><strong>25 min focus</strong><small>Abandoned</small></span><span class=\"ds-log-stamp\">26 AUG 09:41</span></div></div>",
+      "css": ".ds-log { --ink: #000; --paper: #fff; max-width: 380px; border: 1px solid var(--ink); background: var(--paper); overflow: hidden; font-family: Geneva, Verdana, 'DejaVu Sans', sans-serif; }.ds-log-row { display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 9px; padding: 6px 8px; border-bottom: 1px dotted var(--ink); font-size: 12px; color: var(--ink); }.ds-log-row:last-child { border-bottom: 0; }.ds-log-row:hover { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 4px 4px; image-rendering: pixelated; }.ds-log-box { width: 14px; height: 14px; display: grid; place-items: center; border: 1px solid var(--ink); border-radius: 0; }.ds-log-box-on { background: var(--ink); color: var(--paper); }.ds-log-box svg { display: block; image-rendering: pixelated; }.ds-log-what { min-width: 0; }.ds-log-what strong { display: block; font-weight: 400; }.ds-log-what small { font-family: 'Silkscreen', 'Courier New', monospace; font-size: 8px; text-transform: uppercase; }.ds-log-stamp { font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; font-variant-numeric: tabular-nums; white-space: nowrap; }"
+    },
+    {
+      "name": "Desktop Icon",
+      "kind": "nav",
+      "refersTo": "desk-icon",
+      "description": "Navigation as objects on a desktop: a 36px authored glyph over a plated label. Hover inverts the label; the selected destination inverts both.",
+      "html": "<nav class=\"ds-desk\" aria-label=\"Primary\"><a class=\"ds-desk-icon ds-desk-icon-active\" href=\"#\"><svg viewBox=\"0 0 12 12\" width=\"36\" height=\"36\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"3\" y=\"0\" width=\"6\" height=\"1\"/><rect x=\"1\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"1\" width=\"2\" height=\"1\"/><rect x=\"1\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"5\" y=\"3\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"4\" y=\"4\" width=\"4\" height=\"1\"/><rect x=\"11\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"11\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"7\" y=\"6\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"4\" y=\"7\" width=\"4\" height=\"1\"/><rect x=\"11\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"0\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"5\" y=\"8\" width=\"2\" height=\"1\"/><rect x=\"11\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"10\" width=\"2\" height=\"1\"/><rect x=\"9\" y=\"10\" width=\"2\" height=\"1\"/><rect x=\"3\" y=\"11\" width=\"6\" height=\"1\"/></svg><span class=\"ds-desk-label\">Home</span></a><a class=\"ds-desk-icon\" href=\"#\"><svg viewBox=\"0 0 12 12\" width=\"36\" height=\"36\" shape-rendering=\"crispEdges\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"1\" y=\"0\" width=\"10\" height=\"1\"/><rect x=\"1\" y=\"1\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"1\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"2\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"2\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"2\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"3\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"3\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"3\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"4\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"5\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"5\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"5\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"6\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"6\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"6\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"7\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"8\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"8\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"8\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"3\" y=\"9\" width=\"2\" height=\"1\"/><rect x=\"6\" y=\"9\" width=\"3\" height=\"1\"/><rect x=\"10\" y=\"9\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"10\" width=\"1\" height=\"1\"/><rect x=\"10\" y=\"10\" width=\"1\" height=\"1\"/><rect x=\"1\" y=\"11\" width=\"10\" height=\"1\"/></svg><span class=\"ds-desk-label\">Quests</span></a></nav>",
+      "css": ".ds-desk { --ink: #000; --paper: #fff; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 104px; padding: 14px 4px; }.ds-desk-icon { width: 92px; padding: 5px 2px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: var(--ink); }.ds-desk-icon svg { display: block; image-rendering: pixelated; }.ds-desk-label { font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; line-height: 1.35; text-align: center; padding: 1px 3px; background: var(--paper); }.ds-desk-icon:hover .ds-desk-label { background: var(--ink); color: var(--paper); }.ds-desk-icon-active svg { background: var(--ink); color: var(--paper); }.ds-desk-icon-active .ds-desk-label { background: var(--ink); color: var(--paper); }.ds-desk-icon:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }"
+    },
+    {
+      "name": "Cache Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Silkscreen 8px uppercase in a 1px frame. The warning variant is the same badge inverted — severity is inversion, never a colour.",
+      "html": "<span class=\"ds-badge-row\"><span class=\"ds-badge\">fresh</span><span class=\"ds-badge\">cached</span><span class=\"ds-badge ds-badge-warn\">stale — provider unreachable</span></span>",
+      "css": ".ds-badge-row { --ink: #000; --paper: #fff; display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }.ds-badge { display: inline-block; padding: 3px 5px 2px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 8px; text-transform: uppercase; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; }.ds-badge-warn { background: var(--ink); color: var(--paper); }"
+    },
+    {
+      "name": "Focus Attention Timeline",
+      "kind": "custom",
+      "description": "The reference implementation of the Pattern-Not-Colour Rule: five attention classes carried by five dither tiles, each repeated at 11px in a labelled key.",
+      "html": "<div class=\"ds-timeline-wrap\"><div class=\"ds-timeline\"><span class=\"ds-seg ds-seg-direct\" style=\"flex:5\"></span><span class=\"ds-seg ds-seg-support\" style=\"flex:2\"></span><span class=\"ds-seg ds-seg-off\" style=\"flex:1\"></span><span class=\"ds-seg ds-seg-direct\" style=\"flex:4\"></span><span class=\"ds-seg ds-seg-unclear\" style=\"flex:1\"></span><span class=\"ds-seg ds-seg-unmon\" style=\"flex:2\"></span></div><div class=\"ds-legend\"><span><i class=\"ds-key ds-seg-direct\"></i> Direct work</span><span><i class=\"ds-key ds-seg-support\"></i> Supporting</span><span><i class=\"ds-key ds-seg-off\"></i> Off task</span><span><i class=\"ds-key ds-seg-unclear\"></i> Unclear</span><span><i class=\"ds-key ds-seg-unmon\"></i> Unmonitored</span></div></div>",
+      "css": ".ds-timeline-wrap { --ink: #000; --paper: #fff; max-width: 420px; color: var(--ink); }.ds-timeline { display: flex; gap: 1px; height: 22px; padding: 1px; border: 1px solid var(--ink); background: var(--paper); overflow: hidden; }.ds-seg { display: block; min-width: 1px; background-color: var(--paper); image-rendering: pixelated; }.ds-seg-direct { background-color: var(--ink); }.ds-seg-support { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; }.ds-seg-off { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20x='3'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='1'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='1'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20y='3'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 4px 4px; }.ds-seg-unclear { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='1'%20fill='%23000'/%3E%3Crect%20x='2'%20y='2'%20width='1'%20height='1'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 4px 4px; }.ds-seg-unmon { background-image: url(\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='2'%20height='2'%20shape-rendering='crispEdges'%3E%3Crect%20width='1'%20height='2'%20fill='%23000'/%3E%3C/svg%3E\"); background-size: 2px 2px; }.ds-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-family: 'Silkscreen', 'Courier New', monospace; font-size: 9px; text-transform: uppercase; }.ds-legend span { display: flex; align-items: center; gap: 5px; }.ds-key { display: inline-block; width: 11px; height: 11px; border: 1px solid var(--ink); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Printed Desktop",
+    "overview": "Compass is drawn the way a one-bit workstation was drawn: one ink on one paper, with every intermediate value achieved by knocking pixels out of a tile rather than by mixing. The two tokens are literally named --ink and --paper, and that naming is the whole thesis — this is not a palette that happens to be monochrome, it is a printing process with a single plate. Grays do not exist; ordered dithers stand in for all of them. The desktop ground itself is a 25% dither, so every window sits on visible tooth rather than on flat white.\n\nThe lineage is the early one-bit desktop operating system: a sticky menu bar with a working pull-down, an icon column where destinations are objects you select, one-pixel window chrome with an inverted title bar, a segmented status bar along a window’s foot, a hatched resize grip in its trailing corner, and marching ants around a selection. Density is tight and instrumented — 13px body text, 8-to-10px chrome type, 1px rules, 16px between windows — because the system’s job is to show counted, stamped, verified quantities rather than to breathe. Nothing eases: there is not one transition declaration in the stylesheet, so state changes snap, and the animations that do exist run on steps().\n\nThe confirmed anti-reference is the cream-and-sage rounded-card rendition this world replaced: a #f6f3ec ground, a #4c8a3f sage accent, Segoe UI over Georgia, soft radii and an even grid of equal cards. That was the AI-default look, and escaping it is the reason this world exists. Any drift back toward a warm neutral background, a single tasteful accent hue, a system-UI/serif pairing, or a page built as a lawn of identical rounded panels is a regression, not a variation.",
+    "keyCharacteristics": [
+      "Two inks and no third colour anywhere in the system.",
+      "Ordered dither tiles instead of grays, used for fills, grounds, bars and shadows.",
+      "Classification carried by pattern, never by hue.",
+      "One-pixel chrome; zero corner radius on every rectangle.",
+      "Silkscreen as the chrome voice, Geneva as the body voice.",
+      "Authored 12-grid pixel icons; no emoji, no icon font.",
+      "Stepped motion, instant state changes, dithered drop shadows."
+    ],
+    "rules": [
+      {
+        "name": "The Two-Ink Rule",
+        "body": "There are exactly two colour values in this system: #000000 and #ffffff. No third colour token exists, and none may be introduced — not for a brand accent, not for success or danger, not for a chart series. If a design needs another value, it needs another pattern.",
+        "section": "colors"
+      },
+      {
+        "name": "The Pattern-Not-Colour Rule",
+        "body": "Categorical meaning is carried by dither pattern and always accompanied by a labelled key. The five-class focus attention timeline is the reference implementation: direct_work is solid ink, supporting_work is 50% dither, off_task is back-hatch, unclear is 12% dither, unmonitored is vertical stripe — each swatch repeated at 11px in a legend beneath the bar. Any new classification follows the same shape: distinct tile, visible legend.",
+        "section": "colors"
+      },
+      {
+        "name": "The Solid Ground Rule",
+        "body": "Text sits only on solid black or solid white — never on a dither. Dithers are for fills, grounds, bars and shadows. Where prose has to appear over a dithered surface it gets plated first: the hero paragraph, the desk-icon label and the leaderboard note all carry their own paper background, and inverting to ink-on-paper is always preferred to dithering behind type.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Silkscreen is chrome and Geneva is content, and they never trade jobs. A sentence a person reads is never set in Silkscreen; a control, label, status field or counted number is never set in Geneva. When in doubt, ask whether the string is part of the machine or part of the message.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Readout Rule",
+        "body": "Any number that changes in place — timers, XP, scores, ranks, meter values — is set with font-variant-numeric: tabular-nums so digits do not shift the layout as they tick.",
+        "section": "typography"
+      },
+      {
+        "name": "The Whole-Pixel Rule",
+        "body": "Every measurement in this system is a whole pixel and every drawn thing is snapped to its grid. Pixel icons render at integer multiples of 12 (12, 24, 36, 48); the companion frame snaps to a whole multiple of 24 before drawing; dither backgrounds set background-size to their exact tile size; image-rendering: pixelated and shape-rendering: crispEdges are applied at the raster. Fractional sizes produce interpolated pixels, which is the one thing this world cannot survive.",
+        "section": "layout"
+      },
+      {
+        "name": "The Plated Content Rule",
+        "body": "Running text never sits directly on the dithered desktop. Content lives inside a window, or on an element that carries its own paper background and 1px frame.",
+        "section": "layout"
+      },
+      {
+        "name": "The Halftone Shadow Rule",
+        "body": "Depth is a 3px dithered plate offset down and right, never a blur, never an opacity ramp, and never a solid offset block. If a surface needs to lift, it takes the plate; if it does not, it takes a 1px frame and nothing else.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One-Pixel Chrome Rule",
+        "body": "Structural borders are 1px solid var(--ink). 2px is the only escalation and it means urgency or rank: an error note, a live monitor that is actively sharing, a first-place podium card. Dotted 1px is the de-escalation, used for divisions inside a surface — list rows, log rows, leaderboard rows, rules, and advisory boxes.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Zero Radius Rule",
+        "body": "Corner radius is 0 on every surface, control, badge, tile and container. The sole exception is input[type='radio'] and its dot at 50%. Pills, rounded cards and softened buttons are out of the world.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Twelve Grid Rule",
+        "body": "Any new icon is authored as a 12×12 string grid of # and . in PixelIcon.tsx, alongside the existing 50 glyphs — not imported from an icon library, not traced from an SVG, not set as a font glyph.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Window Names Nothing Rule",
+        "body": "A window title bar is chrome, never the document heading. Screens structured as windows name themselves with PageTitle, a visually hidden h1, so every page has exactly one h1 and exactly one visible page-title treatment. Never promote a window title to the page heading, and never add a second visible page banner above the windows.",
+        "section": "components"
+      },
+      {
+        "name": "The Drawn Glyph Rule",
+        "body": "No emoji renders anywhere in the interface. Every symbol is an authored 12-grid glyph; server-supplied emoji are translated by iconFor() at the design layer rather than by changing what the server stores.",
+        "section": "components"
+      },
+      {
+        "name": "The Knockout Rule",
+        "body": "A disabled or dimmed control is dimmed by knocking pixels out of it with the --knock50 tile laid over it as a pseudo-element. Never opacity, never a lighter ink — neither exists in a one-bit world.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do build every panel as a window: 1px ink frame, inverted title bar (min-height 20px, 5px 6px 4px 8px), paper body (12px 14px), optional segmented status bar, hatched 13px grip in the trailing corner.",
+      "Do express every intermediate value as an ordered dither tile from the existing set (--d12, --d25, --d50, --d75, --d87, --hatch, --hatch-back, --vstripe, --hstripe, --checker4), painted with background-size matched to the tile.",
+      "Do carry classification with pattern plus a labelled legend, following the five-class attention timeline: solid ink, 50% dither, back-hatch, 12% dither, vertical stripe.",
+      "Do keep text on solid black or solid white; plate it with its own paper background if it must sit over a dithered surface.",
+      "Do mark selection and active state by inversion — ink ground, paper text — and mark an in-progress selection with the travelling marching-ants border (0.5s linear infinite, 3px dashes on a scrolling gradient).",
+      "Do dim disabled controls with the --knock50 overlay.",
+      "Do set every number that ticks in font-variant-numeric: tabular-nums.",
+      "Do author new icons as 12×12 string grids in PixelIcon.tsx and render them at integer multiples of 12.",
+      "Do step motion (steps(n, jump-none)) and honour both prefers-reduced-motion: reduce and :root[data-motion='off'], which switch every animation off."
+    ],
+    "donts": [
+      "Don’t introduce a third colour. There are two values, #000000 and #ffffff, and no colour token exists to extend.",
+      "Don’t encode meaning in hue, tint or saturation — there is none to encode with. Pattern carries classification.",
+      "Don’t set type over a dither, and don’t use a dither as a \"light gray text\" substitute.",
+      "Don’t add a corner radius. Everything is square except input[type='radio'].",
+      "Don’t use blur, opacity ramps, gradients (other than the marching-ants dash pattern), or a solid offset block for depth. Depth is the 3px 50%-dither plate.",
+      "Don’t ease anything. There is not one transition in the stylesheet; state changes are instant and animations run on steps() — the single exception is marching ants at linear, where the 3px dash pattern is itself the quantisation.",
+      "Don’t render an emoji, an icon font, or an imported SVG icon set.",
+      "Don’t promote a window title bar to the page heading, or add a visible page banner alongside the hidden PageTitle h1.",
+      "Don’t drift back to the anti-reference: no #f6f3ec cream ground, no #4c8a3f sage accent, no Segoe UI over Georgia, no grid of equal rounded cards."
+    ]
+  }
+}

@@ -57,7 +57,7 @@ export function OnboardingProfile() {
   }
 
   return (
-    <Card title="Welcome to Compass 🧭">
+    <Card title="Welcome to Compass">
       <StepDots step={0} />
       <p>Compass turns your real work into a cozy companion game — locally, on your machine.
         Each browser gets its own profile.</p>

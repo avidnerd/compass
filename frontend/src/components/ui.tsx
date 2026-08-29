@@ -1,16 +1,38 @@
 import type { ReactNode } from 'react'
 import type { Meta } from '../api/client'
+import { PixelIcon } from './PixelIcon'
 
-export function Card({ title, children, actions }: { title?: string; children: ReactNode; actions?: ReactNode }) {
+/** Every panel in this system is a window: title bar, body, optional segmented
+ *  status bar, hatched resize grip. `Card` keeps its name so screens that have
+ *  not been individually art-directed still land inside the world. */
+/** A window title bar is chrome, never the document heading. Screens whose
+ *  structure is windows rather than a banner name themselves here instead, so
+ *  every page has exactly one h1 and only one visible page-title treatment. */
+export function PageTitle({ children }: { children: ReactNode }) {
+  return <h1 className="sr-only">{children}</h1>
+}
+
+export function Card({ title, children, actions, status, grip = true }: {
+  title?: string
+  children: ReactNode
+  actions?: ReactNode
+  /** Segmented status-bar fields, rendered left to right; the last is pushed right. */
+  status?: ReactNode[]
+  grip?: boolean
+}) {
   return (
-    <section className="card">
+    <section className="win">
       {(title || actions) && (
-        <header className="card-header">
+        <header className="win-title">
           {title && <h2>{title}</h2>}
-          {actions}
+          {actions && <span className="win-actions">{actions}</span>}
         </header>
       )}
-      {children}
+      <div className="win-body">{children}</div>
+      {status && status.length > 0 && (
+        <div className="win-status">{status.map((field, i) => <span key={i}>{field}</span>)}</div>
+      )}
+      {grip && status && status.length > 0 && <span className="win-grip" aria-hidden="true" />}
     </section>
   )
 }
@@ -25,13 +47,27 @@ export function StatTile({ label, value, hint }: { label: string; value: ReactNo
   )
 }
 
+const CELLS = 20
+
+/** A level you can count. Cells beat a smooth bar here: in one bit there is no
+ *  fill colour to judge a percentage by, but you can always count the squares. */
 export function Meter({ label, value, max = 100 }: { label: string; value: number; max?: number }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100))
+  const exact = (pct / 100) * CELLS
+  const full = Math.floor(exact)
+  const partial = exact - full >= 0.34 && full < CELLS
   return (
-    <div className="meter" role="meter" aria-valuenow={value} aria-valuemin={0} aria-valuemax={max}
-      aria-label={label}>
-      <div className="meter-head"><span>{label}</span><span>{value}</span></div>
-      <div className="meter-track"><div className="meter-fill" style={{ width: `${pct}%` }} /></div>
+    <div className="meter">
+      <div className="meter-head">
+        <span>{label}</span>
+        <span className="meter-num">{value}</span>
+      </div>
+      <div className="meter-track" role="meter" aria-valuenow={value} aria-valuemin={0}
+        aria-valuemax={max} aria-label={label}>
+        {Array.from({ length: CELLS }, (_, i) => (
+          <span key={i} className={`meter-cell ${i < full ? 'on' : i === full && partial ? 'half' : ''}`} />
+        ))}
+      </div>
     </div>
   )
 }
@@ -40,7 +76,7 @@ export function CacheBadge({ meta }: { meta?: Meta }) {
   if (!meta || meta.from_cache === undefined) return null
   return (
     <span className={`badge ${meta.stale ? 'badge-warn' : ''}`}>
-      {meta.stale ? 'stale data (provider unreachable)' : meta.from_cache ? 'cached' : 'fresh'}
+      {meta.stale ? 'stale — provider unreachable' : meta.from_cache ? 'cached' : 'fresh'}
     </span>
   )
 }
@@ -74,6 +110,15 @@ export function Spinner({ label = 'Loading…' }: { label?: string }) {
   return <p className="muted" aria-busy="true">{label}</p>
 }
 
+/** A one-bit checkbox that reports a fact rather than accepting input. */
+export function StateBox({ on, label }: { on: boolean; label: string }) {
+  return (
+    <span className={`log-box ${on ? 'verified' : ''}`} role="img" aria-label={label}>
+      {on && <PixelIcon name="check" size={12} />}
+    </span>
+  )
+}
+
 export const CONNECTOR_LABELS: Record<string, string> = {
   google_calendar: 'Google Calendar',
   google_drive: 'Google Drive',
@@ -99,4 +144,15 @@ export const EVIDENCE_LABELS: Record<string, string> = {
   github_checks_passed: 'Checks passed',
   meet_attended: 'Meet attended',
   manual_confirmation: 'You confirm it',
+}
+
+/** Which drawn glyph stands for each evidence source. */
+export const EVIDENCE_ICONS: Record<string, string> = {
+  file_created: 'file', file_modified: 'file',
+  document_content_changed: 'file', sheet_values_changed: 'insights',
+  presentation_content_changed: 'easel', email_sent: 'envelope',
+  calendar_event_completed: 'clock', github_commit_created: 'bolt',
+  github_pull_request_opened: 'folder', github_pull_request_merged: 'check',
+  github_checks_passed: 'check', meet_attended: 'megaphone',
+  manual_confirmation: 'check',
 }

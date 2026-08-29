@@ -1,235 +1,290 @@
+import { useId } from 'react'
 import type { Character } from '../api/types'
+import { PixelIcon } from './PixelIcon'
 
-/** Layered local SVG companion. All layers are enum-driven; nothing here is
- * ever produced by an LLM beyond enum choices. */
+/** The companion, drawn as one-bit pixel art on a 24x24 grid.
+ *
+ *  Silhouettes are authored as masks; the one-pixel outline is computed from the
+ *  mask at render time, so it is always exact and never drifts from the shape.
+ *  The creature reads first: its body is paper-white inside a hard outline, and
+ *  pattern is confined to the lower coat so the face never competes with texture.
+ *
+ *  There is no colour in this system, so the character's `palette` enum selects a
+ *  COAT PATTERN and `aura` becomes the habitat's own material — the enums keep
+ *  their job of telling companions apart, in the only vocabulary a one-bit world
+ *  has. Everything is still enum-driven; nothing here is ever produced by a model
+ *  beyond those enum choices. */
 
-export const PALETTES: Record<string, { body: string; belly: string; accent: string; habitat: string }> = {
-  meadow: { body: '#7cbf6b', belly: '#dff0d0', accent: '#4c8a3f', habitat: '#eaf6df' },
-  ember: { body: '#e8875a', belly: '#ffe3c8', accent: '#c05b2e', habitat: '#fdeee2' },
-  tide: { body: '#5fa8d3', belly: '#dceefb', accent: '#33698f', habitat: '#e5f2fb' },
-  dusk: { body: '#8d7bb8', belly: '#e8e1f5', accent: '#5d4a8a', habitat: '#efeaf9' },
-  citrus: { body: '#e3b23c', belly: '#fbeecb', accent: '#b08215', habitat: '#fbf4dd' },
-  orchid: { body: '#d377a8', belly: '#f9dfec', accent: '#a34a78', habitat: '#fceaf3' },
+const W = 24
+
+/** Coat patterns, replacing the old colour palettes one for one. */
+export const COATS: Record<string, string> = {
+  meadow: 'p25',
+  ember: 'phatch',
+  tide: 'phstripe',
+  dusk: 'p50',
+  citrus: 'pchecker',
+  orchid: 'pvstripe',
 }
 
-function Eyes({ kind, cx1, cx2, cy }: { kind: string; cx1: number; cx2: number; cy: number }) {
-  if (kind === 'sleepy') {
-    return (
-      <g stroke="#2f2a36" strokeWidth="2.4" strokeLinecap="round" fill="none">
-        <path d={`M ${cx1 - 5} ${cy} q 5 4 10 0`} />
-        <path d={`M ${cx2 - 5} ${cy} q 5 4 10 0`} />
-      </g>
-    )
-  }
-  if (kind === 'determined') {
-    return (
-      <g fill="#2f2a36">
-        <path d={`M ${cx1 - 6} ${cy - 5} l 12 3 l -1 3 l -11 -1 z`} />
-        <path d={`M ${cx2 + 6} ${cy - 5} l -12 3 l 1 3 l 11 -1 z`} />
-      </g>
-    )
-  }
-  return (
-    <g fill="#2f2a36">
-      <circle cx={cx1} cy={cy} r={4.4} />
-      <circle cx={cx2} cy={cy} r={4.4} />
-      {kind === 'sparkle' && (
-        <g fill="#ffffff">
-          <circle cx={cx1 + 1.6} cy={cy - 1.6} r={1.5} />
-          <circle cx={cx2 + 1.6} cy={cy - 1.6} r={1.5} />
-        </g>
-      )}
-    </g>
-  )
+/** The body a species shares below the head. */
+const TORSO = [
+  '...##################...', // 8
+  '...##################...', // 9
+  '..####################..', // 10
+  '..####################..', // 11
+  '..####################..', // 12
+  '..####################..', // 13
+  '..####################..', // 14
+  '...##################...', // 15
+  '...##################...', // 16
+  '....################....', // 17
+  '.....##############.....', // 18
+  '......############......', // 19
+  '.......##########.......', // 20
+  '......###....###........', // 21
+  '......###....###........', // 22
+  '........................', // 23
+]
+
+const BODIES: Record<string, string[]> = {
+  sproutling: [
+    '........................', // 0
+    '........................', // 1
+    '......##......##........', // 2  leaves
+    '.....####....####.......', // 3
+    '......####..####........', // 4
+    '........######..........', // 5  stem
+    '.....##############.....', // 6
+    '....################....', // 7
+    ...TORSO,
+  ],
+  emberfox: [
+    '........................', // 0
+    '........................', // 1
+    '....##..........##......', // 2  ears
+    '....####......####......', // 3
+    '.....#####..#####.......', // 4
+    '......############......', // 5
+    '.....##############.....', // 6
+    '....################....', // 7
+    '...##################...', // 8
+    '...##################...', // 9
+    '..####################..', // 10
+    '..####################..', // 11
+    '..####################..', // 12
+    '..####################..', // 13
+    '..####################..', // 14
+    '...##################...', // 15
+    '...###################..', // 16  tail
+    '....###################.', // 17
+    '.....##################.', // 18
+    '......############......', // 19
+    '.......##########.......', // 20
+    '......###....###........', // 21
+    '......###....###........', // 22
+    '........................', // 23
+  ],
+  tidepup: [
+    '........................', // 0
+    '........................', // 1
+    '........................', // 2
+    '..........####..........', // 3  crest
+    '..........####..........', // 4
+    '........######..........', // 5
+    '.....##############.....', // 6
+    '....################....', // 7
+    '...##################...', // 8
+    '...##################...', // 9
+    '..####################..', // 10
+    '.######################.', // 11  fins
+    '.######################.', // 12
+    '..####################..', // 13
+    '..####################..', // 14
+    '...##################...', // 15
+    '...##################...', // 16
+    '....################....', // 17
+    '.....##############.....', // 18
+    '......############......', // 19
+    '.......##########.......', // 20
+    '......###....###........', // 21
+    '......###....###........', // 22
+    '........................', // 23
+  ],
 }
 
-function Markings({ kind, color }: { kind: string; color: string }) {
-  if (kind === 'stripes')
-    return (
-      <g stroke={color} strokeWidth="3" strokeLinecap="round" opacity="0.55" fill="none">
-        <path d="M 38 78 q 8 -4 16 0" />
-        <path d="M 66 78 q 8 -4 16 0" />
-      </g>
-    )
-  if (kind === 'spots')
-    return (
-      <g fill={color} opacity="0.5">
-        <circle cx="42" cy="76" r="3.4" />
-        <circle cx="76" cy="72" r="2.8" />
-        <circle cx="62" cy="84" r="2.2" />
-      </g>
-    )
-  if (kind === 'patches')
-    return <ellipse cx="72" cy="66" rx="9" ry="7" fill={color} opacity="0.4" />
-  if (kind === 'swirl')
-    return (
-      <path d="M 58 80 q 8 -8 2 -12 q -5 -3 -7 3" stroke={color} strokeWidth="2.6" fill="none"
-        opacity="0.6" strokeLinecap="round" />
-    )
-  return null
+type Run = [x: number, y: number, w: number]
+
+/** Pattern is confined to the lower coat so the face stays legible. */
+const COAT_FROM = 16
+
+const EYES: Record<string, { ink: Run[]; light?: Run[] }> = {
+  round: { ink: [[8, 10, 2], [8, 11, 2], [14, 10, 2], [14, 11, 2]] },
+  sparkle: {
+    ink: [[8, 10, 2], [8, 11, 2], [14, 10, 2], [14, 11, 2]],
+    light: [[8, 10, 1], [14, 10, 1]],
+  },
+  sleepy: { ink: [[7, 11, 4], [13, 11, 4]] },
+  determined: { ink: [[7, 9, 4], [13, 9, 4], [8, 11, 2], [14, 11, 2]] },
 }
 
-function Accessory({ kind, accent }: { kind: string; accent: string }) {
-  switch (kind) {
-    case 'scarf':
-      return (
-        <g>
-          <path d="M 40 92 q 20 10 40 0 l -2 8 q -18 8 -36 0 z" fill={accent} />
-          <rect x="52" y="94" width="7" height="16" rx="3" fill={accent} />
-        </g>
-      )
-    case 'glasses':
-      return (
-        <g stroke="#2f2a36" strokeWidth="2.2" fill="rgba(255,255,255,0.35)">
-          <circle cx="48" cy="58" r="8" />
-          <circle cx="72" cy="58" r="8" />
-          <path d="M 56 58 h 8" fill="none" />
-        </g>
-      )
-    case 'flower':
-      return (
-        <g transform="translate(78,34)">
-          {[0, 72, 144, 216, 288].map((a) => (
-            <ellipse key={a} rx="4" ry="6.5" fill="#f6a7c1" transform={`rotate(${a})`} />
-          ))}
-          <circle r="3" fill="#f3d258" />
-        </g>
-      )
-    case 'headphones':
-      return (
-        <g fill="#2f2a36">
-          <path d="M 36 50 q 24 -26 48 0 l -5 4 q -19 -22 -38 0 z" />
-          <rect x="32" y="50" width="9" height="14" rx="4" />
-          <rect x="79" y="50" width="9" height="14" rx="4" />
-        </g>
-      )
-    case 'satchel':
-      return (
-        <g>
-          <path d="M 42 66 L 82 96" stroke="#8a6b47" strokeWidth="3.4" />
-          <rect x="74" y="90" width="18" height="13" rx="3" fill="#a5824f" />
-        </g>
-      )
-    case 'bowtie':
-      return (
-        <g fill={accent}>
-          <path d="M 60 92 l -12 -6 v 12 z" />
-          <path d="M 60 92 l 12 -6 v 12 z" />
-          <circle cx="60" cy="92" r="2.6" />
-        </g>
-      )
-    case 'crown':
-      return (
-        <g fill="#f3c94f" stroke="#c9a02e" strokeWidth="1">
-          <path d="M 46 34 l 4 -10 l 6 7 l 4 -11 l 4 11 l 6 -7 l 4 10 z" />
-        </g>
-      )
-    default:
-      return null
-  }
+const MOUTH: Run[] = [[10, 14, 1], [11, 15, 2], [13, 14, 1]]
+
+const MARKINGS: Record<string, Run[]> = {
+  stripes: [[4, 12, 2], [18, 12, 2], [4, 13, 2], [18, 13, 2]],
+  spots: [[5, 13, 2], [17, 12, 2]],
+  patches: [[15, 7, 4], [15, 8, 4]],
+  swirl: [[10, 18, 4], [10, 19, 1], [13, 19, 1]],
 }
 
-function Aura({ kind }: { kind: string }) {
-  if (kind === 'soft-glow') return <circle cx="60" cy="72" r="46" fill="#ffe9a8" opacity="0.35" />
-  if (kind === 'sparkles')
-    return (
-      <g fill="#f3c94f" className="sparkle-layer">
-        <circle cx="24" cy="40" r="2" />
-        <circle cx="98" cy="52" r="2.4" />
-        <circle cx="88" cy="24" r="1.8" />
-        <circle cx="30" cy="90" r="1.8" />
-      </g>
-    )
-  if (kind === 'bubbles')
-    return (
-      <g stroke="#9fcbe8" fill="none" strokeWidth="1.4" opacity="0.8">
-        <circle cx="26" cy="46" r="4" />
-        <circle cx="96" cy="38" r="5.5" />
-        <circle cx="92" cy="86" r="3" />
-      </g>
-    )
-  if (kind === 'embers')
-    return (
-      <g fill="#e8875a" opacity="0.8">
-        <circle cx="28" cy="44" r="2.2" />
-        <circle cx="94" cy="60" r="1.8" />
-        <circle cx="86" cy="30" r="2.6" />
-      </g>
-    )
-  return null
-}
-
-function Body({ species, palette }: { species: string; palette: { body: string; belly: string; accent: string } }) {
-  if (species === 'emberfox') {
-    return (
-      <g>
-        <path d="M 38 44 l -6 -18 l 16 8 z" fill={palette.body} />
-        <path d="M 82 44 l 6 -18 l -16 8 z" fill={palette.body} />
-        <ellipse cx="60" cy="74" rx="30" ry="32" fill={palette.body} />
-        <ellipse cx="60" cy="86" rx="18" ry="16" fill={palette.belly} />
-        <path d="M 86 92 q 16 4 12 18 q -10 -2 -14 -10" fill={palette.accent} opacity="0.9" />
-      </g>
-    )
-  }
-  if (species === 'tidepup') {
-    return (
-      <g>
-        <ellipse cx="60" cy="76" rx="31" ry="30" fill={palette.body} />
-        <ellipse cx="60" cy="88" rx="19" ry="14" fill={palette.belly} />
-        <path d="M 30 62 q -10 6 -6 16 q 8 0 12 -8" fill={palette.body} />
-        <path d="M 90 62 q 10 6 6 16 q -8 0 -12 -8" fill={palette.body} />
-        <path d="M 48 40 q 12 -14 24 0 q -12 -6 -24 0" fill={palette.accent} />
-      </g>
-    )
-  }
-  // sproutling
-  return (
-    <g>
-      <path d="M 60 26 q -2 -12 -12 -14 q 2 12 8 15 z" fill={palette.accent} />
-      <path d="M 60 26 q 2 -12 12 -14 q -2 12 -8 15 z" fill={palette.accent} />
-      <ellipse cx="60" cy="76" rx="30" ry="31" fill={palette.body} />
-      <ellipse cx="60" cy="87" rx="18" ry="15" fill={palette.belly} />
-    </g>
-  )
+const ACCESSORIES: Record<string, { ink: Run[]; light?: Run[] }> = {
+  scarf: { ink: [[5, 16, 14], [5, 17, 14], [10, 18, 2], [10, 19, 2]] },
+  glasses: {
+    ink: [
+      [6, 9, 5], [6, 10, 1], [10, 10, 1], [6, 11, 1], [10, 11, 1], [6, 12, 5],
+      [13, 9, 5], [13, 10, 1], [17, 10, 1], [13, 11, 1], [17, 11, 1], [13, 12, 5],
+      [11, 10, 2],
+    ],
+  },
+  flower: { ink: [[17, 3, 3], [17, 4, 3], [18, 5, 1]], light: [[18, 4, 1]] },
+  headphones: {
+    ink: [[7, 4, 10], [6, 5, 1], [17, 5, 1], [4, 6, 3], [4, 7, 3], [17, 6, 3], [17, 7, 3]],
+  },
+  /* Slung on the flank: a strap over the face would read as a scar, not a bag. */
+  satchel: {
+    ink: [[12, 16, 1], [13, 17, 1], [13, 18, 5], [13, 19, 4]],
+    light: [[14, 18, 3]],
+  },
+  bowtie: { ink: [[8, 16, 3], [7, 17, 4], [8, 18, 3], [13, 16, 3], [13, 17, 4], [13, 18, 3], [11, 17, 2]] },
+  crown: { ink: [[6, 1, 2], [11, 1, 2], [16, 1, 2], [6, 2, 12], [6, 3, 12]], light: [[9, 3, 1], [14, 3, 1]] },
 }
 
 const HABITAT_PROPS: Record<string, string> = {
-  bookstack: '📚', terrarium: '🪴', lantern: '🏮', easel: '🎨',
-  telescope: '🔭', kettle: '🫖', banner: '🚩', trophy: '🏆',
+  bookstack: 'bookstack', terrarium: 'terrarium', lantern: 'lantern', easel: 'easel',
+  telescope: 'telescope', kettle: 'kettle', banner: 'banner', trophy: 'ranks',
 }
 
-export function Companion({ character, size = 220, showHabitat = true }: {
+function grid(rows: string[]) {
+  return (x: number, y: number) => y >= 0 && y < W && x >= 0 && x < W && rows[y][x] === '#'
+}
+
+/** Merge horizontal spans so a 24x24 field ships as ~60 rects, not 576. */
+function merge(hit: (x: number, y: number) => boolean): Run[] {
+  const out: Run[] = []
+  for (let y = 0; y < W; y += 1) {
+    let x = 0
+    while (x < W) {
+      if (hit(x, y)) {
+        let w = 1
+        while (x + w < W && hit(x + w, y)) w += 1
+        out.push([x, y, w])
+        x += w
+      } else x += 1
+    }
+  }
+  return out
+}
+
+function Rects({ runs, fill }: { runs: Run[]; fill: string }) {
+  return (
+    <>
+      {runs.map(([x, y, w]) => (
+        <rect key={`${x}-${y}-${w}`} x={x} y={y} width={w} height={1} fill={fill} />
+      ))}
+    </>
+  )
+}
+
+const PATTERN_TILES: Record<string, [number, number, number, number][]> = {
+  p25: [[0, 0, 1, 1]],
+  p50: [[0, 0, 1, 1], [1, 1, 1, 1]],
+  phatch: [[0, 0, 1, 1], [1, 1, 1, 1], [2, 2, 1, 1], [3, 3, 1, 1]],
+  phstripe: [[0, 0, 2, 1]],
+  pvstripe: [[0, 0, 1, 2]],
+  pchecker: [[0, 0, 2, 2], [2, 2, 2, 2]],
+}
+const TILE_SIZE: Record<string, number> = {
+  p25: 2, p50: 2, phatch: 4, phstripe: 2, pvstripe: 2, pchecker: 4,
+}
+
+export function Companion({ character, size = 240, showHabitat = true }: {
   character: Pick<Character, 'species' | 'palette' | 'eyes' | 'markings' | 'accessory' | 'aura' | 'habitat' | 'animation' | 'expression'> & { props?: string[] }
   size?: number
   showHabitat?: boolean
 }) {
-  const palette = PALETTES[character.palette] ?? PALETTES.meadow
+  const uid = useId().replace(/:/g, '')
+  /** Snap to a whole multiple of the grid so every drawn pixel stays square. */
+  const frame = Math.max(W, Math.round(size / W) * W)
+  /** The creature sits inside the habitat, clear of its corner props. */
+  const art = showHabitat ? Math.max(W, Math.round((frame * 0.74) / W) * W) : frame
+
+  const rows = BODIES[character.species] ?? BODIES.sproutling
+  const solid = grid(rows)
+  const edge = (x: number, y: number) =>
+    solid(x, y) && !(solid(x - 1, y) && solid(x + 1, y) && solid(x, y - 1) && solid(x, y + 1))
+
+  const outline = merge(edge)
+  const body = merge((x, y) => solid(x, y) && !edge(x, y) && y < COAT_FROM)
+  const coat = merge((x, y) => solid(x, y) && !edge(x, y) && y >= COAT_FROM)
+
+  const coatKey = COATS[character.palette] ?? 'p25'
+  const coatId = `${uid}-coat`
+  const shadeId = `${uid}-shade`
+
+  const eyes = EYES[character.eyes] ?? EYES.round
+  const marks = MARKINGS[character.markings] ?? []
+  const worn = ACCESSORIES[character.accessory]
   const anim = character.animation || 'idle'
+  const props = (character.props ?? []).slice(0, 4)
+
   return (
-    <div className={`companion-wrap anim-${anim}`} style={{ width: size, height: size }}
+    <div className={`companion-wrap anim-${anim}`} style={{ width: frame, height: frame }}
       role="img" aria-label={`Your companion, a ${character.species}`}>
       {showHabitat && (
-        <div className="habitat" style={{ background: palette.habitat }} aria-hidden="true">
-          {(character.props ?? []).slice(0, 4).map((p) => (
-            <span key={p} className="habitat-prop" title={p}>{HABITAT_PROPS[p] ?? '✨'}</span>
+        <>
+          <div className={`habitat aura-${character.aura || 'none'}`} aria-hidden="true" />
+          {props.map((p) => (
+            <span key={p} className="habitat-prop" title={p}>
+              <PixelIcon name={HABITAT_PROPS[p] ?? 'sparkle'} size={24} />
+            </span>
           ))}
-        </div>
+        </>
       )}
-      <svg viewBox="0 0 120 120" width="100%" height="100%" className="companion-svg">
-        <Aura kind={character.aura} />
-        <ellipse cx="60" cy="108" rx="26" ry="5" fill="rgba(0,0,0,0.12)" />
+      <svg viewBox={`0 0 ${W} ${W}`} width={art} height={art} className="companion-svg"
+        shapeRendering="crispEdges" aria-hidden="true">
+        <defs>
+          <pattern id={coatId} patternUnits="userSpaceOnUse"
+            width={TILE_SIZE[coatKey]} height={TILE_SIZE[coatKey]}>
+            {PATTERN_TILES[coatKey].map(([x, y, w, h]) => (
+              <rect key={`${x}-${y}`} x={x} y={y} width={w} height={h} fill="#000" />
+            ))}
+          </pattern>
+          <pattern id={shadeId} patternUnits="userSpaceOnUse" width="2" height="2">
+            <rect x="0" y="0" width="1" height="1" fill="#000" />
+            <rect x="1" y="1" width="1" height="1" fill="#000" />
+          </pattern>
+        </defs>
+
+        {/* The creature casts a dithered shadow, not a soft one. */}
+        <rect x="7" y="23" width="10" height="1" fill={`url(#${shadeId})`} />
+
         <g className="companion-body">
-          <Body species={character.species} palette={palette} />
-          <Markings kind={character.markings} color={palette.accent} />
-          <Eyes kind={character.eyes} cx1={49} cx2={71} cy={60} />
-          <path d="M 55 70 q 5 5 10 0" stroke="#2f2a36" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+          <Rects runs={body} fill="#fff" />
+          <Rects runs={coat} fill={`url(#${coatId})`} />
+          <Rects runs={outline} fill="#000" />
+          {marks.length > 0 && <Rects runs={marks} fill="#000" />}
+          <Rects runs={eyes.ink} fill="#000" />
+          {eyes.light && <Rects runs={eyes.light} fill="#fff" />}
+          <Rects runs={MOUTH} fill="#000" />
           {character.expression === 'joyful' && (
-            <g fill="#f6a7c1" opacity="0.7">
-              <circle cx="42" cy="68" r="3.6" />
-              <circle cx="78" cy="68" r="3.6" />
-            </g>
+            <Rects runs={[[5, 12, 2], [17, 12, 2]]} fill="#000" />
           )}
-          <Accessory kind={character.accessory} accent={palette.accent} />
+          {worn && (
+            <>
+              <Rects runs={worn.ink} fill="#000" />
+              {worn.light && <Rects runs={worn.light} fill="#fff" />}
+            </>
+          )}
         </g>
       </svg>
     </div>

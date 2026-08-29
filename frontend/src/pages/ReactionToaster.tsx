@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
 import type { GameEvent } from '../api/types'
+import { PixelIcon } from '../components/PixelIcon'
 
 interface Toast {
   id: number
   lines: string[]
+}
+
+const EMOTE_ICON: Record<string, string> = {
+  cheer: 'megaphone', heart: 'heart', spark: 'sparkle',
+  flex: 'bolt', tea: 'kettle', confetti: 'sparkle',
 }
 
 /** Shows companion reactions and multiplayer moments as gentle toasts. */
@@ -19,10 +25,10 @@ export function ReactionToaster() {
         push([p.reaction, p.encouragement].filter(Boolean) as string[])
       } else if (event.type === 'boss.defeated') {
         const p = event.payload as { name?: string; defeat_line?: string }
-        push([`🎉 ${p.name ?? 'The boss'} is defeated!`, p.defeat_line ?? ''])
+        push([`${p.name ?? 'The boss'} is defeated.`, p.defeat_line ?? ''])
       } else if (event.type === 'party.emote') {
         const p = event.payload as { emote?: string; display_name?: string }
-        const glyph = { cheer: '📣', heart: '💛', spark: '✨', flex: '💪', tea: '🍵', confetti: '🎊' }[p.emote ?? ''] ?? '✨'
+        const glyph = EMOTE_ICON[p.emote ?? ''] ?? 'sparkle'
         const id = Date.now() + Math.random()
         setEmotes((prev) => [...prev, { id, emote: glyph }])
         setTimeout(() => setEmotes((prev) => prev.filter((x) => x.id !== id)), 1700)
@@ -50,8 +56,8 @@ export function ReactionToaster() {
       </div>
       {emotes.map((e, i) => (
         <span key={e.id} className="emote-burst"
-          style={{ right: `${2 + (i % 3) * 2.4}rem`, bottom: '6rem' }} aria-hidden="true">
-          {e.emote}
+          style={{ right: `${32 + (i % 3) * 38}px`, bottom: 96 }} aria-hidden="true">
+          <PixelIcon name={e.emote} size={36} />
         </span>
       ))}
     </>
