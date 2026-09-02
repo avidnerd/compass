@@ -40,19 +40,36 @@ authors are credited under the MIT licence.
 
 ## Install it
 
-If you just want to run Compass, you do not need this repository checked out.
-Build a wheel once and install it anywhere with Python 3.11+:
+You do not need this repository checked out to run Compass.
+
+**With Python 3.11+** — one command, nothing to configure:
 
 ```bash
-make package                                   # builds the SPA into an installable wheel
-uv tool install ./backend/dist/*.whl           # or: pipx install ./backend/dist/*.whl
-compass                                        # starts the app and opens your browser
+uv tool install git+https://github.com/avidnerd/compass#subdirectory=backend
+compass
 ```
 
-There is nothing to configure. The database and an encryption key are created on
-first run under your own data directory (`~/Library/Application Support/Compass` on
-macOS, `%LOCALAPPDATA%\Compass` on Windows, `$XDG_DATA_HOME/compass` on Linux), and
-your **own** free OpenRouter key is pasted into Settings → Connections rather than a
+(`pipx install "git+https://github.com/avidnerd/compass#subdirectory=backend"` works too.)
+Installing from source builds the web interface once, so this needs Node as well;
+a wheel from the releases page needs neither.
+
+**Without Python** — download the binary for your platform from
+[Releases](https://github.com/avidnerd/compass/releases) and run it.
+
+> **The binaries are unsigned.** Code signing needs paid Apple and Windows developer
+> certificates, so your system will warn you once:
+> - **macOS:** `chmod +x compass-macos-*`, then right-click → Open (or
+>   `xattr -d com.apple.quarantine compass-macos-*` first).
+> - **Windows:** SmartScreen → More info → Run anyway.
+> - **Linux:** `chmod +x compass-linux-x86_64` and run it.
+>
+> If you would rather not run an unsigned download, the wheel involves no
+> downloaded executable, and `make package` builds one yourself from source.
+
+Either way there is nothing to configure. The database and an encryption key are
+created on first run in your own data directory (`~/Library/Application Support/Compass`
+on macOS, `%LOCALAPPDATA%\Compass` on Windows, `$XDG_DATA_HOME/compass` on Linux), and
+your **own** free OpenRouter key is pasted into Settings → Connections rather than into a
 file. Bring your own key; Compass never uses anyone else's and never calls a paid model.
 
 `compass --help` covers `--port`, `--host`, `--data-dir` and `--no-browser`.
@@ -60,6 +77,16 @@ file. Bring your own key; Compass never uses anyone else's and never calls a pai
 Compass opens your real browser rather than bundling a desktop webview, and that is
 deliberate: the focus monitor needs `getDisplayMedia`, which Tauri's webview cannot
 raise on macOS and which Electron replaces with its own incompatible API.
+
+### Building the distributables yourself
+
+```bash
+make package    # -> backend/dist/*.whl        (installable anywhere with Python)
+make binary     # -> backend/dist/compass      (single executable, no Python needed)
+```
+
+Tagging `v*` runs both for macOS (Intel and Apple Silicon), Linux and Windows in CI,
+smoke-tests each binary by actually starting it, and attaches everything to a release.
 
 ## Develop it
 

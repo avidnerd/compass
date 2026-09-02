@@ -103,6 +103,16 @@ only.
   environment variable remains a fallback for source checkouts and CI. The app secret is
   generated on first run and the database lives in the platform's per-user data directory,
   so an installed copy needs no `.env` at all.
+- Three install paths exist: `uv tool install` straight from the git URL (a build hook
+  compiles the interface), a wheel, and a standalone PyInstaller binary for people without
+  Python. Tagging `v*` builds all of them for macOS Intel and Apple Silicon, Linux and
+  Windows, and smoke-tests each binary by starting it.
+- **The binaries are unsigned and will stay unsigned** until someone buys an Apple
+  Developer membership and a Windows code-signing certificate. macOS Gatekeeper and
+  Windows SmartScreen warn once; the README documents the bypass, and the wheel is offered
+  as the path that involves no downloaded executable. macOS builds are ad-hoc signed
+  (`codesign --sign -`), which is free and unrelated — it does not clear Gatekeeper, but an
+  unsigned arm64 binary can otherwise fail to launch at all.
 - One process, one SQLite connection, in-process workers and timers. This suits a local-first
   app and rules out horizontal scaling or rolling restarts.
 - Provider credentials are encrypted at rest with `COMPASS_APP_SECRET`.
