@@ -151,6 +151,33 @@ async def clear_github(request: Request, profile: dict = CurrentProfile):
     return envelope(await providers.delete_credentials(profile["id"], "github"), request)
 
 
+class OpenRouterBody(BaseModel):
+    api_key: str
+
+
+@router.put("/providers/openrouter")
+async def save_openrouter(body: OpenRouterBody, request: Request, profile: dict = CurrentProfile):
+    """Adopt a personal OpenRouter key, after checking it actually works.
+
+    Verified before storing so a typo fails here rather than silently degrading
+    every later job to the local fallback.
+    """
+    api_key = body.api_key.strip()
+    if not api_key:
+        raise ApiError(422, "invalid_request", "Paste your OpenRouter key.")
+    if not await openrouter.verify_key(api_key):
+        raise ApiError(400, "openrouter_unauthorized",
+                       "OpenRouter did not accept that key. Check it at openrouter.ai/keys.")
+    state = await providers.save_credentials(profile["id"], "openrouter", {"api_key": api_key})
+    return envelope(state, request)
+
+
+@router.delete("/providers/openrouter")
+async def clear_openrouter(request: Request, profile: dict = CurrentProfile):
+    """Fall back to the process-wide key, if the deployment has one."""
+    return envelope(await providers.delete_credentials(profile["id"], "openrouter"), request)
+
+
 @router.post("/connections/{connector}:refresh")
 async def refresh_connector(connector: str, request: Request, profile: dict = CurrentProfile):
     if connector not in capabilities.CONNECTORS:

@@ -2,7 +2,7 @@ PYTHON ?= python3
 VENV := .venv
 PY := $(VENV)/bin/python
 
-.PHONY: setup migrate dev test build serve backend-dev frontend-dev
+.PHONY: setup migrate dev test build serve backend-dev frontend-dev package
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -28,3 +28,15 @@ build:
 
 serve:
 	cd backend && ../$(PY) -m uvicorn app.main:app --host $${COMPASS_BIND_HOST:-127.0.0.1} --port 8000
+
+# Assemble an installable wheel: build the SPA, copy it inside the package so an
+# installed copy has an interface to serve, then build with hatchling.
+package:
+	cd frontend && npm run build
+	rm -rf backend/app/web && cp -R frontend/dist backend/app/web
+	cd backend && ../$(PY) -m pip install --quiet --upgrade build hatchling
+	cd backend && ../$(PY) -m build --wheel
+	@echo
+	@echo "Wheel in backend/dist/. Install it anywhere with:"
+	@echo "  uv tool install ./backend/dist/*.whl     # or: pipx install ./backend/dist/*.whl"
+	@echo "Then run:  compass"

@@ -94,6 +94,15 @@ only.
 - Deploying the bridge requires enabling four Google APIs as Apps Script **advanced services**.
   Apps Script's default Cloud projects are hidden and cannot be opened in the Cloud Console, so
   the Console route does not work at all.
+- Compass installs as a Python package with a `compass` command that starts the local
+  server and opens the user's own browser. It is deliberately not a desktop-webview app:
+  the focus monitor depends on `getDisplayMedia`, which Tauri's webview cannot raise on
+  macOS and which Electron replaces with an incompatible `desktopCapturer` API. Wrapping
+  it would break or require rewriting that feature.
+- The OpenRouter key is bring-your-own, entered in the UI and encrypted per profile; the
+  environment variable remains a fallback for source checkouts and CI. The app secret is
+  generated on first run and the database lives in the platform's per-user data directory,
+  so an installed copy needs no `.env` at all.
 - One process, one SQLite connection, in-process workers and timers. This suits a local-first
   app and rules out horizontal scaling or rolling restarts.
 - Provider credentials are encrypted at rest with `COMPASS_APP_SECRET`.

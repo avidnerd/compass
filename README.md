@@ -38,14 +38,39 @@ authors are credited under the MIT licence.
 - **Persistence:** a single local SQLite database (WAL) with numbered migrations
 - **AI:** free-only OpenRouter gateway — models must end in `:free`, report zero pricing, and support structured outputs; otherwise Compass uses transparent local fallbacks. It never calls a paid model or `openrouter/auto`.
 
-## Setup
+## Install it
+
+If you just want to run Compass, you do not need this repository checked out.
+Build a wheel once and install it anywhere with Python 3.11+:
 
 ```bash
-cp .env.example .env   # then fill in your keys (see below)
+make package                                   # builds the SPA into an installable wheel
+uv tool install ./backend/dist/*.whl           # or: pipx install ./backend/dist/*.whl
+compass                                        # starts the app and opens your browser
+```
+
+There is nothing to configure. The database and an encryption key are created on
+first run under your own data directory (`~/Library/Application Support/Compass` on
+macOS, `%LOCALAPPDATA%\Compass` on Windows, `$XDG_DATA_HOME/compass` on Linux), and
+your **own** free OpenRouter key is pasted into Settings → Connections rather than a
+file. Bring your own key; Compass never uses anyone else's and never calls a paid model.
+
+`compass --help` covers `--port`, `--host`, `--data-dir` and `--no-browser`.
+
+Compass opens your real browser rather than bundling a desktop webview, and that is
+deliberate: the focus monitor needs `getDisplayMedia`, which Tauri's webview cannot
+raise on macOS and which Electron replaces with its own incompatible API.
+
+## Develop it
+
+```bash
+cp .env.example .env   # optional: env keys still work in a checkout
 make setup             # venv + backend deps + npm install
 make migrate           # apply SQLite migrations
 make dev               # FastAPI (:8000) + Vite (:5173) together
 ```
+
+A source checkout keeps its database and secret in `backend/`, exactly as before.
 
 Open http://localhost:5173. For a single-process "release" build:
 

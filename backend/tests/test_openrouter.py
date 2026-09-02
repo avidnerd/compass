@@ -143,3 +143,50 @@ async def test_a_200_carrying_an_error_body_is_not_a_crash(monkeypatch, body, ex
             "google/gemma-4-26b-a4b-it:free", [{"role": "user", "content": "hi"}],
             ReactionBatch, 0.2)
     await openrouter._client.aclose()
+
+
+# --------------------------------------------------- bring-your-own key checks
+
+async def test_a_bad_key_is_rejected_by_an_authenticated_endpoint(monkeypatch):
+    """The catalog at /models answers 200 for any string, so verifying there
+    would accept a typo and silently degrade every later job to the fallback.
+    /key is authenticated, so it actually says no."""
+    import httpx
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["path"] = request.url.path
+        seen["auth"] = request.headers.get("Authorization")
+        return httpx.Response(401, json={"error": {"message": "invalid key"}})
+
+    monkeypatch.setattr(openrouter, "_client",
+                        httpx.AsyncClient(transport=httpx.MockTransport(handler),
+                                          base_url="https://openrouter.ai/api/v1"))
+    assert await openrouter.verify_key("sk-or-v1-not-real") is False
+    assert seen["path"].endswith("/key"), "must verify against the authenticated endpoint"
+    assert seen["auth"] == "Bearer sk-or-v1-not-real"
+    await openrouter._client.aclose()
+
+
+async def test_a_good_key_is_accepted(monkeypatch):
+    import httpx
+    monkeypatch.setattr(openrouter, "_client", httpx.AsyncClient(
+        transport=httpx.MockTransport(lambda r: httpx.Response(200, json={"data": {}})),
+        base_url="https://openrouter.ai/api/v1"))
+    assert await openrouter.verify_key("sk-or-v1-real") is True
+    await openrouter._client.aclose()
+
+
+async def test_a_profiles_own_key_overrides_the_env_default(env, monkeypatch):
+    """Bring-your-own-key: an installed copy has no .env, and one process may
+    serve several profiles without spending each other's quota."""
+    from app import providers as provider_service
+    from tests.conftest import create_profile
+    monkeypatch.setattr(openrouter.settings, "openrouter_api_key", "env-key")
+
+    profile = await create_profile(env.client, "Owner")
+    pid = profile["profile"]["id"]
+    assert await openrouter.key_for_profile(pid) == "env-key"
+
+    await provider_service.save_credentials(pid, "openrouter", {"api_key": "profile-key"})
+    assert await openrouter.key_for_profile(pid) == "profile-key"

@@ -80,7 +80,7 @@ async def credentials(profile_id: str) -> dict:
 
 
 async def save_credentials(profile_id: str, provider: str, config: dict) -> dict:
-    if provider not in (BRIDGE, "github", "canvas"):
+    if provider not in (BRIDGE, "github", "canvas", "openrouter"):
         raise ApiError(422, "invalid_request", f"Unknown provider: {provider}")
     await db.get().execute(
         """INSERT INTO provider_credentials (profile_id, provider, config_json, status, updated_at)
@@ -115,6 +115,8 @@ async def _mark(profile_id: str, provider: str, status: str, error_code: str | N
 
 def _mask(secret: str) -> str:
     secret = secret or ""
+    if not secret:
+        return ""          # nothing stored — callers turn this into null
     return f"…{secret[-4:]}" if len(secret) > 4 else "set"
 
 
@@ -129,7 +131,16 @@ async def public_state(profile_id: str) -> dict:
 
     bridge_config = resolved.get("bridge") or {}
     github_config = resolved.get("github") or {}
+    openrouter_config = resolved.get("openrouter") or {}
     return {
+        # Bring-your-own key: an installed copy has no .env to edit, so the key
+        # is entered in the UI and encrypted like every other credential. The
+        # env value stays a fallback for source checkouts and CI.
+        "openrouter": {
+            "configured": bool(openrouter_config.get("api_key") or settings.openrouter_api_key),
+            "from_env": not openrouter_config.get("api_key") and bool(settings.openrouter_api_key),
+            "token_hint": _mask(openrouter_config.get("api_key", "")) or None,
+        },
         "active": await active_provider_for(resolved),
         "bridge": {
             "configured": bool(bridge_config.get("url") and bridge_config.get("token")),

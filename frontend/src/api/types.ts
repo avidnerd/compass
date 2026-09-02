@@ -423,6 +423,12 @@ export interface ProviderSlot {
 }
 
 export interface ProviderState {
+  openrouter: {
+    configured: boolean
+    /** True when the process-wide env key is in force rather than a saved one. */
+    from_env: boolean
+    token_hint: string | null
+  }
   active: 'bridge' | null
   bridge: ProviderSlot
   github: ProviderSlot

@@ -9,7 +9,11 @@ from .config import settings
 
 logger = logging.getLogger("compass.db")
 
-MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
+# Packaged installs carry the migrations inside app/; a source checkout keeps
+# them beside it at backend/migrations.
+_BUNDLED_MIGRATIONS = Path(__file__).resolve().parent / "migrations"
+MIGRATIONS_DIR = (_BUNDLED_MIGRATIONS if _BUNDLED_MIGRATIONS.is_dir()
+                  else Path(__file__).resolve().parents[1] / "migrations")
 
 _conn: aiosqlite.Connection | None = None
 

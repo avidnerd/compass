@@ -5,11 +5,64 @@ app secret) never leave this module except through the clients that need them;
 no endpoint may echo them.
 """
 import os
+import secrets
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+# Running from a source checkout keeps everything in the repo, which is what a
+# developer expects. An installed copy has no repo to write into, so state goes
+# to the platform's own per-user data directory instead.
+IS_CHECKOUT = (REPO_ROOT / "backend" / "app").is_dir() and (REPO_ROOT / "frontend").is_dir()
+
+
+def _default_data_dir() -> Path:
+    override = os.environ.get("COMPASS_DATA_DIR")
+    if override:
+        return Path(override).expanduser()
+    if IS_CHECKOUT:
+        return REPO_ROOT / "backend"
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / "Compass"
+    if os.name == "nt":
+        base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
+        return Path(base) / "Compass"
+    base = os.environ.get("XDG_DATA_HOME") or str(Path.home() / ".local" / "share")
+    return Path(base) / "compass"
+
+
+DATA_DIR = _default_data_dir()
+
+
+def _resolve_app_secret() -> str:
+    """The key that encrypts stored credentials.
+
+    Set COMPASS_APP_SECRET to control it. Otherwise one is generated on first
+    run and kept in the data directory, so an installed copy needs no manual
+    setup — and, because it lives beside the database it protects, a user who
+    moves or backs up their data keeps both halves together.
+    """
+    from_env = os.environ.get("COMPASS_APP_SECRET", "").strip()
+    if from_env:
+        return from_env
+    path = DATA_DIR / "app_secret"
+    try:
+        if path.exists():
+            existing = path.read_text().strip()
+            if existing:
+                return existing
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        generated = secrets.token_urlsafe(48)
+        path.write_text(generated + "\n")
+        path.chmod(0o600)
+        return generated
+    except OSError:
+        # Unwritable location: fail visibly at the crypto layer rather than
+        # silently storing credentials under a key that changes each boot.
+        return ""
 ENV_PATH = REPO_ROOT / ".env"
 # override=True: the workspace .env is the authoritative config for this local
 # app — a stale OPENROUTER_API_KEY/COMPASS_* exported in the user's shell
@@ -88,7 +141,7 @@ class Settings:
     # Derives the key that encrypts provider credentials at rest (see crypto).
     # Changing it makes stored bridge/GitHub tokens unreadable — they then have
     # to be re-entered in Settings → Connections.
-    app_secret: str = os.environ.get("COMPASS_APP_SECRET", "")
+    app_secret: str = _resolve_app_secret()
     frontend_origin: str = os.environ.get("COMPASS_FRONTEND_ORIGIN", "http://localhost:5173")
     timezone: str = os.environ.get("COMPASS_TIMEZONE", "UTC")
     bind_host: str = os.environ.get("COMPASS_BIND_HOST", "127.0.0.1")
@@ -108,7 +161,7 @@ class Settings:
     college_dashboard_memo_seconds: int = max(
         0, min(_int("COMPASS_COLLEGE_DASHBOARD_MEMO_SECONDS", 300), 3600))
 
-    db_path: Path = Path(os.environ.get("COMPASS_DB_PATH", str(REPO_ROOT / "backend" / "compass.db")))
+    db_path: Path = Path(os.environ.get("COMPASS_DB_PATH", str(DATA_DIR / "compass.db")))
 
     # Cache TTLs (seconds)
     ttl_model_catalog: int = _int("COMPASS_TTL_MODEL_CATALOG", 24 * 3600)
