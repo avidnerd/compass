@@ -59,6 +59,16 @@ only.
   institution's permission, which is the connector platform Compass refuses to be. The feed
   carries due dates only: no submission status and no grades, so a Canvas assignment can seed a
   quest but can never verify one.
+- Canvas is not the whole timetable. Courses graded through **Gradescope, Pearson MyLab/Mastering
+  or LabFlow** keep their own deadlines: Gradescope on LTI 1.3 usually syncs its due date into
+  Canvas, LTI 1.0 only if the instructor typed it there, and Pearson only after the first grade
+  sync — while extensions, late deadlines and section-specific dates are documented as never
+  syncing. So Compass reads **any number of iCalendar feeds**, not just Canvas, and says on
+  screen that a quiet list can mean a deadline lives somewhere it cannot see.
+- Scraping those tools is refused, not deferred. None offers a student-usable API; every
+  third-party bridge is a browser extension driving the student's live session, which would
+  mean Compass holding a Gradescope or Pearson credential. That breaks the read-only,
+  no-credential-custody posture the product is built on.
 - Focus sessions are the unit of work, with optional screen monitoring whose frames are
   analysed and deleted rather than retained.
 - Focus rooms: working alongside other people, sharing only presence and a timer. Head-to-head

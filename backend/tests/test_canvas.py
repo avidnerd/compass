@@ -176,3 +176,114 @@ def test_http_is_upgraded_for_remote_hosts_but_kept_on_loopback():
         "http://canvas.example.edu/f.ics").startswith("https://")
     assert canvas_service.normalise_url(
         "http://127.0.0.1:8899/feed.ics").startswith("http://127.0.0.1")
+
+
+# ------------------------------------------------- feeds beyond Canvas
+# Canvas only carries deadlines an instructor put in Canvas. A course graded
+# through Gradescope, Pearson or LabFlow can have deadlines that never reach it,
+# so any tool publishing iCalendar can be added alongside.
+
+OTHER_FEED = """BEGIN:VCALENDAR\r
+VERSION:2.0\r
+BEGIN:VEVENT\r
+UID:gradescope-ps4@example\r
+DTSTART:20991020T235900Z\r
+SUMMARY:Problem Set 4\r
+END:VEVENT\r
+BEGIN:VEVENT\r
+UID:gradescope-lab2@example\r
+DTSTART:20991025T235900Z\r
+SUMMARY:Lab 2 writeup\r
+END:VEVENT\r
+END:VCALENDAR\r
+"""
+
+
+def test_a_non_canvas_feed_keeps_every_dated_event():
+    """Only Canvas uses the assignment-UID convention; other feeds have no such
+    marker, and a student who adds one has already chosen what it holds."""
+    assert ics.assignments(OTHER_FEED, canvas_only=True) == []
+    assert len(ics.assignments(OTHER_FEED, canvas_only=False)) == 2
+
+
+async def test_a_second_feed_adds_its_deadlines(env, monkeypatch):
+    profile = await create_profile(env.client, "Student")
+    pid = profile["profile"]["id"]
+
+    async def fake_fetch(url: str) -> str:
+        return OTHER_FEED if "gradescope" in url else FEED
+    monkeypatch.setattr(canvas_service, "fetch", fake_fetch)
+
+    await canvas_service.link(pid, "https://canvas.example.edu/f.ics")
+    await canvas_service.link(pid, "https://cal.example.com/gradescope.ics",
+                              label="Gradescope", kind="generic")
+
+    stored = await canvas_service.feeds(pid)
+    assert [f["kind"] for f in stored] == ["canvas", "generic"]
+
+    items, _ = await canvas_service._all_assignments(pid)
+    titles = {a["title"] for a in items}
+    assert "Literature review draft" in titles   # Canvas
+    assert "Problem Set 4" in titles             # the other tool
+    assert {a["feed_label"] for a in items} == {"Canvas", "Gradescope"}
+
+
+async def test_one_dead_feed_does_not_blank_out_the_others(env, monkeypatch):
+    profile = await create_profile(env.client, "Student")
+    pid = profile["profile"]["id"]
+
+    async def fake_fetch(url: str) -> str:
+        if "broken" in url:
+            raise canvas_service.CanvasError("canvas_not_found", "gone")
+        return FEED
+    monkeypatch.setattr(canvas_service, "fetch", fake_fetch)
+
+    await canvas_service.link(pid, "https://canvas.example.edu/f.ics")
+    await canvas_service._save_feeds(pid, (await canvas_service.feeds(pid)) + [
+        {"id": "x", "url": "https://broken.example.com/f.ics", "label": "Dead", "kind": "generic"}])
+
+    items, meta = await canvas_service._all_assignments(pid, force=True)
+    assert items, "a dead feed must not blank out a working one"
+    assert meta["feed_errors"][0]["code"] == "canvas_not_found"
+
+
+async def test_the_same_deadline_through_two_feeds_counts_once(env, monkeypatch):
+    profile = await create_profile(env.client, "Student")
+    pid = profile["profile"]["id"]
+
+    async def _same(url: str) -> str:
+        return FEED
+    monkeypatch.setattr(canvas_service, "fetch", _same)
+
+    await canvas_service.link(pid, "https://canvas.example.edu/a.ics")
+    await canvas_service.link(pid, "https://canvas.example.edu/b.ics", label="Copy")
+    items, _ = await canvas_service._all_assignments(pid, force=True)
+    assert len(items) == len({a["uid"] for a in items})
+
+
+async def test_removing_one_feed_keeps_the_rest(env, monkeypatch):
+    profile = await create_profile(env.client, "Student")
+    pid = profile["profile"]["id"]
+
+    async def fake_fetch(url: str) -> str:
+        return OTHER_FEED if "other" in url else FEED
+    monkeypatch.setattr(canvas_service, "fetch", fake_fetch)
+
+    await canvas_service.link(pid, "https://canvas.example.edu/f.ics")
+    await canvas_service.link(pid, "https://other.example.com/f.ics", kind="generic")
+    other = next(f for f in await canvas_service.feeds(pid) if f["kind"] == "generic")
+
+    result = await canvas_service.unlink_feed(pid, other["id"])
+    assert result["feed_count"] == 1
+    assert [f["kind"] for f in await canvas_service.feeds(pid)] == ["canvas"]
+
+
+async def test_a_credential_written_before_multi_feed_still_reads(env):
+    """Older profiles stored a single feed_url; that must keep working."""
+    from app import providers as provider_service
+    profile = await create_profile(env.client, "Student")
+    pid = profile["profile"]["id"]
+    await provider_service.save_credentials(
+        pid, "canvas", {"feed_url": "https://canvas.example.edu/legacy.ics"})
+    stored = await canvas_service.feeds(pid)
+    assert len(stored) == 1 and stored[0]["kind"] == "canvas"

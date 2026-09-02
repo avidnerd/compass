@@ -28,8 +28,8 @@ from urllib.parse import urlparse
 import httpx
 
 from .. import cache, db, ics
-from ..errors import ApiError, ProviderError
-from ..util import now_iso
+from ..errors import ApiError, ProviderError, not_found
+from ..util import new_id, now_iso
 
 logger = logging.getLogger("compass.canvas")
 
@@ -111,16 +111,75 @@ async def _credentials(profile_id: str) -> dict:
     return (await provider_service.credentials(profile_id)).get(PROVIDER) or {}
 
 
-async def link(profile_id: str, raw_url: str) -> dict:
-    """Verify the feed parses before storing it, so a bad paste fails loudly."""
+async def feeds(profile_id: str) -> list[dict]:
+    """Every calendar feed this profile reads, Canvas first.
+
+    Canvas is the anchor, but a deadline that lives only in Gradescope, Pearson
+    or LabFlow never reaches a Canvas feed unless the instructor put it there.
+    Any tool that publishes iCalendar can be added alongside — including a
+    personal calendar a student syncs those tools into.
+
+    Credentials written before multi-feed carried a single `feed_url`; those are
+    read as one Canvas feed rather than migrated, so a downgrade stays safe.
+    """
+    creds = await _credentials(profile_id)
+    stored = creds.get("feeds")
+    if isinstance(stored, list):
+        return [f for f in stored if f.get("url")]
+    if creds.get("feed_url"):
+        return [{"id": "canvas", "url": creds["feed_url"], "label": "Canvas", "kind": "canvas"}]
+    return []
+
+
+async def _save_feeds(profile_id: str, items: list[dict]) -> None:
     from .. import providers as provider_service
+    await provider_service.save_credentials(profile_id, PROVIDER, {"feeds": items})
+
+
+async def link(profile_id: str, raw_url: str, *, label: str = "", kind: str = "canvas") -> dict:
+    """Verify a feed parses before storing it, so a bad paste fails loudly."""
     url = normalise_url(raw_url)
+    kind = "canvas" if kind == "canvas" else "generic"
     body = await fetch(url)
-    items = ics.assignments(body)
-    await provider_service.save_credentials(profile_id, PROVIDER, {"feed_url": url})
+    items = ics.assignments(body, canvas_only=(kind == "canvas"))
+    if kind == "canvas" and not items and ics.assignments(body, canvas_only=False):
+        raise CanvasError(
+            "canvas_no_assignments",
+            "That feed parsed but holds no Canvas assignments. If it is a calendar from "
+            "another tool, add it as an other feed instead.")
+
+    current = await feeds(profile_id)
+    existing = next((f for f in current if f["url"] == url), None)
+    if existing:
+        existing.update({"label": label.strip()[:60] or existing.get("label") or "Canvas",
+                         "kind": kind})
+    else:
+        current.append({
+            "id": new_id(),
+            "url": url,
+            "label": label.strip()[:60] or ("Canvas" if kind == "canvas" else "Other feed"),
+            "kind": kind,
+        })
+    await _save_feeds(profile_id, current)
     await _mark(profile_id, "ok", None)
     await cache.invalidate_connector(profile_id, CONNECTOR)
-    return {"linked": True, "assignment_count": len(items), "feed": mask(url)}
+    return {"linked": True, "assignment_count": len(items), "feed": mask(url),
+            "feed_count": len(current)}
+
+
+async def unlink_feed(profile_id: str, feed_id: str) -> dict:
+    """Remove one feed. Removing the last one clears the credential entirely."""
+    current = await feeds(profile_id)
+    remaining = [f for f in current if f.get("id") != feed_id]
+    if len(remaining) == len(current):
+        raise not_found("feed")
+    if remaining:
+        await _save_feeds(profile_id, remaining)
+    else:
+        from .. import providers as provider_service
+        await provider_service.delete_credentials(profile_id, PROVIDER)
+    await cache.invalidate_connector(profile_id, CONNECTOR)
+    return {"linked": bool(remaining), "feed_count": len(remaining)}
 
 
 async def unlink(profile_id: str) -> dict:
@@ -139,16 +198,18 @@ async def _mark(profile_id: str, status: str, error_code: str | None) -> None:
 
 
 async def public_link(profile_id: str) -> dict:
-    creds = await _credentials(profile_id)
-    if not creds.get("feed_url"):
-        return {"status": "not_linked", "feed": None, "evidence": False}
+    current = await feeds(profile_id)
+    if not current:
+        return {"status": "not_linked", "feed": None, "feeds": [], "evidence": False}
     cur = await db.get().execute(
         "SELECT status, error_code, last_checked_at FROM provider_credentials "
         "WHERE profile_id = ? AND provider = ?", (profile_id, PROVIDER))
     row = await cur.fetchone()
     return {
         "status": "linked",
-        "feed": mask(creds["feed_url"]),
+        "feed": mask(current[0]["url"]),
+        "feeds": [{"id": f.get("id"), "label": f.get("label"), "kind": f.get("kind", "canvas"),
+                   "feed": mask(f["url"])} for f in current],
         "connection_status": (row["status"] if row else "unknown"),
         "error_code": (row["error_code"] if row else None),
         "last_checked_at": (row["last_checked_at"] if row else None),
@@ -160,25 +221,43 @@ async def public_link(profile_id: str) -> dict:
 
 
 async def _all_assignments(profile_id: str, *, force: bool = False) -> tuple[list[dict], dict]:
-    """Every assignment in the feed, cached. No date window applied."""
-    creds = await _credentials(profile_id)
-    url = creds.get("feed_url")
-    if not url:
+    """Every dated entry across every linked feed, cached. No date window."""
+    current = await feeds(profile_id)
+    if not current:
         raise ApiError(409, "canvas_not_linked",
-                       "No Canvas feed linked yet. Add one in Settings → Connections.")
+                       "No calendar feed linked yet. Add one in Settings → Connections.")
 
     async def load() -> dict:
-        body = await fetch(url)
-        items = ics.assignments(body)
-        return {"items": items, "fetched_at": now_iso()}
+        merged: dict[str, dict] = {}
+        errors: list[dict] = []
+        for feed in current:
+            try:
+                body = await fetch(feed["url"])
+            except CanvasError as exc:
+                # One dead feed must not blank out the others: report it and
+                # keep whatever the rest still hold.
+                errors.append({"feed_id": feed.get("id"), "label": feed.get("label"),
+                               "code": exc.code, "message": str(exc)})
+                continue
+            for item in ics.assignments(body, canvas_only=feed.get("kind", "canvas") == "canvas"):
+                item["feed_id"] = feed.get("id")
+                item["feed_label"] = feed.get("label")
+                # The same assignment reaching Compass through two feeds is one
+                # deadline, not two; first feed listed wins.
+                merged.setdefault(item["uid"], item)
+        items = sorted(merged.values(), key=lambda a: a["due_at"])
+        return {"items": items, "errors": errors, "fetched_at": now_iso()}
 
-    try:
-        payload, meta = await cache.get_or_compute(
-            profile_id, "canvas.assignments", {"feed": mask(url)}, 1800, load, force=force)
-    except CanvasError as exc:
-        await _mark(profile_id, "error", exc.code)
-        raise
-    await _mark(profile_id, "ok", None)
+    payload, meta = await cache.get_or_compute(
+        profile_id, "canvas.assignments",
+        {"feeds": [mask(f["url"]) for f in current]}, 1800, load, force=force)
+
+    errors = payload.get("errors") or []
+    if errors and not payload.get("items"):
+        await _mark(profile_id, "error", errors[0]["code"])
+    else:
+        await _mark(profile_id, "ok", None)
+    meta = {**meta, "feed_errors": errors}
     return payload.get("items", []), meta
 
 
@@ -278,8 +357,9 @@ async def overview(profile: dict, force: bool = False) -> dict:
         items, meta, error = data["items"], data["meta"], None
     except ProviderError as exc:
         items, meta, error = [], {}, {"code": exc.code, "message": str(exc)}
+    feed_errors = (meta or {}).get("feed_errors") or []
     already = await _imports(profile["id"])
     for a in items:
         a["imported_quest_id"] = already.get(a["uid"], {}).get("quest_id")
     return {"link": link, "assignments": items, "imports": list(already.values()),
-            "meta": meta, "error": error}
+            "meta": meta, "error": error, "feed_errors": feed_errors}

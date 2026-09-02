@@ -87,11 +87,13 @@ token into Settings → Connections. Nothing else is needed.
    and evidence never enter a room payload. Head-to-head battles, party bosses and the league
    board were removed: competitive ranking is evidence-negative for this audience, and both
    needed a second live player Compass has no user base to supply.
-7. **Canvas** — paste your personal Calendar Feed URL (Canvas → Calendar → Calendar Feed) and
-   Compass reads upcoming assignments and turns them into quests with their real due dates. No
-   token and no admin approval: student access tokens are being restricted and OAuth needs an
-   institutional developer key, so the feed is the only self-serve door. It carries deadlines,
-   not proof — verification still comes from Drive, Gmail, Calendar or GitHub.
+7. **Deadlines** — paste your personal Canvas Calendar Feed URL (Canvas → Calendar → Calendar
+   Feed) and Compass reads upcoming assignments and turns them into quests with their real due
+   dates. No token and no admin approval: student access tokens are being restricted and OAuth
+   needs an institutional developer key, so the feed is the only self-serve door. Courses graded
+   through Gradescope, Pearson or LabFlow can hold deadlines Canvas never sees, so any number of
+   additional iCalendar feeds can be added alongside. Feeds carry deadlines, not proof —
+   verification still comes from Drive, Gmail, Calendar or GitHub.
 8. **College OS** — if [`college-os/`](college-os/README.md) has provisioned your Google account,
    Compass detects the COLLEGE DASHBOARD and turns its rows into quests (see below).
 

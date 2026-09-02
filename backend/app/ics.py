@@ -84,17 +84,19 @@ def parse(text: str) -> list[dict]:
     return events
 
 
-def assignments(text: str, *, limit: int = 200) -> list[dict]:
-    """Canvas assignments with a due date, newest deadline first.
+def assignments(text: str, *, limit: int = 200, canvas_only: bool = True) -> list[dict]:
+    """Dated entries from a calendar feed, earliest deadline first.
 
-    Only VEVENTs whose UID marks them as an assignment are returned: a feed also
-    carries lecture slots and instructor-authored events, which are not work the
-    student owes anyone.
+    With `canvas_only` (the default, for a Canvas feed) only VEVENTs whose UID
+    marks them as an assignment are returned: a Canvas feed also carries lecture
+    slots and instructor-authored events, which are not work the student owes
+    anyone. Other feeds have no such convention — a student who adds one has
+    already chosen what it contains — so every dated event counts.
     """
     out: list[dict] = []
     for event in parse(text):
         uid = event.get("UID", ("", {}))[0]
-        if not _ASSIGNMENT_UID.search(uid):
+        if canvas_only and not _ASSIGNMENT_UID.search(uid):
             continue
         summary_raw, _ = event.get("SUMMARY", ("", {}))
         summary = _unescape(summary_raw).strip()
