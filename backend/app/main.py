@@ -21,7 +21,11 @@ from .ws import router as ws_router
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("compass.main")
 
-SPA_DIST = REPO_ROOT / "frontend" / "dist"
+# An installed copy has no repo to read from, so the built interface ships
+# inside the package (packaging copies frontend/dist -> app/web). A source
+# checkout keeps using frontend/dist so `make dev` needs no extra step.
+_BUNDLED_WEB = Path(__file__).resolve().parent / "web"
+SPA_DIST = _BUNDLED_WEB if (_BUNDLED_WEB / "index.html").exists() else REPO_ROOT / "frontend" / "dist"
 
 _background: list[asyncio.Task] = []
 

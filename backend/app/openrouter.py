@@ -11,6 +11,7 @@ invariants enforced here, and only here:
   transparent manual behavior. There is no paid fallback, ever.
 """
 import asyncio
+from contextvars import ContextVar
 import json
 import logging
 import random
@@ -65,13 +66,52 @@ def profile_lock(profile_id: str) -> asyncio.Lock:
     return _profile_locks[profile_id]
 
 
+# The key travels with each request rather than being baked into the client:
+# a profile brings its own, so one local process can serve several people
+# without one of them silently spending another's quota.
+_key_var: ContextVar[str | None] = ContextVar("openrouter_key", default=None)
+
+
+def active_key() -> str | None:
+    """The key for the work in flight: the profile's own, else the env default."""
+    return _key_var.get() or settings.openrouter_api_key
+
+
+def use_key(api_key: str | None):
+    """Bind a profile's key for the duration of a call."""
+    return _key_var.set(api_key)
+
+
+def reset_key(token) -> None:
+    _key_var.reset(token)
+
+
+async def key_for_profile(profile_id: str | None) -> str | None:
+    """A profile's own OpenRouter key, falling back to the process-wide one.
+
+    Looked up lazily to avoid a startup import cycle, and failure is never fatal:
+    a missing or unreadable credential simply means the env key applies.
+    """
+    if not profile_id:
+        return settings.openrouter_api_key
+    try:
+        from . import providers as provider_service
+        creds = (await provider_service.credentials(profile_id)).get("openrouter") or {}
+    except Exception:
+        return settings.openrouter_api_key
+    return creds.get("api_key") or settings.openrouter_api_key
+
+
+def _auth_headers() -> dict:
+    return {"Authorization": f"Bearer {active_key() or ''}"}
+
+
 def client() -> httpx.AsyncClient:
     global _client
     if _client is None:
         _client = httpx.AsyncClient(
             base_url=settings.openrouter_api_base,
             headers={
-                "Authorization": f"Bearer {settings.openrouter_api_key}",
                 "Content-Type": "application/json",
                 "X-Title": "Compass (local)",
             },
@@ -87,10 +127,25 @@ async def aclose() -> None:
         _client = None
 
 
+async def verify_key(api_key: str) -> bool:
+    """Does OpenRouter accept this key?
+
+    Checked against /key, which is authenticated. The catalog at /models is not
+    — it answers 200 for any garbage string — so validating there would accept
+    a typo and then degrade every later job to the local fallback with no
+    explanation.
+    """
+    try:
+        resp = await client().get("/key", headers={"Authorization": f"Bearer {api_key}"})
+    except httpx.HTTPError:
+        return False
+    return resp.status_code == 200
+
+
 async def refresh_free_model_catalog(force: bool = False) -> dict:
     """Fetch (or reuse) the OpenRouter model catalog; cached 24h globally."""
     async def fetch() -> dict:
-        resp = await client().get("/models")
+        resp = await client().get("/models", headers=_auth_headers())
         resp.raise_for_status()
         return resp.json()
 
@@ -172,7 +227,7 @@ def preference_order() -> list[str]:
 
 
 async def resolve_free_model(preferences: list[str] | None = None, force: bool = False) -> FreeModel | None:
-    if not settings.openrouter_api_key:
+    if not active_key():
         return None
     try:
         catalog = await refresh_free_model_catalog(force=force)
@@ -196,7 +251,7 @@ async def resolve_candidates(limit: int = 2, preferences: list[str] | None = Non
     allow_missing_structured tolerates a missing structured-outputs flag for
     the explicitly preferred ids only — never for the default chain.
     """
-    if not settings.openrouter_api_key:
+    if not active_key():
         return []
     try:
         catalog = await refresh_free_model_catalog()
@@ -244,7 +299,7 @@ async def _request_once(model_id: str, messages: list[dict], schema_model: type[
         "temperature": temperature,
         "response_format": _schema_for(schema_model),
     }
-    resp = await client().post("/chat/completions", json=body)
+    resp = await client().post("/chat/completions", json=body, headers=_auth_headers())
     global _auth_state
     if resp.status_code in (401, 403):
         _auth_state = "failed"
@@ -361,6 +416,20 @@ async def call_free_structured(
         if cached is not None:
             return schema_model.model_validate(cached["result"]), cached["model_id"]
 
+    token = use_key(await key_for_profile(profile_id))
+    try:
+        return await _run_job(profile_id, purpose, schema_model, system, user, temperature,
+                              key_material, cache_ttl_seconds, use_cache, preferred_models,
+                              allow_missing_structured)
+    finally:
+        reset_key(token)
+
+
+async def _run_job(
+    profile_id: str, purpose: str, schema_model: type[T], system: str, user: str,
+    temperature: float, key_material: dict, cache_ttl_seconds: int | None, use_cache: bool,
+    preferred_models: list[str] | None, allow_missing_structured: bool,
+) -> tuple[T, str]:
     candidates = await resolve_candidates(limit=2, preferences=preferred_models,
                                           allow_missing_structured=allow_missing_structured)
     if not candidates:
@@ -406,6 +475,19 @@ async def call_free_vision_structured(
     """
     if not images:
         raise ValueError("At least one image is required for a vision call.")
+    token = use_key(await key_for_profile(profile_id))
+    try:
+        return await _run_vision_job(profile_id, schema_model, system, user, images,
+                                     temperature, preferred_models)
+    finally:
+        reset_key(token)
+
+
+async def _run_vision_job(
+    profile_id: str, schema_model: type[T], system: str, user: str,
+    images: list[tuple[str, str]], temperature: float,
+    preferred_models: list[str] | None,
+) -> tuple[T, str]:
     candidates = await resolve_candidates(
         limit=2,
         preferences=preferred_models,

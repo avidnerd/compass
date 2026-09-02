@@ -6,6 +6,7 @@ import type { ConnectorState, ProviderState } from '../api/types'
 import { Card, CONNECTOR_LABELS, ErrorNote, Spinner } from '../components/ui'
 import { ProviderSetup } from '../components/ProviderSetup'
 import { CanvasSetup } from '../components/CanvasSetup'
+import { OpenRouterSetup } from '../components/OpenRouterSetup'
 import { PixelIcon } from '../components/PixelIcon'
 import { StepDots } from './OnboardingProfile'
 
@@ -159,6 +160,7 @@ export function OnboardingConnect() {
       </div>
 
       <CanvasSetup />
+      <OpenRouterSetup />
 
       {showSetup && (
         <>
