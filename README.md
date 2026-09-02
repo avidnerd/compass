@@ -1,10 +1,21 @@
 # Compass 🧭
 
-Compass turns your real work telemetry into a personal, expressive companion game — entirely
-local-first. Connect Google Workspace + GitHub, set a goal, focus, and let deterministic evidence
-(interpreted by a **verified-free** OpenRouter model) feed a pixel companion that grows with you.
-Work alongside friends in a shared focus room — without ever sharing
-your private goals, files, or evidence.
+**Compass checks that you actually did the work.**
+
+Set a goal and it becomes 3–7 concrete subgoals, each with an acceptance criterion and a plan for
+what would count as proof. Finish a focus session and Compass re-reads your own Google Workspace
+and GitHub accounts, extracts deterministic evidence — a file you edited, an email you sent, a
+commit you pushed, a calendar block you kept — and closes the step only if that evidence is
+actually there. Progress is earned, not asserted.
+
+Everything runs on your own machine. There is no hosted server holding your goals, no connector
+platform between you and your data, and no paid inference path: every model is re-verified as free
+at the moment it is called, and when none qualifies Compass degrades to transparent local
+fallbacks rather than reaching for a paid one. Access is read-only by construction — Compass can
+read your accounts and can never write to them.
+
+A pixel companion grows out of that verified progress. It is the product's face and the reason
+logging work feels worth doing, but the verification underneath is what Compass actually is.
 
 Connected data arrives through one free, self-hosted provider: **the Apps Script bridge**, a
 read-only Web App you deploy in your own Google account
@@ -15,9 +26,10 @@ two files, run one function, click Deploy.
 
 The full product/architecture specification lives in [PLAN.md](PLAN.md).
 
-Compass started as a hackathon project built with
-[@justanotherinternetguy](https://github.com/justanotherinternetguy). This repository is a cleaned-up
-public release of that work.
+Compass began as a hackathon project built with
+[@justanotherinternetguy](https://github.com/justanotherinternetguy) and has since been rebuilt as
+a working local-first application. This repository is the public release of that work; both
+authors are credited under the MIT licence.
 
 ## Stack
 
@@ -42,7 +54,7 @@ make build             # lint, typecheck, test, build the SPA
 make serve             # FastAPI serves SPA + API + WebSocket on :8000
 ```
 
-`make test` runs the backend suite (86 tests, all offline — the data provider and OpenRouter are
+`make test` runs the backend suite (122 tests, all offline — the data provider and OpenRouter are
 mocked at the transport layer) plus the frontend typecheck and lint. CI runs the same on every push.
 
 ### Environment (.env at the workspace root)
@@ -80,9 +92,10 @@ token into Settings → Connections. Nothing else is needed.
    finishing refreshes each required provider once, extracts deterministic evidence, and asks
    the free model whether the subgoal looks complete (≥0.50 → verified, ≤0.35 → not completed,
    otherwise you decide — with an honest evidence card either way).
-5. **Rewards** — deterministic focus score against *your own* recent baseline, idempotent XP /
-   care points / stats. The companion never dies, never guilt-trips, and absence never drops
-   mood below 30.
+5. **Rewards** — a deterministic focus score against *your own* recent baseline, with idempotent
+   XP, care points and stats feeding the companion. Deliberately not a pressure system: the
+   companion never dies, never guilt-trips, and absence never drops mood below 30. There are no
+   streaks to break and no ranking against anyone else.
 6. **Focus rooms** — a shared room exposes only presence and a timer. Goals, filenames, repos
    and evidence never enter a room payload. Head-to-head battles, party bosses and the league
    board were removed: competitive ranking is evidence-negative for this audience, and both
@@ -156,19 +169,31 @@ fetched uncached and held in process memory for the page render only.
 - **Stale analytics badge** — the provider was unreachable, so cached data was served with a
   visible freshness label. Use the per-connector refresh (60s cooldown) when it's back.
 
-## Demo flow (judges)
+## Seeing the whole loop
 
-1. `make serve` and show `Settings → Connections`: healthy connectors + the active `:free` model.
-2. Open two different browsers → two independent profiles and provider identities.
-3. Run onboarding in browser A: disclosure → bounded scan → edit an inferred interest → hatch a companion.
-4. Create a meaningful quest; review/edit the model's subgoals and evidence plan; activate.
-   (Or open **College** → *Detect* → import a `SEMESTER GOALS` row and show that the sheet's own
-   Definition of Done and Evidence column drove the quest's acceptance criterion and evidence plan.)
-5. Start a **1-minute demo session** from Home, make a real change in a connected app (e.g.
-   create a Google Doc), finish → watch targeted refresh, the evidence card, verification, XP,
-   care points, stat growth, and a new journal memory.
-6. Browser B joins a focus room with the six-character code → both timers run, neither side
-   can see the other's goal, file or evidence.
-8. Show Insights → System: cache savings, provider freshness, verification history.
-9. Kill the OpenRouter key/network and repeat a finish: Compass falls back safely and the UI
-   says "Free AI temporarily unavailable" — no paid request is ever made.
+The shortest path to watching a claim get checked against real evidence:
+
+1. `make serve`, then open `Settings → Connections` — healthy connectors and the active `:free`
+   model.
+2. Run onboarding. Connecting accounts is optional and the flow says so: skip it and you go
+   straight to choosing a companion, with every step closing on your own confirmation. Connect
+   the bridge first and you also get the bounded interest scan, whose inferences are editable
+   before anything is saved.
+3. Create a goal and review the subgoals and evidence plan the model proposed — both are editable
+   before you activate. (Or open **College** → *Detect* and import a `SEMESTER GOALS` row, where
+   the sheet's own Definition of Done and Evidence column drive the acceptance criterion.)
+4. **The part that matters:** start a 1-minute session from Home, make a real change in a
+   connected app — create a Google Doc, push a commit — then finish. Compass refreshes only the
+   providers that step needs, extracts the evidence, shows you exactly what it found, and closes
+   the subgoal only if the evidence supports it.
+5. Repeat step 4 *without* doing the work. The step does not close, and the evidence card says
+   why rather than pretending.
+6. Open **Deadlines**, paste a Canvas Calendar Feed URL, and import an assignment — it becomes a
+   quest with its real due date.
+7. Open two browsers → two independent profiles. Join a focus room with the six-character code
+   from the second one: both timers run, and neither side can see the other's goal, file or
+   evidence.
+8. `Insights → System` — cache savings, provider freshness, and the verification history.
+9. Remove the OpenRouter key or drop the network and repeat a finish. Compass falls back to local
+   plans and human confirmation and says "Free AI temporarily unavailable". No paid request is
+   ever made.
