@@ -2,7 +2,7 @@ PYTHON ?= python3
 VENV := .venv
 PY := $(VENV)/bin/python
 
-.PHONY: setup migrate dev test build serve backend-dev frontend-dev package
+.PHONY: setup migrate dev test build serve backend-dev frontend-dev package binary
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -40,3 +40,14 @@ package:
 	@echo "Wheel in backend/dist/. Install it anywhere with:"
 	@echo "  uv tool install ./backend/dist/*.whl     # or: pipx install ./backend/dist/*.whl"
 	@echo "Then run:  compass"
+
+# A single executable for people without Python. UNSIGNED: macOS and Windows
+# will warn on first run (the README says how to get past it); signing needs
+# paid developer accounts.
+binary:
+	cd frontend && npm run build
+	rm -rf backend/app/web && cp -R frontend/dist backend/app/web
+	$(PY) -m pip install --quiet --upgrade pyinstaller
+	cd backend && ../$(PY) -m PyInstaller --clean --noconfirm compass.spec
+	@echo
+	@echo "Binary at backend/dist/compass"

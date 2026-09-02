@@ -1,0 +1,144 @@
+name: Release
+
+# Builds the installable wheel and a standalone binary per platform, then
+# attaches them to a GitHub Release.
+#
+# The binaries are UNSIGNED. macOS Gatekeeper and Windows SmartScreen warn on
+# first run; the release notes below say how to get past it. Signing needs paid
+# Apple and Windows certificates, so it is deliberately not attempted rather
+# than half-done.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  wheel:
+    name: Wheel (any platform with Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - name: Build the web interface
+        run: npm ci && npm run build
+        working-directory: frontend
+      - name: Bundle it into the package
+        run: rm -rf backend/app/web && cp -R frontend/dist backend/app/web
+      - run: pip install build
+      - run: python -m build --wheel
+        working-directory: backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel
+          path: backend/dist/*.whl
+
+  binary:
+    name: Binary (${{ matrix.label }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest,   label: macos-arm64,   asset: compass-macos-arm64 }
+          - { os: macos-13,       label: macos-intel,   asset: compass-macos-x86_64 }
+          - { os: ubuntu-latest,  label: linux-x86_64,  asset: compass-linux-x86_64 }
+          - { os: windows-latest, label: windows-x86_64, asset: compass-windows-x86_64.exe }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - name: Build the web interface
+        run: npm ci && npm run build
+        working-directory: frontend
+      - name: Bundle it into the package
+        shell: bash
+        run: rm -rf backend/app/web && cp -R frontend/dist backend/app/web
+      - run: pip install -r backend/requirements.txt pyinstaller
+      - run: pyinstaller --clean --noconfirm compass.spec
+        working-directory: backend
+      - name: Ad-hoc sign (macOS)
+        # Free and unrelated to a developer account: it does not clear
+        # Gatekeeper, but an unsigned arm64 binary can fail to launch at all.
+        if: startsWith(matrix.os, 'macos')
+        run: codesign --force --sign - backend/dist/compass
+      - name: Smoke test — it must actually serve
+        shell: bash
+        run: |
+          set -e
+          BIN=backend/dist/compass
+          [ -f "$BIN.exe" ] && BIN="$BIN.exe"
+          "$BIN" --port 8231 --no-browser --data-dir "$RUNNER_TEMP/compass-ci" &
+          for i in $(seq 1 30); do
+            sleep 2
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8231/ || true)
+            [ "$code" = "200" ] && break
+          done
+          test "$code" = "200" || { echo "binary did not serve"; exit 1; }
+          curl -s -o /dev/null -w "api %{http_code}\n" http://127.0.0.1:8231/api/v1/me
+      - name: Name the artifact for its platform
+        shell: bash
+        run: |
+          mkdir -p out
+          if [ -f backend/dist/compass.exe ]; then
+            cp backend/dist/compass.exe "out/${{ matrix.asset }}"
+          else
+            cp backend/dist/compass "out/${{ matrix.asset }}"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: out/${{ matrix.asset }}
+
+  release:
+    needs: [wheel, binary]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts, merge-multiple: true }
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          body: |
+            ## Install
+
+            **With Python (recommended)** — nothing to configure:
+
+            ```bash
+            uv tool install compass_study-*.whl    # or: pipx install compass_study-*.whl
+            compass
+            ```
+
+            **Without Python** — download the binary for your platform, then run it.
+
+            ### These binaries are unsigned
+
+            Signing needs paid Apple and Windows developer certificates, so the
+            downloads are not signed and your system will warn you once.
+
+            - **macOS:** `chmod +x compass-macos-*` then right-click → Open, or
+              `xattr -d com.apple.quarantine compass-macos-*` before running.
+            - **Windows:** SmartScreen shows "Windows protected your PC" →
+              More info → Run anyway.
+            - **Linux:** `chmod +x compass-linux-x86_64` and run it.
+
+            If that is not acceptable to you, the wheel above involves no
+            downloaded executable at all — and you can always build from source
+            with `make package`.
+
+            ## First run
+
+            Compass creates its database and an encryption key in your own data
+            directory and opens your browser. Add your own free OpenRouter key in
+            Settings → Connections; Compass only ever calls models verified free
+            at the moment of the call, and never a paid one.

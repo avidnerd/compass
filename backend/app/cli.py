@@ -78,7 +78,13 @@ def main(argv: list[str] | None = None) -> int:
         threading.Timer(1.5, lambda: webbrowser.open(url)).start()
 
     import uvicorn
-    uvicorn.run("app.main:app", host=args.host, port=port, log_level="warning")
+    if getattr(sys, "frozen", False):
+        # A frozen binary has no installed package to resolve an import string
+        # against, so hand uvicorn the application object itself.
+        from .main import app as application
+        uvicorn.run(application, host=args.host, port=port, log_level="warning")
+    else:
+        uvicorn.run("app.main:app", host=args.host, port=port, log_level="warning")
     return 0
 
 

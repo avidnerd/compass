@@ -1,2 +1,4 @@
 dist/
 app/web/
+build/
+*.spec.bak

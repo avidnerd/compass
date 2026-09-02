@@ -51,3 +51,8 @@ packages = ["app"]
 
 [tool.hatch.build]
 artifacts = ["app/web/**"]
+
+# Builds frontend/ into app/web/ when it is missing, so installing straight
+# from a git URL produces a copy that actually has an interface to serve.
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "build_hook.py"
