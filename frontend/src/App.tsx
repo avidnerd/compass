@@ -31,7 +31,9 @@ const NAV = [
   { to: '/home', label: 'Home', icon: 'home' },
   { to: '/quests', label: 'Quests', icon: 'quests' },
   { to: '/college', label: 'College', icon: 'college' },
-  { to: '/canvas', label: 'Canvas', icon: 'clock' },
+  // Route and API stay /canvas (Canvas is the anchor feed); the label says
+  // what the page actually holds, which is deadlines from any calendar.
+  { to: '/canvas', label: 'Deadlines', icon: 'clock' },
   { to: '/party', label: 'Rooms', icon: 'party' },
   { to: '/character/journal', label: 'Journal', icon: 'journal' },
   { to: '/insights', label: 'Insights', icon: 'insights' },

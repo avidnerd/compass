@@ -429,9 +429,18 @@ export interface ProviderState {
   handshake?: { ok: boolean; capabilities: string[]; timezone: string | null }
 }
 
+export interface CanvasFeed {
+  id: string | null
+  label: string | null
+  /** 'canvas' filters to assignment UIDs; 'generic' keeps every dated event. */
+  kind: 'canvas' | 'generic'
+  feed: string
+}
+
 export interface CanvasLink {
   status: 'linked' | 'not_linked'
   feed: string | null
+  feeds?: CanvasFeed[]
   connection_status?: string
   error_code?: string | null
   last_checked_at?: string | null
@@ -449,6 +458,8 @@ export interface CanvasAssignment {
   url: string | null
   description: string | null
   imported_quest_id?: string | null
+  feed_id?: string | null
+  feed_label?: string | null
 }
 
 export interface CanvasOverview {
@@ -457,4 +468,5 @@ export interface CanvasOverview {
   imports: { source_key: string; quest_id: string | null }[]
   meta?: import('./client').Meta
   error?: { code: string; message: string } | null
+  feed_errors?: { feed_id: string | null; label: string | null; code: string; message: string }[]
 }

@@ -48,7 +48,7 @@ export function CanvasPage() {
     return next
   })
 
-  if (overview.isPending) return <Spinner label="Reading Canvas…" />
+  if (overview.isPending) return <Spinner label="Reading your feeds…" />
 
   const data = overview.data?.data
   const linked = data?.link.status === 'linked'
@@ -57,26 +57,32 @@ export function CanvasPage() {
 
   return (
     <>
-      <PageTitle>Canvas</PageTitle>
+      <PageTitle>Deadlines</PageTitle>
       <CanvasSetup />
 
       {linked && (
         <Card
-          title="Upcoming assignments"
+          title="Upcoming deadlines"
           actions={
             <button onClick={() => refresh.mutate()} disabled={refresh.isPending}>
-              <PixelIcon name="refresh" /> {refresh.isPending ? 'Reading…' : 'Re-read feed'}
+              <PixelIcon name="refresh" /> {refresh.isPending ? 'Reading…' : 'Re-read feeds'}
             </button>
           }
-          status={[`${items.length} in the next ${data?.link ? 60 : 60} days`,
+          status={[`${items.length} in the next 60 days`,
+            `${(data?.link.feeds?.length ?? 0)} ${(data?.link.feeds?.length ?? 0) === 1 ? 'feed' : 'feeds'}`,
             `${selected.size} selected`]}
         >
           {data?.error && (
             <ErrorNote error={new Error(`${data.error.message} (${data.error.code})`)} />
           )}
+          {/* One dead feed does not blank out the rest — say which one broke. */}
+          {(data?.feed_errors ?? []).map((e) => (
+            <ErrorNote key={e.feed_id ?? e.code}
+              error={new Error(`${e.label ?? 'A feed'} could not be read: ${e.message}`)} />
+          ))}
           {items.length === 0 && !data?.error && (
-            <p>Nothing due in the next 60 days, or your instructors have not put due dates on
-              anything yet. A Canvas feed only carries what they entered.</p>
+            <p>Nothing due in the next 60 days. A feed only carries what was actually put in
+              it, so a quiet list can also mean a deadline lives somewhere Compass cannot see.</p>
           )}
 
           {items.length > 0 && (
@@ -92,7 +98,9 @@ export function CanvasPage() {
                   )}
                   <span className="log-what">
                     <strong>{a.title}</strong>
-                    <small>{a.course ?? 'No course'}{a.imported_quest_id ? ' · imported' : ''}</small>
+                    <small>{a.course ?? a.feed_label ?? 'No course'}
+                      {(data?.link.feeds?.length ?? 0) > 1 && a.course ? ` · ${a.feed_label}` : ''}
+                      {a.imported_quest_id ? ' · imported' : ''}</small>
                   </span>
                   <span className="log-stamp">{dueLabel(a.due_at, a.all_day)}</span>
                 </div>
@@ -115,11 +123,18 @@ export function CanvasPage() {
       )}
 
       {linked && (
-        <Card title="What Canvas can and cannot do" status={['Due dates only']}>
+        <Card title="What a feed can and cannot do" status={['Due dates only']}>
           <p className="small">
-            Canvas tells Compass <strong>when</strong> something is due. It cannot tell Compass
-            whether you did it — the calendar feed carries no submission status and no grades.
-            That is a limit of the feed, not a setting.
+            A calendar feed tells Compass <strong>when</strong> something is due. It cannot tell
+            Compass whether you did it — no feed carries submission status or grades. That is a
+            limit of the format, not a setting.
+          </p>
+          <p className="small">
+            Canvas also only carries what your instructors entered <em>in Canvas</em>. Courses
+            graded through Gradescope, Pearson or LabFlow often sync a due date across, but
+            extensions, late deadlines and section-specific dates never do. If a deadline is
+            missing here, it is missing from Canvas — add that tool&apos;s own calendar under
+            Deadline feeds, or paste the assignment into <Link to="/quests/new">a new quest</Link>.
           </p>
           <p className="small">
             To have a step close itself, connect Google or GitHub on{' '}

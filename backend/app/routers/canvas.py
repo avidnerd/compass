@@ -13,6 +13,10 @@ router = APIRouter(prefix="/canvas", tags=["canvas"])
 
 class LinkBody(BaseModel):
     feed_url: str = Field(min_length=1, max_length=2000)
+    label: str = ""
+    # "canvas" filters to Canvas assignment UIDs; "generic" takes every dated
+    # event, for feeds from tools that grade outside the LMS.
+    kind: str = "canvas"
 
 
 @router.get("")
@@ -27,11 +31,26 @@ async def get_status(request: Request, profile: dict = CurrentProfile):
 
 @router.post("/link")
 async def create_link(body: LinkBody, request: Request, profile: dict = CurrentProfile):
-    return envelope(await canvas_service.link(profile["id"], body.feed_url), request)
+    return envelope(await canvas_service.link(
+        profile["id"], body.feed_url, label=body.label, kind=body.kind), request)
+
+
+@router.get("/feeds")
+async def list_feeds(request: Request, profile: dict = CurrentProfile):
+    feeds = await canvas_service.feeds(profile["id"])
+    return envelope([{"id": f.get("id"), "label": f.get("label"),
+                      "kind": f.get("kind", "canvas"), "feed": canvas_service.mask(f["url"])}
+                     for f in feeds], request)
+
+
+@router.delete("/feeds/{feed_id}")
+async def delete_feed(feed_id: str, request: Request, profile: dict = CurrentProfile):
+    return envelope(await canvas_service.unlink_feed(profile["id"], feed_id), request)
 
 
 @router.delete("/link")
 async def delete_link(request: Request, profile: dict = CurrentProfile):
+    """Remove every feed at once."""
     return envelope(await canvas_service.unlink(profile["id"]), request)
 
 
