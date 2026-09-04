@@ -73,17 +73,33 @@ jobs:
       - name: Smoke test — it must actually serve
         shell: bash
         run: |
-          set -e
+          set -u
           BIN=backend/dist/compass
-          [ -f "$BIN.exe" ] && BIN="$BIN.exe"
-          "$BIN" --port 8231 --no-browser --data-dir "$RUNNER_TEMP/compass-ci" &
-          for i in $(seq 1 30); do
+          if [ -f "backend/dist/compass.exe" ]; then BIN=backend/dist/compass.exe; fi
+          echo "testing $BIN"
+          # A bash-native temp path: $RUNNER_TEMP is a Windows path with
+          # backslashes, which this shell would mangle.
+          DATA="$(mktemp -d)/compass-ci"
+          "$BIN" --port 8231 --no-browser --data-dir "$DATA" > smoke.log 2>&1 &
+          APP_PID=$!
+          code=000
+          for i in $(seq 1 45); do
             sleep 2
-            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8231/ || true)
-            [ "$code" = "200" ] && break
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8231/ || echo 000)
+            if [ "$code" = "200" ]; then break; fi
+            # If the process already died, stop waiting on it.
+            if ! kill -0 "$APP_PID" 2>/dev/null; then break; fi
           done
-          test "$code" = "200" || { echo "binary did not serve"; exit 1; }
-          curl -s -o /dev/null -w "api %{http_code}\n" http://127.0.0.1:8231/api/v1/me
+          if [ "$code" != "200" ]; then
+            echo "::error::the binary did not serve (last status $code)"
+            echo "--- application output ---"
+            cat smoke.log || true
+            exit 1
+          fi
+          api=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8231/api/v1/me || echo 000)
+          echo "served 200; api answered $api (401 expected without a session)"
+          kill "$APP_PID" 2>/dev/null || true
+
       - name: Name the artifact for its platform
         shell: bash
         run: |
