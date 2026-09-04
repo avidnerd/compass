@@ -59,7 +59,7 @@ export function OnboardingProfile() {
   return (
     <Card title="Welcome to Compass">
       <StepDots step={0} />
-      <p>Compass turns your real work into a cozy companion game — locally, on your machine.
+      <p>Compass checks that you actually did the work, using evidence from your own accounts — locally, on your machine.
         Each browser gets its own profile.</p>
       {!recoverMode ? (
         <form onSubmit={(e) => { e.preventDefault(); create.mutate() }}>

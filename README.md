@@ -1,5 +1,9 @@
 # Compass 🧭
 
+[![CI](https://github.com/avidnerd/compass/actions/workflows/ci.yml/badge.svg)](https://github.com/avidnerd/compass/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-black.svg)](https://www.python.org/)
+
 **Compass checks that you actually did the work.**
 
 Set a goal and it becomes 3–7 concrete subgoals, each with an acceptance criterion and a plan for
@@ -16,6 +20,16 @@ read your accounts and can never write to them.
 
 A pixel companion grows out of that verified progress. It is the product's face and the reason
 logging work feels worth doing, but the verification underneath is what Compass actually is.
+
+![The Compass home screen](docs/screenshots/home.png)
+
+<sub>Every red mark is evidence a machine checked. Steps you merely assert stay unmarked —
+the colour is reserved for that one meaning and nothing else.</sub>
+
+| Deadlines | Quests |
+|---|---|
+| ![Deadlines](docs/screenshots/deadlines.png) | ![Quests](docs/screenshots/quests.png) |
+| Canvas plus any other calendar feed, merged and deduplicated | Subgoals close only on evidence |
 
 Connected data arrives through one free, self-hosted provider: **the Apps Script bridge**, a
 read-only Web App you deploy in your own Google account
@@ -106,7 +120,7 @@ make build             # lint, typecheck, test, build the SPA
 make serve             # FastAPI serves SPA + API + WebSocket on :8000
 ```
 
-`make test` runs the backend suite (122 tests, all offline — the data provider and OpenRouter are
+`make test` runs the backend suite (125 tests, all offline — the data provider and OpenRouter are
 mocked at the transport layer) plus the frontend typecheck and lint. CI runs the same on every push.
 
 ### Environment (.env at the workspace root)
@@ -189,6 +203,49 @@ This integration inherits every guarantee in [Privacy](#privacy): it is read-onl
 Compass can never edit the sheet, the calendars, Tasks, Drive, or Gmail. Only the *link* (file ids)
 and the *import ledger* (which row became which quest) reach SQLite; dashboard cell contents are
 fetched uncached and held in process memory for the page render only.
+
+## Engineering notes
+
+The problems in this repository that were not obvious, and what was done about them.
+
+**A free-only LLM gateway that verifies at call time.** Every model request passes through one
+function. A model qualifies only if its id ends in `:free`, it reports zero prompt *and*
+completion pricing, and it advertises structured outputs — checked against the live catalogue on
+each call, not trusted from config, because a model can stop being free. Unknown pricing
+disqualifies. There is no paid fallback anywhere in the codebase; when nothing qualifies the
+caller degrades to a deterministic local path and the UI says so.
+
+**Read-only by construction, not by convention.** The Apps Script bridge requests only
+`*.readonly` OAuth scopes, so Google's own authorisation layer — not Compass's code — guarantees
+nothing can be modified. A write-verb denylist and a read allowlist sit behind that as defence in
+depth.
+
+**Evidence the model never gets to invent.** The LLM proposes a plan using internal evidence
+*enums*; it never sees connector names or tool signatures. Evidence extraction is deterministic
+Python against the provider payloads, and any enum Compass cannot actually observe degrades to
+manual confirmation instead of pretending. Prompt-injection surface is bounded by delimiting all
+connected content as untrusted.
+
+**Exactly-once resolution under concurrency.** Focus verification is reachable from a timer, a
+user action, and a job worker at the same time. The tests drive those paths concurrently and
+assert a single resolution, because the failure mode is silent double-crediting rather than a
+crash.
+
+**Screenshots that never touch disk twice.** Focus monitoring samples still frames from one
+explicit browser screen-share, analyses them, and deletes them — they are never SQLite rows and
+never LLM-cache entries. No audio, camera, keystrokes or clipboard are captured, and the attention
+view never decides completion.
+
+**A design system with one job for colour.** The interface is a one-bit desktop: two inks, ordered
+dither patterns instead of greys, and 50 hand-authored 12×12 pixel icons rather than an icon font
+or emoji. Classification is carried by *pattern*, which is more accessible than hue for
+colour-blind users, and the single spot ink is reserved for one meaning — evidence a machine
+verified. `DESIGN.md` records the whole system.
+
+**Distribution without a signing certificate.** Three install paths: a git-URL install with a
+build hook that compiles the frontend, a wheel, and a PyInstaller binary. It is deliberately not a
+desktop-webview app, because the focus monitor depends on `getDisplayMedia`, which Tauri's webview
+cannot raise on macOS and Electron replaces with an incompatible API.
 
 ## Privacy
 

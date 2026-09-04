@@ -195,8 +195,8 @@ export function FocusSessionPage() {
                 Recheck evidence
               </button>
             </div>
-            <p className="small muted">Confirming yourself grants 80% of normal rewards — honesty
-              keeps the game meaningful.</p>
+            <p className="small muted">Confirming yourself grants 80% of normal rewards. The gap
+              is deliberate: it keeps verified progress worth more than asserted progress.</p>
             <ErrorNote error={confirm.error || recheck.error} />
           </Card>
           <EvidenceCard verification={verification} />
