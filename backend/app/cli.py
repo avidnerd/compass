@@ -49,6 +49,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--data-dir", help="Where the database and app secret live.")
     args = parser.parse_args(argv)
 
+    # A Windows console defaults to cp1252, which cannot encode much of what a
+    # user's own data contains — a course name, a display name, a path. Ask for
+    # UTF-8 rather than let an encode error kill the launcher.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
     if args.data_dir:
         import os
         os.environ["COMPASS_DATA_DIR"] = args.data_dir
@@ -68,9 +77,9 @@ def main(argv: list[str] | None = None) -> int:
     port = _free_port(args.port)
     url = f"http://{'localhost' if args.host == '127.0.0.1' else args.host}:{port}"
 
-    print(f"Compass  →  {url}")
-    print(f"Data     →  {DATA_DIR}")
-    print("Add your own free OpenRouter key in Settings → Connections.")
+    print(f"Compass:  {url}")
+    print(f"Data:     {DATA_DIR}")
+    print("Add your own free OpenRouter key in Settings > Connections.")
     print("Ctrl-C to stop.\n")
 
     if not args.no_browser:
