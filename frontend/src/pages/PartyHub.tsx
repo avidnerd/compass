@@ -52,7 +52,7 @@ export function PartyHub() {
 
       <Card title="Focus rooms" status={[`${parties.data?.data.length ?? 0} joined`]}>
         <p>Working alongside other people makes it easier to start and easier to keep going.
-          A room shares only that you are focusing and for how long — never the goal, the file
+          A room shares only that you are focusing and for how long. Never the goal, the file
           or the evidence behind it.</p>
       </Card>
 

@@ -35,7 +35,7 @@ _CAPABILITY_CONNECTORS: dict[str, str] = {
     "sheets.get_metadata": "google_sheets",
     "slides.get_presentation": "google_slides",
     "calendar.list_events": "google_calendar",
-    # Lets Compass find the College OS calendars (🎓 Academic, ⭐ Opportunities,
+    # Lets Compass find the College OS calendars (Academic, Opportunities,
     # …) instead of only reading `primary`.
     "calendar.list_calendars": "google_calendar",
     "gmail.list_messages": "gmail",

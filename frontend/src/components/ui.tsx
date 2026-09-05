@@ -76,7 +76,7 @@ export function CacheBadge({ meta }: { meta?: Meta }) {
   if (!meta || meta.from_cache === undefined) return null
   return (
     <span className={`badge ${meta.stale ? 'badge-warn' : ''}`}>
-      {meta.stale ? 'stale — provider unreachable' : meta.from_cache ? 'cached' : 'fresh'}
+      {meta.stale ? 'stale: provider unreachable' : meta.from_cache ? 'cached' : 'fresh'}
     </span>
   )
 }

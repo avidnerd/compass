@@ -53,7 +53,7 @@ export function QuestNew() {
         <label htmlFor="goal">Goal</label>
         <input id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} required
           maxLength={300} placeholder="e.g. Finish the draft of my thesis chapter" />
-        <label htmlFor="meaning">Why it matters (optional — helps the plan feel human)</label>
+        <label htmlFor="meaning">Why it matters (optional, helps the plan feel human)</label>
         <textarea id="meaning" value={meaning} onChange={(e) => setMeaning(e.target.value)}
           maxLength={300} rows={2} />
         <div className="row">
@@ -91,7 +91,7 @@ export function QuestNew() {
       <p className="small muted">
         If you have a project brief, assignment sheet or task list, upload it instead and Compass
         will use the tasks it already contains rather than inventing its own. A document that
-        lists its steps needs no AI at all. Plain text, Markdown or CSV — the text is read once
+        lists its steps needs no AI at all. Plain text, Markdown or CSV. The text is read once
         to build the plan and never stored.
       </p>
 

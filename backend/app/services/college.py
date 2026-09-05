@@ -47,13 +47,23 @@ TAB_TIME_LOG = "TIME LOG"
 TABS = [TAB_THIS_WEEK, TAB_SEMESTER, TAB_OPPORTUNITIES, TAB_REVIEWS, TAB_TIME_LOG]
 
 CALENDAR_NAMES = [
-    "🎓 Academic", "🧠 Work & Projects", "🏛 Clubs & Duke", "👤 Personal", "⭐ Opportunities",
+    "Academic", "Work & Projects", "Clubs & Duke", "Personal", "Opportunities",
 ]
-RHYTHM_TITLES = ["🌙 Nightly Shutdown", "🔄 Sunday Weekly Reset", "🗓 Monthly Direction Check"]
+RHYTHM_TITLES = ["Nightly Shutdown", "Sunday Weekly Reset", "Monthly Direction Check"]
 TASK_LIST_NAMES = [
-    "📥 Inbox", "🎓 Academics", "💼 Career / Research", "🚀 Projects",
-    "🏛 Clubs / Leadership", "👤 Personal",
+    "Inbox", "Academics", "Career / Research", "Projects",
+    "Clubs / Leadership", "Personal",
 ]
+
+
+def normalise_name(name: str) -> str:
+    """Compare Workspace object names ignoring a leading decorative prefix.
+
+    Earlier versions of the provisioner prefixed calendars and task lists with
+    an emoji. Accounts set up then still carry those names, so matching strips
+    any leading non-alphanumeric characters before comparing.
+    """
+    return re.sub(r"^[^0-9A-Za-z]+", "", name or "").strip().casefold()
 
 OPPORTUNITY_STATUSES = [
     "DISCOVERED", "RESEARCHING", "APPLYING / ATTENDING", "WAITING",
@@ -408,8 +418,9 @@ async def detect(profile: dict, force: bool = False) -> dict:
     dashboard = dashboards[0] if dashboards else None
     root = roots[0] if roots else None
 
-    present = {c["name"] for c in await _list_calendars(profile)}
-    calendars = [{"name": n, "present": n in present} for n in CALENDAR_NAMES] if present else []
+    present = {normalise_name(c["name"]) for c in await _list_calendars(profile)}
+    calendars = ([{"name": n, "present": normalise_name(n) in present} for n in CALENDAR_NAMES]
+                 if present else [])
 
     status = "linked" if dashboard else ("partial" if root else "not_detected")
     # A re-detect may point at a different (or no longer existing) spreadsheet;
@@ -679,10 +690,24 @@ async def overview(profile: dict, force: bool = False) -> dict:
     public = public_link(link)
 
     if public["status"] != "linked":
-        return {"link": public, "dashboard": None, "importable": [], "imports": [],
-                "hint": ("Compass could not find a spreadsheet named "
-                         f"\"{settings.college_dashboard_name}\" in your Drive. Run setUp() from "
-                         "college-os/setup.gs, then re-detect.")}
+        # Two very different failures reach this point. Telling someone to run a
+        # provisioner when Compass cannot see their Drive at all sends them to
+        # the wrong place, so name the actual blocker.
+        from .. import providers as provider_service
+        connected = await provider_service.active_provider(profile) is not None
+        if not connected:
+            hint = ("Compass is not connected to a Google account yet, so it cannot see your "
+                    "Drive. Connect the read-only Apps Script bridge in Settings, Connections, "
+                    "then come back and re-detect.")
+        elif public["status"] == "partial":
+            hint = (f"Found the COLLEGE folder but no spreadsheet named "
+                    f"\"{settings.college_dashboard_name}\" inside it. If you renamed it, rename "
+                    "it back, or run setUp() from college-os/setup.gs to recreate it.")
+        else:
+            hint = ("Compass could not find a spreadsheet named "
+                    f"\"{settings.college_dashboard_name}\" in your Drive. Run setUp() from "
+                    "college-os/setup.gs, then re-detect.")
+        return {"link": public, "dashboard": None, "importable": [], "imports": [], "hint": hint}
 
     dashboard = await read_dashboard(profile, force=force)
     available = quest_service.available_evidence_types()

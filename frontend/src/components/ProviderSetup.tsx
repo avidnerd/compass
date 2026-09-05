@@ -30,7 +30,7 @@ export function ProviderSetup({ compact = false }: { compact?: boolean }) {
   const saveBridge = useMutation({
     mutationFn: () => api<ProviderState>('/providers/bridge', { method: 'PUT', body: { url, token } }),
     onSuccess: (resp) => {
-      setSaved(`Bridge connected — ${resp.data.handshake?.capabilities.length ?? 0} capabilities available.`)
+      setSaved(`Bridge connected. ${resp.data.handshake?.capabilities.length ?? 0} capabilities available.`)
       setUrl('')
       setToken('')
       invalidateAll()
@@ -69,7 +69,7 @@ export function ProviderSetup({ compact = false }: { compact?: boolean }) {
       {data.bridge.configured ? (
         <div className="list-item">
           <span>
-            <strong>Apps Script bridge</strong> — connected
+            <strong>Apps Script bridge</strong>: connected
             {data.bridge.from_env && <span className="small muted"> (from .env)</span>}
             <br />
             <span className="small muted">
@@ -85,7 +85,7 @@ export function ProviderSetup({ compact = false }: { compact?: boolean }) {
         <>
           <p className="muted">
             Deploy <code>college-os/bridge/api.gs</code> as a Web App in your own Google account and
-            paste its details here. It runs under your own read-only OAuth grant — no connector
+            paste its details here. It runs under your own read-only OAuth grant, so no connector
             platform, no Google Cloud project, no cost.
           </p>
           <ol className="small">
@@ -146,7 +146,7 @@ export function ProviderSetup({ compact = false }: { compact?: boolean }) {
 
       {onBridge && (
         <p className="small muted" style={{ marginBottom: 0 }}>
-          Google Meet is unavailable on this path — its API needs a Google Cloud project, which is
+          Google Meet is unavailable on this path. Its API needs a Google Cloud project, which is
           the cost the bridge avoids. Compass reports it as unsupported rather than pretending.
         </p>
       )}

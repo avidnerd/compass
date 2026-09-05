@@ -93,7 +93,7 @@ export function OnboardingConnect() {
           set a goal, break it into steps, and run focus sessions. You confirm each step
           yourself when it is done.</p>
 
-        <p>Connecting your own Google and GitHub accounts changes one thing — Compass can
+        <p>Connecting your own Google and GitHub accounts changes one thing. Compass can
           then <em>check</em> that a step really happened, instead of taking your word for it.
           That is the whole point of the product, so it is worth doing, just not necessarily
           right now.</p>
@@ -140,7 +140,7 @@ export function OnboardingConnect() {
               printed in that ink.
             </p>
             <p className="small">
-              Read-only, and it runs in your own Google account — nothing is sent to us,
+              Read-only, and it runs in your own Google account. Nothing is sent to us,
               because there is no us to send it to. Budget about 10 minutes.
             </p>
           </div>
@@ -170,7 +170,7 @@ export function OnboardingConnect() {
           <ProviderSetup />
           <div className="row" style={{ marginTop: 4 }}>
             <button className="primary" onClick={() => navigate('/onboarding/scan')}>
-              Done — continue
+              Done, continue
             </button>
           </div>
         </>

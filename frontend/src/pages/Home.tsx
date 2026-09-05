@@ -219,8 +219,8 @@ export function Home() {
             <p>A session is {SESSION_STATE[activeSession.state]?.toLowerCase() ?? activeSession.state}. Jump back in.</p>
           ) : (
             <>
-              <p>Start a focus session. Verified effort is what feeds your companion's growth —
-                nothing here grows because you said it did.</p>
+              <p>Start a focus session. Verified effort is what feeds your companion's growth.
+                Nothing here grows because you said it did.</p>
               <div className="monitoring-disclosure">
                 <strong>Private attention view included</strong>
                 Compass samples the screen you choose. It never records audio, camera, keystrokes
@@ -291,7 +291,7 @@ export function Home() {
             actions={<Link to="/college"><button>Open</button></Link>}>
             <p className="small" style={{ margin: 0 }}>
               Linked to <strong>{college.data.data.dashboard_name}</strong>. Import this week's Big 3
-              and semester goals as quests — the sheet's Definition of Done becomes the acceptance
+              and semester goals as quests. The sheet's Definition of Done becomes the acceptance
               criterion Compass verifies.
             </p>
           </Card>
@@ -300,7 +300,7 @@ export function Home() {
         <Card title="Recent sessions" status={[`${recent.length} of last 5`]}>
           {recent.length === 0 ? (
             <p className="log-empty" style={{ padding: 0 }}>
-              No sessions recorded yet. The log fills itself — you can't write to it.
+              No sessions recorded yet. The log fills itself; you cannot write to it.
             </p>
           ) : (
             <div className="log">

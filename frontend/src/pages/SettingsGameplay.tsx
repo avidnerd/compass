@@ -34,14 +34,16 @@ export function SettingsGameplay() {
 
   return (
     <>
-      <h1>Settings — Gameplay</h1>
-      <p className="row small">
-        <Link to="/settings/connections">Connections</Link> ·
-        <Link to="/settings/privacy">Privacy</Link> ·
-        <Link to="/settings/gameplay">Gameplay</Link>
-      </p>
+      <div className="page-head">
+        <h1>Settings: Gameplay</h1>
+        <p className="row small">
+          <Link to="/settings/connections">Connections</Link> ·
+          <Link to="/settings/privacy">Privacy</Link> ·
+          <Link to="/settings/gameplay">Gameplay</Link>
+        </p>
+      </div>
       <Card title="Work hours">
-        <p className="small muted">Used only for your own calendar analytics — Compass never
+        <p className="small muted">Used only for your own calendar analytics. Compass never
           rewards after-hours work for its own sake.</p>
         {profile && (
           <div className="row">

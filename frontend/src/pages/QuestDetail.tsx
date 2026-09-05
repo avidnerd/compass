@@ -100,13 +100,15 @@ export function QuestDetail() {
 
   return (
     <>
-      <h1>{q.goal}</h1>
-      <p className="muted">{q.meaning}</p>
-      <p className="small">
-        <span className="badge">{q.state}</span>
-        {q.plan_model_id && <> · planned by <code>{q.plan_model_id}</code></>}
-        {!q.plan_model_id && q.subgoals?.length ? ' · manual plan (free AI was unavailable)' : ''}
-      </p>
+      <div className="page-head">
+        <h1>{q.goal}</h1>
+        <p className="muted">{q.meaning}</p>
+        <p className="small">
+          <span className="badge">{q.state}</span>
+          {q.plan_model_id && <> · planned by <code>{q.plan_model_id}</code></>}
+          {!q.plan_model_id && q.subgoals?.length ? ' · manual plan (free AI was unavailable)' : ''}
+        </p>
+      </div>
 
       {q.state === 'planning' && <Card><p aria-busy="true">The free model is decomposing your
         goal into measurable steps…</p></Card>}

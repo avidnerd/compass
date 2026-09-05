@@ -84,7 +84,7 @@ export function OnboardingCompanion() {
         <StepDots step={3} />
         <div className="grid-2">
           <div>
-            <p><strong>{hatched.name}</strong> is already yours — this step is done. You can keep
+            <p><strong>{hatched.name}</strong> is already yours, so this step is done. You can keep
               going, or change their look any time.</p>
             <div className="row" style={{ marginTop: 12 }}>
               <Link to="/quests/new"><button className="primary">Continue to your first quest</button></Link>

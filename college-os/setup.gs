@@ -50,20 +50,20 @@ const CONFIG = {
 };
 
 const CALENDARS = [
-  { name: '🎓 Academic',        color: CalendarApp.Color.BLUE,   desc: 'Classes, exams, office hours, academic deadlines you must attend.' },
-  { name: '🧠 Work & Projects', color: CalendarApp.Color.GREEN,  desc: 'Research, job shifts, startup meetings, scheduled project work.' },
-  { name: '🏛 Clubs & Duke',    color: CalendarApp.Color.ORANGE, desc: 'Club meetings, org events, Duke commitments you have accepted.' },
-  { name: '👤 Personal',        color: CalendarApp.Color.MAUVE,  desc: 'Exercise, appointments, social, travel, system rhythms.' },
-  { name: '⭐ Opportunities',   color: CalendarApp.Color.YELLOW, desc: 'Events you are CONSIDERING. Nothing here is a commitment yet.' },
+  { name: 'Academic',        color: CalendarApp.Color.BLUE,   desc: 'Classes, exams, office hours, academic deadlines you must attend.' },
+  { name: 'Work & Projects', color: CalendarApp.Color.GREEN,  desc: 'Research, job shifts, startup meetings, scheduled project work.' },
+  { name: 'Clubs & Duke',    color: CalendarApp.Color.ORANGE, desc: 'Club meetings, org events, Duke commitments you have accepted.' },
+  { name: 'Personal',        color: CalendarApp.Color.MAUVE,  desc: 'Exercise, appointments, social, travel, system rhythms.' },
+  { name: 'Opportunities',   color: CalendarApp.Color.YELLOW, desc: 'Events you are CONSIDERING. Nothing here is a commitment yet.' },
 ];
 
 const TASK_LISTS = [
-  '📥 Inbox',
-  '🎓 Academics',
-  '💼 Career / Research',
-  '🚀 Projects',
-  '🏛 Clubs / Leadership',
-  '👤 Personal',
+  'Inbox',
+  'Academics',
+  'Career / Research',
+  'Projects',
+  'Clubs / Leadership',
+  'Personal',
 ];
 
 const DRIVE_TREE = {
@@ -161,17 +161,17 @@ function calendarNamed(name) {
 // ---------------------------------------------------------------------------
 
 function setUpRhythms(say) {
-  const cal = calendarNamed('👤 Personal');
+  const cal = calendarNamed('Personal');
   const tz = Session.getScriptTimeZone();
 
   ensureSeries(cal, say, {
-    title: '🌙 Nightly Shutdown',
+    title: 'Nightly Shutdown',
     description: [
       '5–10 minutes. Do not let this become a ceremony.',
       '',
       '1. Check tomorrow\'s Calendar.',
       '2. Check overdue Tasks.',
-      '3. Process 📥 Inbox to zero.',
+      '3. Process Inbox to zero.',
       '4. Move unfinished Tasks to a real day.',
       '5. Pick tomorrow\'s Top 3.',
       '6. Verify your first commitment tomorrow morning.',
@@ -182,7 +182,7 @@ function setUpRhythms(say) {
   });
 
   ensureSeries(cal, say, {
-    title: '🔄 Sunday Weekly Reset',
+    title: 'Sunday Weekly Reset',
     description: [
       '45 protected minutes. This is the load-bearing event in the whole system.',
       '',
@@ -194,7 +194,7 @@ function setUpRhythms(say) {
       '   Do not collapse all three into "I ran out of time."',
       '4. SCAN OPPORTUNITIES — Duke Events, DukeGroups, Pratt, Career Center,',
       '   undergrad research, innovation, department newsletters, Gmail labels.',
-      '   Only genuinely interesting things go on ⭐ Opportunities.',
+      '   Only genuinely interesting things go on Opportunities.',
       '5. CHECK DEADLINES — next 3 weeks.',
       '6. PLAN NEXT WEEK — Big 3 + Definition of Done, then time-block the work.',
       '',
@@ -207,7 +207,7 @@ function setUpRhythms(say) {
   });
 
   ensureSeries(cal, say, {
-    title: '🗓 Monthly Direction Check',
+    title: 'Monthly Direction Check',
     description: [
       '30 minutes on top of the weekly reset. Semester-goal altitude.',
       '',
@@ -278,7 +278,7 @@ function setUpTaskLists(say) {
     Tasks.Tasklists.insert({ title: title });
     say('created task list: ' + title);
   });
-  say('NOTE: Tasks list ORDER cannot be set by API. Drag 📥 Inbox to the top by hand.');
+  say('NOTE: Tasks list ORDER cannot be set by API. Drag Inbox to the top by hand.');
 }
 
 // ---------------------------------------------------------------------------
@@ -324,7 +324,7 @@ function ensureProjectHomeTemplate(root, say) {
   const doc = DocumentApp.create(name);
   const body = doc.getBody();
   body.clear();
-  body.appendParagraph('PROJECT HOME — <name>').setHeading(DocumentApp.ParagraphHeading.TITLE);
+  body.appendParagraph('PROJECT HOME: <name>').setHeading(DocumentApp.ParagraphHeading.TITLE);
   body.appendParagraph(
     'Copy this doc for every major ongoing thing: a research lab, a club role, a startup, ' +
     'a competition, the job search, a big academic project.'

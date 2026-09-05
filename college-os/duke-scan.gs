@@ -11,7 +11,7 @@
  * OPPORTUNITIES tab as DISCOVERED rows.
  *
  * It never writes to your calendar. On Sunday you read a short pre-filtered list
- * and decide what earns a spot on ⭐ Opportunities. The decision stays yours;
+ * and decide what earns a spot on Opportunities. The decision stays yours;
  * only the trawling is automated.
  *
  * INSTALL:

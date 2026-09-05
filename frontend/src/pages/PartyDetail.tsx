@@ -52,7 +52,7 @@ export function PartyDetail() {
         status={[`${p.members.length} here`, `${focusing} focusing`]}
       >
         <p>Everyone in this room can see that you are working and for how long. Nobody
-          can see what you are working on — not the goal, not the file, not the evidence.</p>
+          can see what you are working on. Not the goal, not the file, not the evidence.</p>
 
         <div className="log">
           {p.members.map((m) => (

@@ -25,7 +25,7 @@ account" is enforced by Google's OAuth layer rather than by trusting the code.
 
 1. **script.google.com** → **New project**. Name it `Compass Bridge`.
 2. Paste `api.gs` into `Code.gs`.
-3. ⚙️ **Project Settings** → check *"Show appsscript.json manifest file"*, open the manifest, and
+3. **Project Settings** → check *"Show appsscript.json manifest file"*, open the manifest, and
    replace it with `appsscript.json` from this folder. Set `timeZone` if you aren't on Eastern.
 4. Run **`setUpBridge`**. Approve the OAuth prompt — it's your own script, so Google shows the
    "unverified app" warning (*Advanced* → *Go to project*). **Copy the token it prints.**

@@ -126,14 +126,14 @@ export function CanvasPage() {
         <Card title="What a feed can and cannot do" status={['Due dates only']}>
           <p className="small">
             A calendar feed tells Compass <strong>when</strong> something is due. It cannot tell
-            Compass whether you did it — no feed carries submission status or grades. That is a
+            Compass whether you did it. No feed carries submission status or grades. That is a
             limit of the format, not a setting.
           </p>
           <p className="small">
             Canvas also only carries what your instructors entered <em>in Canvas</em>. Courses
             graded through Gradescope, Pearson or LabFlow often sync a due date across, but
             extensions, late deadlines and section-specific dates never do. If a deadline is
-            missing here, it is missing from Canvas — add that tool&apos;s own calendar under
+            missing here, it is missing from Canvas. Add that tool&apos;s own calendar under
             Deadline feeds, or paste the assignment into <Link to="/quests/new">a new quest</Link>.
           </p>
           <p className="small">

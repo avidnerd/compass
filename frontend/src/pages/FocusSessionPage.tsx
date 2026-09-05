@@ -21,7 +21,7 @@ function EvidenceCard({ verification }: { verification: Verification }) {
           : 'none'} ·
         {verification.model_id
           ? <> interpreted by <code>{verification.model_id}</code> (confidence {Math.round(verification.confidence * 100)}%)</>
-          : ' no free model was available — deterministic evidence only'}
+          : ' no free model was available, so deterministic evidence only'}
       </p>
       <p>{verification.explanation}</p>
       {verification.evidence.length > 0 && (
@@ -130,7 +130,7 @@ export function FocusSessionPage() {
       {(session.state === 'running' || session.state === 'paused') && (
         <Card>
           <div className="timer-big" aria-live="off">{formatSeconds(Math.max(0, remaining))}</div>
-          <p className="timer-state">{session.state === 'paused' ? 'Paused — no judgment, breathe.' :
+          <p className="timer-state">{session.state === 'paused' ? 'Paused. Take your time.' :
             remaining <= 0 ? 'Time! Finish whenever you are ready.' : 'Focusing…'}</p>
           {character.data && <Companion character={{ ...character.data.data, animation: session.state === 'paused' ? 'rest' : 'idle' }} size={150} showHabitat={false} />}
           <div className={`live-monitor ${monitoring.isSharing ? 'sharing' : ''}`}>
@@ -147,7 +147,7 @@ export function FocusSessionPage() {
               </p>
             ) : (
               <>
-                <p className="small muted">Choose what Compass can see. It samples still moments only —
+                <p className="small muted">Choose what Compass can see. It samples still moments only,
                   never audio, camera, keystrokes, or clipboard.</p>
                 <button className="primary" onClick={() => void monitoring.requestForSession(session)}>
                   Share a screen & resume monitoring
@@ -177,10 +177,10 @@ export function FocusSessionPage() {
 
       {session.state === 'ending' && verification?.result === 'needs_confirmation' && (
         <>
-          <Card title="Compass isn't sure — you decide">
+          <Card title="Compass is not sure, so you decide">
             <p>{verification.human_confirmed === null
               ? 'The evidence was inconclusive. Did you complete this step?'
-              : 'Thanks — recorded.'}</p>
+              : 'Recorded.'}</p>
             <div className="row">
               <button className="primary" disabled={confirm.isPending}
                 onClick={() => confirm.mutate({ id: verification.id, accepted: true })}>
@@ -207,7 +207,7 @@ export function FocusSessionPage() {
       {session.state === 'completed' && (
         <>
           <Card title={verification?.result === 'verified' ? 'Verified' :
-            verification?.human_confirmed ? 'Counted — you confirmed it' : 'Session complete'}>
+            verification?.human_confirmed ? 'Counted: you confirmed it' : 'Session complete'}>
             <div className="grid-tiles">
               <div className="stat-tile"><div className="stat-value">{session.focus_score ?? '—'}</div>
                 <div className="stat-label">Focus score</div></div>
@@ -215,7 +215,7 @@ export function FocusSessionPage() {
                 <div className="stat-label">Focused time</div></div>
             </div>
             {verification?.result === 'not_completed' && (
-              <p>This one didn't land — that's okay. Maybe pick a smaller slice next session;
+              <p>This one did not land, which is fine. Maybe pick a smaller slice next session;
                 your companion suggests just opening the file counts as a start.</p>
             )}
             <div className="row">
@@ -230,7 +230,7 @@ export function FocusSessionPage() {
       )}
 
       {session.state === 'canceled' && (
-        <Card><p>Session canceled — no worries. <button onClick={() => navigate('/home')}>Home</button></p></Card>
+        <Card><p>Session canceled. <button onClick={() => navigate('/home')}>Home</button></p></Card>
       )}
     </div>
   )

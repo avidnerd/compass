@@ -51,7 +51,7 @@ export function OnboardingScan() {
         sends those bounded excerpts to a <strong>verified-free</strong> OpenRouter model to suggest
         interests and a companion style.</p>
       <ul className="small">
-        <li>Excerpts stay in memory — Compass never stores your file contents.</li>
+        <li>Excerpts stay in memory. Compass never stores your file contents.</li>
         <li>Nothing sensitive is inferred (health, politics, finances, etc.).</li>
         <li>You can edit or delete everything it suggests, or skip entirely.</li>
       </ul>
@@ -64,12 +64,12 @@ export function OnboardingScan() {
                 ? modelInfo.scan_model.id : modelInfo.selected_model}
             </span>{' '}
             <span className="small muted">
-              (verified free in the catalog — if the request itself fails, Compass falls back to
+              (verified free in the catalog; if the request itself fails, Compass falls back to
               filename-based tags and says so in the result)
             </span>
           </>
         ) : (
-          <span className="badge badge-warn">Free AI temporarily unavailable — Compass will use
+          <span className="badge badge-warn">Free AI temporarily unavailable. Compass will use
             filename-based suggestions instead</span>
         )}
       </p>
@@ -77,7 +77,7 @@ export function OnboardingScan() {
       {!jobId && (
         <div className="row">
           <button className="primary" onClick={() => consentAndScan.mutate()}
-            disabled={consentAndScan.isPending}>I consent — start the scan</button>
+            disabled={consentAndScan.isPending}>I consent, start the scan</button>
           <button onClick={() => navigate('/onboarding/companion')}>Skip the scan</button>
         </div>
       )}

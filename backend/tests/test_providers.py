@@ -140,7 +140,7 @@ async def test_college_os_works_end_to_end_on_the_bridge(env):
          "mime_type": "application/vnd.google-apps.folder", "modified_time": "2026-08-01T10:00:00Z"},
     ]
     env.script.sheets = {DASHBOARD_ID: TABS}
-    env.script.calendars = [{"id": "cal-1", "summary": "🎓 Academic"}]
+    env.script.calendars = [{"id": "cal-1", "summary": "Academic"}]
 
     link = (await env.client.post("/api/v1/college/detect")).json()["data"]
     assert link["status"] == "linked"

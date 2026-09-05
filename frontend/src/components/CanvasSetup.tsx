@@ -73,14 +73,14 @@ export function CanvasSetup() {
 
       <p className="small">
         Canvas only carries deadlines your instructors entered <em>in Canvas</em>. If a course
-        grades through Gradescope, Pearson or LabFlow, some deadlines may live only there —
-        add any calendar those tools publish, or a personal calendar you sync them into.
+        grades through Gradescope, Pearson or LabFlow, some deadlines may live only there.
+        Add any calendar those tools publish, or a personal calendar you sync them into.
       </p>
 
       <label htmlFor="feed-kind">Feed type</label>
       <select id="feed-kind" value={kind} onChange={(e) => setKind(e.target.value as 'canvas' | 'generic')}>
-        <option value="canvas">Canvas — assignments only</option>
-        <option value="generic">Another calendar — every dated event</option>
+        <option value="canvas">Canvas: assignments only</option>
+        <option value="generic">Another calendar: every dated event</option>
       </select>
 
       <label htmlFor="feed-label">Name it</label>

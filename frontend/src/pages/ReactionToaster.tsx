@@ -23,9 +23,6 @@ export function ReactionToaster() {
       if (event.type === 'reaction.created') {
         const p = event.payload as { reaction?: string; encouragement?: string }
         push([p.reaction, p.encouragement].filter(Boolean) as string[])
-      } else if (event.type === 'boss.defeated') {
-        const p = event.payload as { name?: string; defeat_line?: string }
-        push([`${p.name ?? 'The boss'} is defeated.`, p.defeat_line ?? ''])
       } else if (event.type === 'party.emote') {
         const p = event.payload as { emote?: string; display_name?: string }
         const glyph = EMOTE_ICON[p.emote ?? ''] ?? 'sparkle'

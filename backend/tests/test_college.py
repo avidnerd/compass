@@ -73,8 +73,8 @@ def seed_college_workspace(env):
          "modified_time": "2026-08-19T10:00:00Z"},
     ]
     env.script.sheets = {DASHBOARD_ID: TABS}
-    env.script.calendars = [{"id": "cal-1", "summary": "🎓 Academic"},
-                           {"id": "cal-2", "summary": "⭐ Opportunities"},
+    env.script.calendars = [{"id": "cal-1", "summary": "Academic"},
+                           {"id": "cal-2", "summary": "Opportunities"},
                            {"id": "cal-3", "summary": "Random other calendar"}]
 
 
@@ -135,8 +135,8 @@ async def test_detect_finds_dashboard_folder_and_calendars(env):
     assert link["root_folder_id"] == "folder-college"
     assert link["project_home_count"] == 1
     present = {c["name"]: c["present"] for c in link["calendars"]}
-    assert present["🎓 Academic"] is True
-    assert present["👤 Personal"] is False
+    assert present["Academic"] is True
+    assert present["Personal"] is False
 
 
 async def test_status_is_not_detected_without_college_os(env):
@@ -309,3 +309,27 @@ async def test_import_is_present_in_the_privacy_export(env):
     export = (await env.client.get("/api/v1/me/export")).json()["data"]
     assert export["college_link"]["dashboard_file_id"] == DASHBOARD_ID
     assert len(export["college_imports"]) == 1
+
+
+async def test_the_hint_names_the_real_blocker(env, monkeypatch):
+    """Telling someone to run a provisioner when Compass cannot see their Drive
+    at all sends them to the wrong place."""
+    from app import providers as provider_service
+    from app.services import college
+    from tests.conftest import create_profile
+
+    profile = await create_profile(env.client, "Student")
+    pid = profile["profile"]["id"]
+
+    async def unconnected(_profile):
+        return None
+    monkeypatch.setattr(provider_service, "active_provider", unconnected)
+    result = await college.overview({"id": pid, "display_name": "Student"})
+    assert "not connected to a Google account" in result["hint"]
+    assert "setUp()" not in result["hint"]
+
+    async def connected(_profile):
+        return "bridge"
+    monkeypatch.setattr(provider_service, "active_provider", connected)
+    result = await college.overview({"id": pid, "display_name": "Student"})
+    assert "setUp()" in result["hint"]

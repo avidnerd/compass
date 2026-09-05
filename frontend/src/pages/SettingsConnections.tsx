@@ -25,15 +25,17 @@ export function SettingsConnections() {
 
   return (
     <>
-      <div className="row spread">
-        <h1>Settings — Connections</h1>
-        <ResetButton className="danger" />
+      <div className="page-head">
+        <div className="row spread">
+          <h1>Settings: Connections</h1>
+          <ResetButton className="danger" />
+        </div>
+        <p className="row small">
+          <Link to="/settings/connections">Connections</Link> ·
+          <Link to="/settings/privacy">Privacy</Link> ·
+          <Link to="/settings/gameplay">Gameplay</Link>
+        </p>
       </div>
-      <p className="row small">
-        <Link to="/settings/connections">Connections</Link> ·
-        <Link to="/settings/privacy">Privacy</Link> ·
-        <Link to="/settings/gameplay">Gameplay</Link>
-      </p>
       <Card title="Connected apps">
         <ConnectorList />
       </Card>
@@ -58,11 +60,11 @@ export function SettingsConnections() {
             <p>
               {fm.auth_state === 'failed'
                 ? <span className="badge badge-warn">Your OpenRouter key was rejected by the
-                    completions API — check OPENROUTER_API_KEY in .env. Compass runs on local
+                    completions API. Check OPENROUTER_API_KEY in .env. Compass runs on local
                     fallbacks meanwhile and will never switch to a paid model.</span>
                 : fm.available
                   ? <>Active model: <code>{fm.selected_model}</code> <span className="badge">verified free</span></>
-                  : <span className="badge badge-warn">Free AI temporarily unavailable — Compass
+                  : <span className="badge badge-warn">Free AI temporarily unavailable. Compass
                       runs on transparent local fallbacks. It will never switch to a paid model.</span>}
             </p>
             <table className="simple">
@@ -78,8 +80,8 @@ export function SettingsConnections() {
               </tbody>
             </table>
             <p className="small muted">Every candidate must end in <code>:free</code>, report zero
-              prompt and completion pricing, and support structured outputs. Anything else —
-              including <code>openrouter/auto</code> — is rejected before a request is made.</p>
+              prompt and completion pricing, and support structured outputs. Anything else,
+              including <code>openrouter/auto</code>, is rejected before a request is made.</p>
           </>
         )}
       </Card>

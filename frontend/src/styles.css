@@ -265,6 +265,23 @@ button:active:focus-visible {
   min-width: 0;
 }
 
+/* A few screens name themselves on the desk rather than inside a window title
+   bar. Type on the desk always needs solid ground under it — the same rule the
+   desktop icon labels follow — because the 25% dither eats the small sizes. */
+.page-head {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 4px; margin-bottom: var(--gap);
+}
+.page-head > .row.spread { width: 100%; }
+.page-head h1,
+.page-head > p,
+.page-head > nav {
+  background: var(--paper);
+  padding: 1px 5px;
+  margin: 0;
+  max-width: 68ch;
+}
+
 .bottom-nav { display: none; }
 
 /* The desktop's own status bar, under every window. */

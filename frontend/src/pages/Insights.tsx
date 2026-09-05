@@ -60,7 +60,7 @@ function BaselineTab() {
       {(b) => (
         <>
           <Card title="Personal baseline">
-            <p className="small muted">Compass compares you only to your own recent sessions —
+            <p className="small muted">Compass compares you only to your own recent sessions,
               never to other people or other professions.</p>
             <div className="grid-tiles">
               <StatTile label="Eligible sessions" value={b.eligible_sessions} />
@@ -130,7 +130,7 @@ function DocumentsTab() {
           <ul className="small">
             {((d.most_active_documents as { id: string; name: string; modified_time: string }[]) ?? [])
               .slice(0, 8).map((f) => (
-                <li key={f.id}>{f.name} — {f.modified_time ? new Date(f.modified_time).toLocaleDateString() : ''}</li>
+                <li key={f.id}>{f.name}: {f.modified_time ? new Date(f.modified_time).toLocaleDateString() : ''}</li>
               ))}
           </ul>
         </Card>
@@ -153,7 +153,7 @@ function EmailTab() {
           <h3>Top senders</h3>
           <ul className="small">
             {((d.top_senders as { sender: string; count: number }[]) ?? []).map((s) => (
-              <li key={s.sender}>{s.sender} — {s.count}</li>
+              <li key={s.sender}>{s.sender}: {s.count}</li>
             ))}
           </ul>
         </Card>
@@ -197,7 +197,7 @@ function GitHubTab() {
           <h3>Top repos</h3>
           <ul className="small">
             {((d.top_repos_by_commits as { repo: string; commits: number }[]) ?? []).map((r) => (
-              <li key={r.repo}>{r.repo} — {r.commits}</li>
+              <li key={r.repo}>{r.repo}: {r.commits}</li>
             ))}
           </ul>
         </Card>
@@ -220,7 +220,7 @@ function CollaborationTab() {
           <h3>Top collaborators</h3>
           <ul className="small">
             {((d.top_collaborators as { email: string; meetings: number }[]) ?? []).map((c) => (
-              <li key={c.email}>{c.email} — {c.meetings} meetings</li>
+              <li key={c.email}>{c.email}: {c.meetings} meetings</li>
             ))}
           </ul>
         </Card>
@@ -311,15 +311,17 @@ function SystemTab() {
 export function Insights() {
   return (
     <>
-      <h1>Insights</h1>
-      <nav className="row" aria-label="Insights sections" style={{ marginBottom: '1rem' }}>
-        {TABS.map((t) => (
-          <NavLink key={t.to} to={t.to} end={t.to === ''}
-            className={({ isActive }) => isActive ? 'badge' : 'small'}>
-            {t.label}
-          </NavLink>
-        ))}
-      </nav>
+      <div className="page-head">
+        <h1>Insights</h1>
+        <nav className="row" aria-label="Insights sections">
+          {TABS.map((t) => (
+            <NavLink key={t.to} to={t.to} end={t.to === ''}
+              className={({ isActive }) => isActive ? 'badge' : 'small'}>
+              {t.label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
       <Routes>
         <Route index element={<BaselineTab />} />
         <Route path="calendar" element={<CalendarTab />} />

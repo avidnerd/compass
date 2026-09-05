@@ -44,13 +44,13 @@ export function OnboardingProfile() {
       <Card title="Save your recovery code">
         <StepDots step={0} />
         <p>This is the <strong>only</strong> way back into this profile if your browser data is
-          cleared. Compass stores just a hash — it can never show it again.</p>
+          cleared. Compass stores just a hash, so it can never show it again.</p>
         <code className="recovery">{recoveryCode}</code>
         <div className="row" style={{ marginTop: '1rem' }}>
           <button className="primary" onClick={async () => {
             await queryClient.invalidateQueries({ queryKey: ['me'] })
             navigate('/onboarding/connect')
-          }}>I saved it — continue</button>
+          }}>I saved it, continue</button>
         </div>
       </Card>
     )
@@ -59,7 +59,7 @@ export function OnboardingProfile() {
   return (
     <Card title="Welcome to Compass">
       <StepDots step={0} />
-      <p>Compass checks that you actually did the work, using evidence from your own accounts — locally, on your machine.
+      <p>Compass checks that you actually did the work, using evidence from your own accounts, locally, on your machine.
         Each browser gets its own profile.</p>
       {!recoverMode ? (
         <form onSubmit={(e) => { e.preventDefault(); create.mutate() }}>

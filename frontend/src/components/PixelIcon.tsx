@@ -740,22 +740,10 @@ const ALIASES: Record<string, string> = {
   customize: 'brush', demo: 'film', idea: 'bulb', scan: 'search',
 }
 
-/** The API still speaks in emoji for leaderboard metrics and player avatars.
- *  Those are product data, not markup, so the design layer translates them
- *  here rather than the server changing what it stores. */
-const FROM_EMOJI: Record<string, string> = {
-  '⏱': 'clock', '⏱️': 'clock', '🔥': 'fire', '⚔': 'battle', '⚔️': 'battle',
-  '💥': 'sparkle', '🗺': 'quests', '🗺️': 'quests', '🤝': 'party',
-  '🌙': 'moon', '🌿': 'leaf', '🍄': 'terrarium', '⚡': 'bolt',
-  '🫧': 'ball', '🧭': 'compass', '🏆': 'ranks', '📊': 'insights',
-}
-
-/** Resolve a server-supplied emoji (or a glyph name) to a drawn icon name. */
+/** Resolve a stored icon name, falling back when it is unknown or absent. */
 export function iconFor(raw: string | null | undefined, fallback = 'compass') {
   if (!raw) return fallback
-  if (G[raw] || ALIASES[raw]) return raw
-  const bare = raw.replace(/️/g, '')
-  return FROM_EMOJI[raw] ?? FROM_EMOJI[bare] ?? fallback
+  return G[raw] || ALIASES[raw] ? raw : fallback
 }
 
 export function PixelIcon({ name, size = 12, label }: {

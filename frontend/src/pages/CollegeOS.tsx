@@ -86,7 +86,7 @@ export function CollegeOS() {
           College OS is the Apps Script provisioner in <code>college-os/</code>. Running
           {' '}<code>setUp()</code> creates the COLLEGE Drive tree, the COLLEGE DASHBOARD
           spreadsheet, five calendars, six Tasks lists, and the Gmail label tree in your own
-          account. Compass then reads that structure — read-only — and turns its goal rows
+          account. Compass then reads that structure, read-only, and turns its goal rows
           into verifiable quests.
         </p>
         {link.status === 'partial' && (
@@ -141,7 +141,7 @@ export function CollegeOS() {
         {data.dashboard && data.dashboard.missing_tabs.length > 0 && (
           <p className="small">
             <span className="badge badge-warn">Missing tabs</span>{' '}
-            {data.dashboard.missing_tabs.join(', ')} — Compass read what it could.
+            {data.dashboard.missing_tabs.join(', ')}. Compass read what it could.
           </p>
         )}
         <p className="small muted">
@@ -156,7 +156,7 @@ export function CollegeOS() {
           {thisWeek.big_three.length > 0 ? (
             <ol>{thisWeek.big_three.map((b) => <li key={b.source_key}>{b.text}</li>)}</ol>
           ) : (
-            <p className="muted">No Big 3 set yet — fill them in during the Sunday Weekly Reset.</p>
+            <p className="muted">No Big 3 set yet. Fill them in during the Sunday Weekly Reset.</p>
           )}
           {thisWeek.areas.length > 0 && (
             <table className="simple">
@@ -283,7 +283,7 @@ export function CollegeOS() {
             ))}
             {reviews.dominant_failure && (
               <p className="small muted" style={{ marginBottom: 0 }}>
-                Most misses were diagnosed as <strong>{reviews.dominant_failure}</strong> failures —
+                Most misses were diagnosed as <strong>{reviews.dominant_failure}</strong> failures.
                 {reviews.dominant_failure === 'GOAL' && ' the goal itself was wrong.'}
                 {reviews.dominant_failure === 'PLAN' && ' the plan, not the effort.'}
                 {reviews.dominant_failure === 'EXECUTION' && ' the plan was fine; the week got away.'}

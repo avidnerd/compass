@@ -40,7 +40,7 @@ export function CharacterJournal() {
     <div className="grid-2">
       <div>
         <Card title={`${ch?.name}'s journal`}>
-          <p className="small muted">Short, editable reflections — never raw work content. Delete
+          <p className="small muted">Short, editable reflections, never raw work content. Delete
             anything, any time.</p>
           {memories.data?.data.items.length === 0 && <p className="muted">No memories yet.
             Finish a focus session to write the first one together.</p>}

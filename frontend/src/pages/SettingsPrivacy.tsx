@@ -46,12 +46,14 @@ export function SettingsPrivacy() {
 
   return (
     <>
-      <h1>Settings — Privacy</h1>
-      <p className="row small">
-        <Link to="/settings/connections">Connections</Link> ·
-        <Link to="/settings/privacy">Privacy</Link> ·
-        <Link to="/settings/gameplay">Gameplay</Link>
-      </p>
+      <div className="page-head">
+        <h1>Settings: Privacy</h1>
+        <p className="row small">
+          <Link to="/settings/connections">Connections</Link> ·
+          <Link to="/settings/privacy">Privacy</Link> ·
+          <Link to="/settings/gameplay">Gameplay</Link>
+        </p>
+      </div>
       <Card title="Interest scanning">
         <label className="row" style={{ fontWeight: 400 }}>
           <input type="checkbox" style={{ width: 'auto' }} checked={profile?.scan_consented ?? false}
