@@ -124,7 +124,7 @@ only.
 
 ## Brand Commitments
 
-- Name: **Compass** 🧭.
+- Name: **Compass**.
 - A pixel companion that grows with the user is the product's face, not an ornament.
 - Originated as a hackathon project with [@justanotherinternetguy](https://github.com/justanotherinternetguy);
   MIT licensed with both authors credited. Attribution is binding.

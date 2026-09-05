@@ -1,320 +1,249 @@
-# Compass 🧭
+# Compass: Evidence-Verified Progress Tracking for Students
 
 [![CI](https://github.com/avidnerd/compass/actions/workflows/ci.yml/badge.svg)](https://github.com/avidnerd/compass/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-black.svg)](https://www.python.org/)
+[![Release](https://img.shields.io/github/v/release/avidnerd/compass?color=black)](https://github.com/avidnerd/compass/releases)
 
-**Compass checks that you actually did the work.**
+Compass turns a semester goal into subgoals and checks each one against evidence read from the
+student's own Google Workspace, GitHub and Canvas accounts. A step closes when Compass finds the
+evidence: a file edited, an email sent, a commit pushed, a calendar block kept.
 
-Set a goal and it becomes 3–7 concrete subgoals, each with an acceptance criterion and a plan for
-what would count as proof. Finish a focus session and Compass re-reads your own Google Workspace
-and GitHub accounts, extracts deterministic evidence — a file you edited, an email you sent, a
-commit you pushed, a calendar block you kept — and closes the step only if that evidence is
-actually there. Progress is earned, not asserted.
+Everything runs locally. No hosted server, no third-party connector platform, no paid API calls.
+Every model is re-verified as free at call time, and Compass falls back to local behaviour when
+none qualifies. Account access is read-only.
 
-Everything runs on your own machine. There is no hosted server holding your goals, no connector
-platform between you and your data, and no paid inference path: every model is re-verified as free
-at the moment it is called, and when none qualifies Compass degrades to transparent local
-fallbacks rather than reaching for a paid one. Access is read-only by construction — Compass can
-read your accounts and can never write to them.
+![Compass overview](docs/screenshots/home.png)
 
-A pixel companion grows out of that verified progress. It is the product's face and the reason
-logging work feels worth doing, but the verification underneath is what Compass actually is.
-
-![The Compass home screen](docs/screenshots/home.png)
-
-<sub>Every red mark is evidence a machine checked. Steps you merely assert stay unmarked —
-the colour is reserved for that one meaning and nothing else.</sub>
+Connected accounts are read through a read-only Apps Script Web App the user deploys in their own
+Google account, plus a read-only GitHub token and any number of iCalendar feeds. The model proposes
+plans using internal evidence enums and never sees connector names. Evidence extraction is plain
+Python against the provider payloads.
 
 | Deadlines | Quests |
 |---|---|
 | ![Deadlines](docs/screenshots/deadlines.png) | ![Quests](docs/screenshots/quests.png) |
-| Canvas plus any other calendar feed, merged and deduplicated | Subgoals close only on evidence |
 
-<details>
-<summary>On a phone</summary>
+## Setup
 
-The desk icons become a dock and the windows stack; every destination stays
-reachable through the menu bar's pull-down.
-
-<img src="docs/screenshots/mobile.png" width="320" alt="Compass on a phone">
-
-</details>
-
-Connected data arrives through one free, self-hosted provider: **the Apps Script bridge**, a
-read-only Web App you deploy in your own Google account
-([`college-os/bridge/`](college-os/bridge/README.md)), plus a free GitHub PAT. No connector
-platform, no Cloud Console and no bill — nothing but your own OAuth grant reads your account. The
-script's manifest turns on the Google APIs it needs as advanced services, so deploying is: paste
-two files, run one function, click Deploy.
-
-The full product/architecture specification lives in [PLAN.md](PLAN.md).
-
-Compass began as a hackathon project built with
-[@justanotherinternetguy](https://github.com/justanotherinternetguy) and has since been rebuilt as
-a working local-first application. This repository is the public release of that work; both
-authors are credited under the MIT licence.
-
-## Stack
-
-- **Backend:** Python · FastAPI · Pydantic · httpx · aiosqlite · Uvicorn (one process: API + WebSocket + built SPA)
-- **Frontend:** React · TypeScript · Vite · React Router · TanStack Query
-- **Persistence:** a single local SQLite database (WAL) with numbered migrations
-- **AI:** free-only OpenRouter gateway — models must end in `:free`, report zero pricing, and support structured outputs; otherwise Compass uses transparent local fallbacks. It never calls a paid model or `openrouter/auto`.
-
-## Install it
-
-You do not need this repository checked out to run Compass.
-
-**With Python 3.11+** — one command, nothing to configure:
+Compass installs as a Python package. With Python 3.11+ and Node:
 
 ```bash
 uv tool install git+https://github.com/avidnerd/compass#subdirectory=backend
 compass
 ```
 
-(`pipx install "git+https://github.com/avidnerd/compass#subdirectory=backend"` works too.)
-Installing from source builds the web interface once, so this needs Node as well;
-a wheel from the releases page needs neither.
+`pipx` works the same way. Node is needed only when installing from source, which builds the web
+interface. A wheel from [Releases](https://github.com/avidnerd/compass/releases) needs neither.
 
-**Without Python** — download the binary for your platform from
-[Releases](https://github.com/avidnerd/compass/releases) and run it.
+Without Python, download a binary from [Releases](https://github.com/avidnerd/compass/releases).
+The binaries are unsigned, so macOS and Windows warn on first run. On macOS run
+`chmod +x compass-macos-arm64` then right-click and choose Open. On Windows choose More info, then
+Run anyway. On an Intel Mac use the wheel or run `make binary`.
 
-> **The binaries are unsigned.** Code signing needs paid Apple and Windows developer
-> certificates, so your system will warn you once:
-> - **macOS:** `chmod +x compass-macos-*`, then right-click → Open (or
->   `xattr -d com.apple.quarantine compass-macos-*` first).
-> - **Windows:** SmartScreen → More info → Run anyway.
-> - **Linux:** `chmod +x compass-linux-x86_64` and run it.
->
-> If you would rather not run an unsigned download, the wheel involves no
-> downloaded executable, and `make package` builds one yourself from source.
+No configuration is needed. The database and an encryption key are created on first run in the
+platform data directory (`~/Library/Application Support/Compass`, `%LOCALAPPDATA%\Compass`, or
+`$XDG_DATA_HOME/compass`). Run `compass --help` for `--port`, `--host`, `--data-dir` and
+`--no-browser`.
 
-Either way there is nothing to configure. The database and an encryption key are
-created on first run in your own data directory (`~/Library/Application Support/Compass`
-on macOS, `%LOCALAPPDATA%\Compass` on Windows, `$XDG_DATA_HOME/compass` on Linux), and
-your **own** free OpenRouter key is pasted into Settings → Connections rather than into a
-file. Bring your own key; Compass never uses anyone else's and never calls a paid model.
+## Quickstart
 
-`compass --help` covers `--port`, `--host`, `--data-dir` and `--no-browser`.
+Run `compass` and complete onboarding. Connecting accounts is optional. Without it, Compass still
+creates quests and runs focus sessions, and steps close on your own confirmation.
 
-Compass opens your real browser rather than bundling a desktop webview, and that is
-deliberate: the focus monitor needs `getDisplayMedia`, which Tauri's webview cannot
-raise on macOS and which Electron replaces with its own incompatible API.
+To turn on verification, open Settings, then Connections, and add your own free
+[OpenRouter key](https://openrouter.ai/keys). Then connect at least one data source below. Create a
+goal, review the subgoals and evidence plan, activate it, and run a focus session.
 
-### Building the distributables yourself
+## Connecting Data Sources
+
+Compass supports four sources. Each is independent, so connect only the ones you want.
+
+Available sources:
+
+- Google Workspace (Drive, Docs, Sheets, Slides, Gmail, Calendar)
+- GitHub
+- Canvas and other iCalendar feeds
+- College OS
+
+### Google Workspace
+
+Deploy the read-only Apps Script bridge in your own Google account by following
+[`college-os/bridge/README.md`](college-os/bridge/README.md). Paste the deployment URL and token
+into Settings, then Connections. The manifest requests only `*.readonly` scopes, so Google's
+authorisation layer enforces read-only access rather than application code.
+
+### GitHub
+
+Create a read-only personal access token and paste it into Settings, then Connections.
+
+### Canvas and other iCalendar feeds
+
+1. In Canvas, open Calendar, click Calendar Feed, and copy the link.
+2. Paste it into Deadlines, then Deadline feeds, with type `Canvas`.
+3. Import assignments as quests with their real due dates.
+
+Institutions restrict Canvas student access tokens, and OAuth needs an institutional developer key,
+so the calendar feed is the only self-serve path. Courses graded through Gradescope, Pearson or
+LabFlow may hold deadlines Canvas never receives. Add those calendars as extra feeds with type
+`Other`. Feeds carry due dates, not proof of completion.
+
+### College OS
+
+[`college-os/`](college-os/README.md) provisions a Google Workspace structure: a `COLLEGE` Drive
+tree, a `COLLEGE DASHBOARD` spreadsheet, calendars, Tasks lists and a Gmail label tree. Open
+College in the sidebar and press Detect.
+
+| College OS | becomes in Compass |
+|---|---|
+| `SEMESTER GOALS` rows | quests, with the Metric as the acceptance criterion |
+| `THIS WEEK` area goals and Big 3 | quests targeted at the coming Sunday |
+| `OPPORTUNITIES` | a pipeline view; open rows are importable as quests |
+| the sheet's `Evidence` column | the evidence specs checked after a focus session |
+| `WEEKLY REVIEWS` | outcome mix, failure diagnosis, evidence-citation rate |
+| `TIME LOG` | per-category estimate multipliers, shown at 3 or more samples |
+
+Imports are idempotent, so a row that already became a quest is never imported twice. An `Evidence`
+cell Compass cannot observe falls back to manual confirmation.
+
+## How It Works
+
+1. **Profiles.** Each browser gets a local profile with its own credentials, an HttpOnly session
+   cookie (only hashes are stored), and a one-time recovery code.
+2. **Quests.** A goal becomes 3 to 7 editable subgoals, each with an acceptance criterion and an
+   evidence plan drawn from internal enums.
+3. **Focus sessions.** The server owns all timing. With one explicit browser screen-share, Compass
+   samples still frames during active work and builds a separate attention view. Frames live in a
+   temporary directory and are deleted after analysis. There is no audio, camera, keystroke or
+   clipboard capture.
+4. **Verification.** Finishing refreshes each required provider once, extracts evidence, and asks a
+   free model whether the subgoal is complete. A score of 0.50 or above verifies it, 0.35 or below
+   marks it incomplete, and anything between leaves the decision to the user. An evidence card
+   shows what was found in every case.
+5. **Rewards.** A focus score computed against the user's own recent baseline, with idempotent XP,
+   care points and stats. There are no streaks, leaderboards or penalties for time away.
+
+## Development
 
 ```bash
-make package    # -> backend/dist/*.whl        (installable anywhere with Python)
-make binary     # -> backend/dist/compass      (single executable, no Python needed)
-```
-
-Tagging `v*` runs both for macOS (Apple Silicon), Linux and Windows in CI, smoke-tests each
-binary by actually starting it and requiring a real response, and attaches everything to a
-release. There is no prebuilt Intel-Mac binary: GitHub is retiring those runners and the job
-sits queued for hours, so Intel users take the wheel or run `make binary` locally.
-
-## Develop it
-
-```bash
-cp .env.example .env   # optional: env keys still work in a checkout
+cp .env.example .env   # optional; env keys still work in a checkout
 make setup             # venv + backend deps + npm install
 make migrate           # apply SQLite migrations
-make dev               # FastAPI (:8000) + Vite (:5173) together
+make dev               # FastAPI (:8000) + Vite (:5173)
 ```
 
-A source checkout keeps its database and secret in `backend/`, exactly as before.
-
-Open http://localhost:5173. For a single-process "release" build:
+A source checkout keeps its database and secret in `backend/`. For a single-process release build:
 
 ```bash
 make build             # lint, typecheck, test, build the SPA
 make serve             # FastAPI serves SPA + API + WebSocket on :8000
 ```
 
-`make test` runs the backend suite (125 tests, all offline — the data provider and OpenRouter are
+`make test` runs the backend suite (125 tests, all offline; the data provider and OpenRouter are
 mocked at the transport layer) plus the frontend typecheck and lint. CI runs the same on every push.
 
 ### Environment (.env at the workspace root)
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `OPENROUTER_API_KEY` | yes | Used **only** for verified-free models |
-| `COMPASS_APP_SECRET` | yes | Any long random string. Derives the key that encrypts stored provider credentials — changing it means re-entering your tokens. |
-| `COMPASS_BRIDGE_URL` / `COMPASS_BRIDGE_TOKEN` | for connected data | Your Apps Script bridge deployment. Can be set per profile in Settings → Connections instead. |
+| `OPENROUTER_API_KEY` | no | Fallback when no per-profile key is set. Used only for verified-free models |
+| `COMPASS_APP_SECRET` | no | Generated on first run if unset. Derives the key encrypting stored credentials |
+| `COMPASS_BRIDGE_URL` / `COMPASS_BRIDGE_TOKEN` | no | Apps Script bridge deployment; settable per profile instead |
 | `COMPASS_GITHUB_TOKEN` | no | Read-only GitHub PAT |
-| `COMPASS_DRIVE_OWNED_ONLY` | no | Restrict Drive reads to files you own, excluding shared-in files. Off by default; requires a bridge deployed from the current `api.gs`. |
-| `OPENROUTER_MODEL` / `OPENROUTER_FALLBACK_MODELS` | no | Preference order; every candidate is re-verified as free at runtime |
-| `COMPASS_BIND_HOST`, `COMPASS_PUBLIC_MODE`, `COMPASS_FRONTEND_ORIGIN` | no | Default binding is `127.0.0.1`; public mode enforces origin checks |
+| `COMPASS_DRIVE_OWNED_ONLY` | no | Restrict Drive reads to files you own |
+| `OPENROUTER_MODEL` / `OPENROUTER_FALLBACK_MODELS` | no | Preference order; every candidate re-verified as free at runtime |
+| `COMPASS_BIND_HOST`, `COMPASS_PUBLIC_MODE`, `COMPASS_FRONTEND_ORIGIN` | no | Default binding is `127.0.0.1` |
+| `COMPASS_DATA_DIR`, `COMPASS_DB_PATH` | no | Override where the database and secret live |
 | `COMPASS_DEMO_MODE` | no | Enables 1-minute demo focus sessions |
 
-Setting up connected data: follow
-[`college-os/bridge/README.md`](college-os/bridge/README.md), then paste the deployment URL and
-token into Settings → Connections. Nothing else is needed.
+### Building distributables
 
-## How it works
+```bash
+make package    # -> backend/dist/*.whl     installable wheel
+make binary     # -> backend/dist/compass   standalone executable
+```
 
-1. **Profiles** — each browser gets a local profile with its own provider credentials (an Apps
-   Script bridge deployment plus an optional GitHub PAT), an HttpOnly session cookie (only hashes
-   are stored), and a one-time recovery code.
-2. **Interest scan** — after explicit consent, Compass samples ≤18 recent Docs/Sheets/Slides
-   (≤4,000 chars each, ≤32,000 total) and asks a free model for editable interest/aesthetic
-   suggestions. Excerpts stay in process memory; only fingerprints and short labels persist.
-3. **Quests** — a goal becomes 3–7 editable subgoals, each with an acceptance criterion and an
-   evidence plan chosen from internal enums (the LLM never sees MCP tool names).
-4. **Focus sessions** — the server owns all timing. With one explicit browser screen-share,
-   Compass samples private still frames during active work and builds a separate attention view
-   (direct work, supporting work, detours, streaks, and recovery). Raw frames live only in a local
-   temporary directory and are deleted after analysis; no audio, camera, keystrokes, or clipboard
-   are captured. Starting uses cached telemetry only;
-   finishing refreshes each required provider once, extracts deterministic evidence, and asks
-   the free model whether the subgoal looks complete (≥0.50 → verified, ≤0.35 → not completed,
-   otherwise you decide — with an honest evidence card either way).
-5. **Rewards** — a deterministic focus score against *your own* recent baseline, with idempotent
-   XP, care points and stats feeding the companion. Deliberately not a pressure system: the
-   companion never dies, never guilt-trips, and absence never drops mood below 30. There are no
-   streaks to break and no ranking against anyone else.
-6. **Focus rooms** — a shared room exposes only presence and a timer. Goals, filenames, repos
-   and evidence never enter a room payload. Head-to-head battles, party bosses and the league
-   board were removed: competitive ranking is evidence-negative for this audience, and both
-   needed a second live player Compass has no user base to supply.
-7. **Deadlines** — paste your personal Canvas Calendar Feed URL (Canvas → Calendar → Calendar
-   Feed) and Compass reads upcoming assignments and turns them into quests with their real due
-   dates. No token and no admin approval: student access tokens are being restricted and OAuth
-   needs an institutional developer key, so the feed is the only self-serve door. Courses graded
-   through Gradescope, Pearson or LabFlow can hold deadlines Canvas never sees, so any number of
-   additional iCalendar feeds can be added alongside. Feeds carry deadlines, not proof —
-   verification still comes from Drive, Gmail, Calendar or GitHub.
-8. **College OS** — if [`college-os/`](college-os/README.md) has provisioned your Google account,
-   Compass detects the COLLEGE DASHBOARD and turns its rows into quests (see below).
+Tagging `v*` builds both for macOS (Apple Silicon), Linux and Windows in CI, smoke-tests each
+binary by starting it, and publishes a release.
 
-## College OS
+## Architecture
 
-[`college-os/`](college-os/README.md) is an Apps Script provisioner that builds a Google Workspace
-operating system in your own account: the `COLLEGE` Drive tree, the **COLLEGE DASHBOARD**
-spreadsheet, five calendars, six Tasks lists, and a Gmail label tree. Compass already reads Google
-Workspace read-only, so the **College** page turns that structure into product objects:
+**Free-only LLM gateway.** All model calls pass through one function. A model qualifies only if its
+id ends in `:free`, it reports zero prompt and completion pricing, and it advertises structured
+outputs. These are checked against the live catalogue on every call, not read from config. Unknown
+pricing disqualifies a model. There is no paid fallback.
 
-| College OS | becomes in Compass |
-|---|---|
-| `SEMESTER GOALS` rows | quests, with the *Metric* as the acceptance criterion |
-| `THIS WEEK` area goals + Big 3 | quests targeted at the coming Sunday, with the *Definition of Done* |
-| `OPPORTUNITIES` (incl. the weekly Duke scan) | a pipeline view; open rows are importable as quests |
-| the sheet's own `Evidence` column | the evidence specs Compass looks for after a focus session |
-| `WEEKLY REVIEWS` | outcome mix, GOAL/PLAN/EXECUTION failure diagnosis, and your evidence-citation rate |
-| `TIME LOG` | per-category estimate multipliers, recomputed and only shown once there are ≥3 samples |
+**Deterministic evidence.** The model proposes plans using internal evidence enums and never sees
+connector names or tool signatures. Extraction is plain Python against provider payloads. Evidence
+types Compass cannot observe fall back to manual confirmation. Connected content is delimited as
+untrusted input.
 
-Open **College** in the sidebar and hit *Detect* — it looks for a spreadsheet named
-`COLLEGE DASHBOARD` in the connected Drive. Imports are idempotent: a row that already became a
-quest is never imported twice, and the quest keeps a `college_os` marker pointing back at its row.
-An `Evidence` cell Compass cannot observe honestly degrades to manual confirmation instead of
-pretending — today that means `Tasks` rows, since Compass does not yet consume Google Tasks. (The
-Apps Script bridge already serves them; it needs a `task_completed` evidence type to land.)
+**Concurrency.** Verification is reachable from a timer, a user action and a job worker at the same
+time. Tests drive these paths concurrently and assert exactly-once resolution, because the failure
+mode here is silent double-crediting rather than a visible error.
 
-This integration inherits every guarantee in [Privacy](#privacy): it is read-only by construction, so
-Compass can never edit the sheet, the calendars, Tasks, Drive, or Gmail. Only the *link* (file ids)
-and the *import ledger* (which row became which quest) reach SQLite; dashboard cell contents are
-fetched uncached and held in process memory for the page render only.
+**Design system.** A one-bit interface: two inks, ordered dither patterns in place of greys, and 50
+hand-authored 12x12 pixel icons. Categories are distinguished by pattern, not hue, which also works
+for colour-blind users. See [DESIGN.md](DESIGN.md).
 
-## Engineering notes
+**Packaging.** Compass opens the system browser instead of bundling a webview, because focus
+monitoring needs `getDisplayMedia` and embedded webviews do not support it consistently.
 
-The problems in this repository that were not obvious, and what was done about them.
+**Stack.** Python, FastAPI, Pydantic, httpx, aiosqlite and Uvicorn on the backend. React,
+TypeScript, Vite and TanStack Query on the frontend. One SQLite database (WAL) with numbered
+migrations.
 
-**A free-only LLM gateway that verifies at call time.** Every model request passes through one
-function. A model qualifies only if its id ends in `:free`, it reports zero prompt *and*
-completion pricing, and it advertises structured outputs — checked against the live catalogue on
-each call, not trusted from config, because a model can stop being free. Unknown pricing
-disqualifies. There is no paid fallback anywhere in the codebase; when nothing qualifies the
-caller degrades to a deterministic local path and the UI says so.
+<details>
+<summary>Mobile layout</summary>
 
-**Read-only by construction, not by convention.** The Apps Script bridge requests only
-`*.readonly` OAuth scopes, so Google's own authorisation layer — not Compass's code — guarantees
-nothing can be modified. A write-verb denylist and a read allowlist sit behind that as defence in
-depth.
+<img src="docs/screenshots/mobile.png" width="320" alt="Compass on a phone">
 
-**Evidence the model never gets to invent.** The LLM proposes a plan using internal evidence
-*enums*; it never sees connector names or tool signatures. Evidence extraction is deterministic
-Python against the provider payloads, and any enum Compass cannot actually observe degrades to
-manual confirmation instead of pretending. Prompt-injection surface is bounded by delimiting all
-connected content as untrusted.
-
-**Exactly-once resolution under concurrency.** Focus verification is reachable from a timer, a
-user action, and a job worker at the same time. The tests drive those paths concurrently and
-assert a single resolution, because the failure mode is silent double-crediting rather than a
-crash.
-
-**Screenshots that never touch disk twice.** Focus monitoring samples still frames from one
-explicit browser screen-share, analyses them, and deletes them — they are never SQLite rows and
-never LLM-cache entries. No audio, camera, keystrokes or clipboard are captured, and the attention
-view never decides completion.
-
-**A design system with one job for colour.** The interface is a one-bit desktop: two inks, ordered
-dither patterns instead of greys, and 50 hand-authored 12×12 pixel icons rather than an icon font
-or emoji. Classification is carried by *pattern*, which is more accessible than hue for
-colour-blind users, and the single spot ink is reserved for one meaning — evidence a machine
-verified. `DESIGN.md` records the whole system.
-
-**Distribution without a signing certificate.** Three install paths: a git-URL install with a
-build hook that compiles the frontend, a wheel, and a PyInstaller binary. It is deliberately not a
-desktop-webview app, because the focus monitor depends on `getDisplayMedia`, which Tauri's webview
-cannot raise on macOS and Electron replaces with an incompatible API.
+</details>
 
 ## Privacy
 
-- All persistence is one local SQLite file (`backend/compass.db`). Delete it and everything is gone.
-- Raw file content is never written to disk, logs, caches, or job records.
-- Raw focus screenshots are temporary local files, never SQLite records or LLM-cache entries, and
-  are deleted after analysis, cancellation, or server crash recovery.
-- Sensitive-attribute inference is explicitly forbidden in every prompt, and connected content is
-  delimited as untrusted data (prompt-injection resistant).
-- Settings → Privacy offers full JSON export, memory deletion, cache deletion, and one-click
-  profile deletion.
-- Read-only by construction: a write-verb denylist plus a read allowlist means Compass cannot
-  create, send, update, or delete anything in your connected accounts.
+- All persistence is one local SQLite file. Delete it and everything is gone.
+- Raw file content is never written to disk, logs, caches or job records.
+- Focus screenshots are temporary local files, never SQLite records or LLM-cache entries, and are
+  deleted after analysis, cancellation or crash recovery.
+- Sensitive-attribute inference is forbidden in every prompt.
+- Settings, then Privacy, offers JSON export, memory deletion, cache deletion and profile deletion.
+- A write-verb denylist plus a read allowlist means Compass cannot create, send, update or delete
+  anything in a connected account.
 
-## Free-model limitations & troubleshooting
+## Troubleshooting
 
-- **"Free AI temporarily unavailable"** — no catalog model passed verification, or your
-  OpenRouter key was rejected (check `Settings → Connections → Free AI status`; a 401 in the
-  server log means the key itself is invalid). Compass keeps working with local fallbacks:
-  filename-based interest tags, manual quest plans, human-confirmed verification, template
-  dialogue. It will never silently switch to a paid model.
-- Free endpoints rate-limit aggressively; Compass queues requests (one in flight globally),
-  batches companion dialogue, caches all deterministic LLM outputs, and retries 429s with
-  backoff at most twice across at most two free models.
-- **Connector shows `disconnected`** — check the bridge card in Settings → Connections
-  (`bridge_not_public` means the Web App wasn't deployed with "Anyone" access). Statuses are
-  cached for 5 minutes.
-- **`google_meet` shows `unsupported`** — expected. The Meet API needs a Google Cloud project, so
-  Compass reports it honestly instead of offering evidence it cannot observe.
-- **Stale analytics badge** — the provider was unreachable, so cached data was served with a
-  visible freshness label. Use the per-connector refresh (60s cooldown) when it's back.
+- **"Free AI temporarily unavailable".** No catalogue model passed verification, or the OpenRouter
+  key was rejected. Check Settings, Connections, Free AI status. Compass continues with local
+  fallbacks: filename-based interest tags, manual quest plans, human-confirmed verification. It
+  does not switch to a paid model.
+- **Connector shows `disconnected`.** Check the bridge card in Settings, then Connections.
+  `bridge_not_public` means the Web App was not deployed with "Anyone" access. Statuses cache for
+  5 minutes.
+- **`google_meet` shows `unsupported`.** Expected. The Meet API needs a Google Cloud project, which
+  this deployment model avoids.
+- **Stale analytics badge.** The provider was unreachable, so cached data was served with a
+  visible freshness label. Use the per-connector refresh, which has a 60 second cooldown.
 
-## Seeing the whole loop
+## Reproducing the Verification Loop
 
-The shortest path to watching a claim get checked against real evidence:
+1. Run `make serve`, then open Settings, Connections to confirm connector status and the active
+   free model.
+2. Complete onboarding and create a goal. Review the subgoals and evidence plan, both editable
+   before activation.
+3. Start a 1-minute session, make a real change in a connected app, and finish. Compass refreshes
+   only the required providers, extracts evidence, and shows what it found.
+4. Repeat step 3 without doing the work. The subgoal stays open and the evidence card explains why.
+5. Open Deadlines, add a Canvas Calendar Feed URL, and import an assignment.
+6. Open a second browser profile and join a focus room with its six-character code.
+7. Open Insights, then System, for cache savings, provider freshness and verification history.
+8. Remove the OpenRouter key and repeat a finish. Compass falls back to local planning and human
+   confirmation, and reports that free AI is unavailable.
 
-1. `make serve`, then open `Settings → Connections` — healthy connectors and the active `:free`
-   model.
-2. Run onboarding. Connecting accounts is optional and the flow says so: skip it and you go
-   straight to choosing a companion, with every step closing on your own confirmation. Connect
-   the bridge first and you also get the bounded interest scan, whose inferences are editable
-   before anything is saved.
-3. Create a goal and review the subgoals and evidence plan the model proposed — both are editable
-   before you activate. (Or open **College** → *Detect* and import a `SEMESTER GOALS` row, where
-   the sheet's own Definition of Done and Evidence column drive the acceptance criterion.)
-4. **The part that matters:** start a 1-minute session from Home, make a real change in a
-   connected app — create a Google Doc, push a commit — then finish. Compass refreshes only the
-   providers that step needs, extracts the evidence, shows you exactly what it found, and closes
-   the subgoal only if the evidence supports it.
-5. Repeat step 4 *without* doing the work. The step does not close, and the evidence card says
-   why rather than pretending.
-6. Open **Deadlines**, paste a Canvas Calendar Feed URL, and import an assignment — it becomes a
-   quest with its real due date.
-7. Open two browsers → two independent profiles. Join a focus room with the six-character code
-   from the second one: both timers run, and neither side can see the other's goal, file or
-   evidence.
-8. `Insights → System` — cache savings, provider freshness, and the verification history.
-9. Remove the OpenRouter key or drop the network and repeat a finish. Compass falls back to local
-   plans and human confirmation and says "Free AI temporarily unavailable". No paid request is
-   ever made.
+## Attribution
+
+Compass began as a hackathon project built with
+[@justanotherinternetguy](https://github.com/justanotherinternetguy) and was later rebuilt as a
+local-first application. Both authors are credited under the MIT licence. The original
+specification is kept in [PLAN.md](PLAN.md), and durable product context in
+[PRODUCT.md](PRODUCT.md).

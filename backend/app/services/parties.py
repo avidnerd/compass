@@ -39,7 +39,7 @@ async def _members(party_id: str) -> list[dict]:
                 "title": player["title"], "companion_name": player["companion_name"],
             })
         else:
-            member.update({"is_simulated": False, "avatar": "🧭", "status": "online"})
+            member.update({"is_simulated": False, "avatar": "compass", "status": "online"})
         members.append(member)
     return members
 
