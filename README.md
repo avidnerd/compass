@@ -99,8 +99,10 @@ make package    # -> backend/dist/*.whl        (installable anywhere with Python
 make binary     # -> backend/dist/compass      (single executable, no Python needed)
 ```
 
-Tagging `v*` runs both for macOS (Intel and Apple Silicon), Linux and Windows in CI,
-smoke-tests each binary by actually starting it, and attaches everything to a release.
+Tagging `v*` runs both for macOS (Apple Silicon), Linux and Windows in CI, smoke-tests each
+binary by actually starting it and requiring a real response, and attaches everything to a
+release. There is no prebuilt Intel-Mac binary: GitHub is retiring those runners and the job
+sits queued for hours, so Intel users take the wheel or run `make binary` locally.
 
 ## Develop it
 

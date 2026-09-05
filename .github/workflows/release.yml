@@ -46,7 +46,9 @@ jobs:
       matrix:
         include:
           - { os: macos-latest,   label: macos-arm64,   asset: compass-macos-arm64 }
-          - { os: macos-13,       label: macos-intel,   asset: compass-macos-x86_64 }
+          # No macos-13 (Intel) leg: GitHub is retiring those runners and jobs
+          # sit queued for hours, blocking a release whose other artifacts are
+          # ready. Intel Mac users install the wheel or build with `make binary`.
           - { os: ubuntu-latest,  label: linux-x86_64,  asset: compass-linux-x86_64 }
           - { os: windows-latest, label: windows-x86_64, asset: compass-windows-x86_64.exe }
     runs-on: ${{ matrix.os }}
@@ -142,8 +144,10 @@ jobs:
             Signing needs paid Apple and Windows developer certificates, so the
             downloads are not signed and your system will warn you once.
 
-            - **macOS:** `chmod +x compass-macos-*` then right-click → Open, or
-              `xattr -d com.apple.quarantine compass-macos-*` before running.
+            - **macOS (Apple Silicon):** `chmod +x compass-macos-arm64` then
+              right-click → Open, or `xattr -d com.apple.quarantine compass-macos-arm64`
+              before running. On an Intel Mac use the wheel above, or build a
+              binary yourself with `make binary`.
             - **Windows:** SmartScreen shows "Windows protected your PC" →
               More info → Run anyway.
             - **Linux:** `chmod +x compass-linux-x86_64` and run it.
