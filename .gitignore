@@ -11,3 +11,8 @@ frontend/dist/
 scratch-server.log
 nohup.out
 .DS_Store
+
+# Design-tooling working files. DESIGN.md and its sidecar are the record;
+# review captures and question logs are process exhaust.
+.impeccable/review/
+.impeccable/questions/

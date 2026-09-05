@@ -31,6 +31,16 @@ the colour is reserved for that one meaning and nothing else.</sub>
 | ![Deadlines](docs/screenshots/deadlines.png) | ![Quests](docs/screenshots/quests.png) |
 | Canvas plus any other calendar feed, merged and deduplicated | Subgoals close only on evidence |
 
+<details>
+<summary>On a phone</summary>
+
+The desk icons become a dock and the windows stack; every destination stays
+reachable through the menu bar's pull-down.
+
+<img src="docs/screenshots/mobile.png" width="320" alt="Compass on a phone">
+
+</details>
+
 Connected data arrives through one free, self-hosted provider: **the Apps Script bridge**, a
 read-only Web App you deploy in your own Google account
 ([`college-os/bridge/`](college-os/bridge/README.md)), plus a free GitHub PAT. No connector
